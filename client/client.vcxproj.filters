@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\amf">
+      <UniqueIdentifier>{79a0222a-1a67-422f-a206-3cd16c027c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\rtmp">
+      <UniqueIdentifier>{3ff9bce5-5c58-4a7b-90e0-b665831c017b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\amf">
+      <UniqueIdentifier>{91229efb-bc98-4ef2-bb6c-8c3163cd1787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\rtmp">
+      <UniqueIdentifier>{ea18ff30-e235-4fd6-a6aa-c68ef967e401}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="amf\amf.cpp">
+      <Filter>Source Files\amf</Filter>
+    </ClCompile>
+    <ClCompile Include="amf\amf0_entities.cpp">
+      <Filter>Source Files\amf</Filter>
+    </ClCompile>
+    <ClCompile Include="amf\amf3.cpp">
+      <Filter>Source Files\amf</Filter>
+    </ClCompile>
+    <ClCompile Include="amf\amf3_entities.cpp">
+      <Filter>Source Files\amf</Filter>
+    </ClCompile>
+    <ClCompile Include="rtmp\rtmp.cpp">
+      <Filter>Source Files\rtmp</Filter>
+    </ClCompile>
+    <ClCompile Include="rtmp\rtmpclient.cpp">
+      <Filter>Source Files\rtmp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="amf\amf.h">
+      <Filter>Header Files\amf</Filter>
+    </ClInclude>
+    <ClInclude Include="amf\amf0.h">
+      <Filter>Header Files\amf</Filter>
+    </ClInclude>
+    <ClInclude Include="amf\amf3.h">
+      <Filter>Header Files\amf</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\packet.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\rtmp.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\types.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
