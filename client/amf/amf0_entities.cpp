@@ -1,5 +1,4 @@
 #include "amf0.h"
-#include "rtmp/packet.h"
 
 namespace amf0 {
 	/*
@@ -10,14 +9,14 @@ namespace amf0 {
 	{
 	}
 	
-	void Number::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		serialize(mValue, pak);
+	void Number::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		serialize(mValue, stream);
 	}
 
-	void Number::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		deserialize(mValue, pak);
+	void Number::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		deserialize(mValue, stream);
 	}
 		
 	std::string Number::toString() const {
@@ -26,12 +25,12 @@ namespace amf0 {
 		return obj;
 	}
 
-	void Number::serialize(double value, Packet* pak){
-		pak->add<double>(value);
+	void Number::serialize(double value, ByteStream& stream){
+		stream << value;
 	}
 
-	void Number::deserialize(double& value, Packet* pak){
-		pak->read<double>(value);
+	void Number::deserialize(double& value, ByteStream& stream){
+		stream >> value;
 	}
 
 	/*
@@ -48,29 +47,31 @@ namespace amf0 {
 		return obj;
 	}
 	
-	void Boolean::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		serialize(mValue, pak);
+	void Boolean::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		serialize(mValue, stream);
 	}
 
-	void Boolean::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		deserialize(mValue, pak);
+	void Boolean::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		deserialize(mValue, stream);
 	}
 
-	void Boolean::serialize(bool value, Packet* pak){
-		pak->add<uint8>(value ? 1 : 0);
+	void Boolean::serialize(bool value, ByteStream& stream){
+		stream << uint8(value ? 1 : 0);
 	}
 
-	void Boolean::deserialize(bool& value, Packet* pak){
-		value = pak->read<uint8>() != 0;
+	void Boolean::deserialize(bool& value, ByteStream& stream){
+		uint8 tmp;
+		stream >> tmp;
+		value = tmp != 0;
 	}
 
 	/*
 	AMF0_OBJECT;
 	*/
 	Object::Object()
-		: Entity(Type, AMF0)
+		: amf::Object(Type, AMF0)
 	{
 	}
 
@@ -96,26 +97,26 @@ namespace amf0 {
 		return obj;
 	}
 
-	void Object::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void Object::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
 		for(auto itr = mProperties.begin(); itr != mProperties.end(); ++itr){
-			String::serialize(itr->first, pak);
-			itr->second->serialize(pak);
+			String::serialize(itr->first, stream);
+			itr->second->serialize(stream);
 		}
 
-		pak->add<uint16>(0);//empty string
-		pak->add<uint8>(AMF0_OBJECT_END);//end of object
+		stream << uint16(0);//empty string
+		stream << uint8(AMF0_OBJECT_END);//end of object
 	}
 
-	void Object::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void Object::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 
 		while(true){
 			std::string key;
-			String::deserialize(key, pak);
+			String::deserialize(key, stream);
 
-			Entity* value = Entity::read(pak);
+			Entity* value = Entity::read(stream);
 			if(value->type() == AMF0_OBJECT_END){
 				delete value;
 				break;
@@ -181,21 +182,21 @@ namespace amf0 {
 		return obj;
 	}
 	
-	void Reference::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		pak->add<uint16>(mValue);
+	void Reference::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		stream << mValue;
 	}
 
-	void Reference::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		pak->read<uint16>(mValue);
+	void Reference::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		stream >> mValue;
 	}
 
 	/*
 	AMF0_ECMA_ARRAY;
 	*/
 	AssociativeArray::AssociativeArray()
-		: Entity(Type, AMF0)
+		: amf::Object(Type, AMF0)
 	{
 	}
 
@@ -221,25 +222,26 @@ namespace amf0 {
 		return obj;
 	}
 	
-	void AssociativeArray::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void AssociativeArray::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
-		pak->add<uint32>(mEntries.size());
+		stream << uint32(mEntries.size());
 
 		for(auto itr = mEntries.begin(); itr != mEntries.end(); ++itr){
-			String::serialize(itr->first, pak);
-			itr->second->serialize(pak);
+			String::serialize(itr->first, stream);
+			itr->second->serialize(stream);
 		}
 	}
 
-	void AssociativeArray::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void AssociativeArray::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 		
-		uint32 size = pak->read<uint32>();
+		uint32 size;
+		stream >> size;
 		for(uint32 i = 0; i < size; ++i){
 			std::string key;
-			String::deserialize(key, pak);
-			mEntries[key] = Entity::read(pak);
+			String::deserialize(key, stream);
+			mEntries[key] = Entity::read(stream);
 		}
 	}
 
@@ -255,7 +257,7 @@ namespace amf0 {
 	AMF0_STRICT_ARRAY;
 	*/
 	StrictArray::StrictArray()
-		: Entity(Type, AMF0)
+		: amf::Object(Type, AMF0)
 	{
 	}
 
@@ -282,20 +284,21 @@ namespace amf0 {
 		return obj;
 	}
 	
-	void StrictArray::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void StrictArray::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
-		pak->add<uint32>(mEntries.size());
+		stream << uint32(mEntries.size());
 		for(auto itr = mEntries.begin(); itr != mEntries.end(); ++itr)
-			(*itr)->serialize(pak);
+			(*itr)->serialize(stream);
 	}
 
-	void StrictArray::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void StrictArray::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 		
-		uint32 size = pak->read<uint32>();
+		uint32 size;
+		stream >> size;
 		for(uint32 i = 0; i < size; ++i)
-			mEntries.push_back(Entity::read(pak));
+			mEntries.push_back(Entity::read(stream));
 	}
 
 	/*
@@ -321,18 +324,18 @@ namespace amf0 {
 		return obj;
 	}
 	
-	void Date::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void Date::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
-		pak->add<double>(mValue);
-		pak->add<uint16>(mTimeZone);
+		stream << mValue;
+		stream << mTimeZone;
 	}
 
-	void Date::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-
-		pak->read<double>(mValue);
-		pak->read<uint16>(mTimeZone);
+	void Date::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		
+		stream >> mValue;
+		stream >> mTimeZone;
 	}
 
 	/*
@@ -384,26 +387,26 @@ namespace amf0 {
 		return obj;
 	}
 	
-	void XmlDocument::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		LongString::serialize(mValue, pak);
+	void XmlDocument::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		LongString::serialize(mValue, stream);
 	}
 
-	void XmlDocument::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		LongString::deserialize(mValue, pak);
+	void XmlDocument::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		LongString::deserialize(mValue, stream);
 	}
 
 	/*
 	AMF0_TYPED_OBJECT
 	*/
 	TypedObject::TypedObject()
-		: Entity(Type, AMF0)
+		: amf::Object(Type, AMF0)
 	{
 	}
 
 	TypedObject::TypedObject(const std::string& name)
-		: Entity(Type, AMF0), mTypename(name)
+		: amf::Object(Type, AMF0), mTypename(name)
 	{
 	}
 
@@ -429,28 +432,28 @@ namespace amf0 {
 		return obj;
 	}
 
-	void TypedObject::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		String::serialize(mTypename, pak);
+	void TypedObject::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		String::serialize(mTypename, stream);
 
 		for(auto itr = mProperties.begin(); itr != mProperties.end(); ++itr){
-			String::serialize(itr->first, pak);
-			itr->second->serialize(pak);
+			String::serialize(itr->first, stream);
+			itr->second->serialize(stream);
 		}
 
-		pak->add<uint16>(0);
-		pak->add<uint8>(AMF0_OBJECT_END);
+		stream << uint16(0);
+		stream << uint8(AMF0_OBJECT_END);
 	}
 
-	void TypedObject::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		String::deserialize(mTypename, pak);
+	void TypedObject::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		String::deserialize(mTypename, stream);
 
 		while(true){
 			std::string key;
-			String::deserialize(key, pak);
+			String::deserialize(key, stream);
 
-			Entity* value = Entity::read(pak);
+			Entity* value = Entity::read(stream);
 			if(value->type() == AMF0_OBJECT_END){
 				delete value;
 				break;

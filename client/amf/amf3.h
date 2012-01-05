@@ -8,7 +8,11 @@
 #include <string>
 
 namespace amf3 {
-	using namespace amf;
+	using amf::AMF3;
+	using amf::Entity;
+	using amf::EncodeException;
+	using amf::DecodeException;
+	namespace log = amf::log;
 
 	typedef enum {
 		AMF3_UNDEFINED = 0,
@@ -54,8 +58,8 @@ namespace amf3 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		bool mValue;
@@ -69,12 +73,12 @@ namespace amf3 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 		
-		static void serialize(int32 value, Packet* pak);
-		static void deserialize(uint32& value, Packet* pak);
-		static void deserialize(int32& value, Packet* pak);
+		static void serialize(int32 value, ByteStream& stream);
+		static void deserialize(uint32& value, ByteStream& stream);
+		static void deserialize(int32& value, ByteStream& stream);
 
 	private:
 		int32 mValue;
@@ -88,11 +92,11 @@ namespace amf3 {
 		
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		static void serialize(double value, Packet* pak);
-		static void deserialize(double& value, Packet* pak);
+		static void serialize(double value, ByteStream& stream);
+		static void deserialize(double& value, ByteStream& stream);
 
 	private:
 		double mValue;
@@ -107,11 +111,11 @@ namespace amf3 {
 
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		static void deserialize(std::string& str, Packet* pak);
-		static void serialize(const std::string& str, Packet* pak);
+		static void deserialize(std::string& str, ByteStream& stream);
+		static void serialize(const std::string& str, ByteStream& stream);
 
 	private:
 		std::string mValue;
@@ -126,8 +130,8 @@ namespace amf3 {
 		
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		std::string mValue;
@@ -142,8 +146,8 @@ namespace amf3 {
 		
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		double mValue;
@@ -158,8 +162,8 @@ namespace amf3 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		std::vector<Entity*> mDense;
@@ -180,8 +184,8 @@ namespace amf3 {
 	public:
 		ExternalDefinition(const std::string& name);
 	
-		uint32 readFlags(Packet* pak);
-		void read(class Object* obj, Packet* pak);
+		uint32 readFlags(ByteStream& stream);
+		void read(class Object* obj, ByteStream& stream);
 
 		void addField(const std::string& name);
 		void setParent(ExternalDefinition* parent);
@@ -204,12 +208,13 @@ namespace amf3 {
 		static const int Type = AMF3_OBJECT;
 
 		Object();
+		Object(const std::string& name);
 		~Object();
 		
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 		
 		template<typename T>
 		void set(const std::string& str, T value){
@@ -230,7 +235,7 @@ namespace amf3 {
 		}
 
 	private:
-		ClassDefinition* mDefinition;
+		std::string mName;
 		std::map<std::string, Entity*> mStaticValues;
 		std::map<std::string, Entity*> mDynamicMembers;
 	};
@@ -243,8 +248,8 @@ namespace amf3 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		std::string mValue;
@@ -259,8 +264,8 @@ namespace amf3 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		uint32 mLength;

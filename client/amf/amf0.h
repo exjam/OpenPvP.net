@@ -8,7 +8,11 @@
 #include <string>
 
 namespace amf0 {
-	using namespace amf;
+	using amf::AMF0;
+	using amf::Entity;
+	using amf::EncodeException;
+	using amf::DecodeException;
+	namespace log = amf::log;
 
 	typedef enum {
 		AMF0_NUMBER = 0,
@@ -40,11 +44,11 @@ namespace amf0 {
 		
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		static void serialize(double value, Packet* pak);
-		static void deserialize(double& value, Packet* pak);
+		static void serialize(double value, ByteStream& stream);
+		static void deserialize(double& value, ByteStream& stream);
 
 	private:
 		double mValue;
@@ -58,17 +62,17 @@ namespace amf0 {
 		
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		static void serialize(bool value, Packet* pak);
-		static void deserialize(bool& value, Packet* pak);
+		static void serialize(bool value, ByteStream& stream);
+		static void deserialize(bool& value, ByteStream& stream);
 
 	private:
 		bool mValue;
 	};
 
-	class Object : public Entity {
+	class Object : public amf::Object {
 	public:
 		static const int Type = AMF0_OBJECT;
 
@@ -77,18 +81,15 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		template<typename T>
-		void set(const std::string& key, T value){
-			set(key, Entity::create(value));
+		virtual void setProperty(const std::string& key, Entity* value){
+			mProperties[key] = value;
 		}
 
-		template<>
-		void set(const std::string& key, Entity* value){
-			if(!value) return;
-			mProperties[key] = value;
+		virtual Entity* getProperty(const std::string& key){ 
+			return mProperties[key];
 		}
 
 	private:
@@ -130,14 +131,14 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		uint16 mValue;
 	};
 
-	class AssociativeArray : public Entity {
+	class AssociativeArray : public amf::Object {
 	public:
 		static const int Type = AMF0_ECMA_ARRAY;
 
@@ -146,18 +147,15 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		template<typename T>
-		void add(const std::string& key, T value){
-			add(key, Entity::create(value));
+		virtual void setProperty(const std::string& key, Entity* value){
+			mEntries[key] = value;
 		}
 
-		template<>
-		void add(const std::string& key, Entity* value){
-			if(!value) return;
-			mEntries[key] = value;
+		virtual Entity* getProperty(const std::string& key){ 
+			return mEntries[key];
 		}
 
 	private:
@@ -171,7 +169,7 @@ namespace amf0 {
 		ObjectEnd();
 	};
 
-	class StrictArray : public Entity {
+	class StrictArray : public amf::Object {
 	public:
 		static const int Type = AMF0_STRICT_ARRAY;
 
@@ -180,18 +178,18 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		template<typename T>
-		void add(T value){
-			add(Entity::create(value));
+		virtual void setProperty(uint32 key, Entity* value){
+			while(key >= mEntries.size())
+				mEntries.push_back(nullptr);
+
+			mEntries[key] = value;
 		}
 
-		template<>
-		void add(Entity* value){
-			if(!value) return;
-			mEntries.push_back(value);
+		virtual Entity* getProperty(uint32 key){
+			return mEntries[key];
 		}
 
 	private:
@@ -206,8 +204,8 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		double mValue;
@@ -241,14 +239,14 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 	private:
 		std::string mValue;
 	};
 
-	class TypedObject : public Entity {
+	class TypedObject : public amf::Object {
 	public:
 		static const int Type = AMF0_TYPED_OBJECT;
 
@@ -259,18 +257,15 @@ namespace amf0 {
 
 		virtual std::string toString() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
-		
-		template<typename T>
-		void set(const std::string& key, T value){
-			setProperty(key, Entity::create(value));
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
+
+		virtual void setProperty(const std::string& key, Entity* value){
+			mProperties[key] = value;
 		}
 
-		template<>
-		void set(const std::string& key, Entity* value){
-			if(!value) return;
-			mProperties[key] = value;
+		virtual Entity* getProperty(const std::string& key){ 
+			return mProperties[key];
 		}
 
 	private:
@@ -299,30 +294,31 @@ namespace amf0 {
 			return obj;
 		}
 	
-		virtual void serialize(Packet* pak) const {
-			Entity::serialize(pak);
-			serialize(mValue, pak);
+		virtual void serialize(ByteStream& stream) const {
+			Entity::serialize(stream);
+			serialize(mValue, stream);
 		}
 
-		virtual void deserialize(Packet* pak){
-			Entity::deserialize(pak);
-			deserialize(mValue, pak);
+		virtual void deserialize(ByteStream& stream){
+			Entity::deserialize(stream);
+			deserialize(mValue, stream);
 		}
 
-		static void serialize(const std::string& value, Packet* pak){
-			pak->add<T>(value.length());
-			pak->add(value.c_str(), value.length());
+		static void serialize(const std::string& value, ByteStream& stream){
+			stream << (T)value.length();
+			stream.write(value.c_str(), value.length());
 		}
 
-		static void deserialize(std::string& value, Packet* pak){
-			T length = pak->read<T>();
+		static void deserialize(std::string& value, ByteStream& stream){
+			T length;
+			stream >> length;
 			if(length == 0){
 				value = std::string();
 				return;
 			}
 		
-			value.assign((char*)pak->data() + pak->position(), length);
-			pak->skip(length);
+			value.assign((char*)stream.data() + stream.tell(), length);
+			stream.skip(length);
 		}
 
 	private:

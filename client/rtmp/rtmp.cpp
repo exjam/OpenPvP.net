@@ -1,81 +1,95 @@
 #include "rtmp.h"
-#include "packet.h"
+#include "bytestream.h"
+
+ByteStream::endian_t little_endian(ByteStream::LITTLE_ENDIAN);
+ByteStream::endian_t big_endian(ByteStream::BIG_ENDIAN);
 
 namespace rtmp {
-	RTMPPacket::RTMPPacket(){
-		mBody = new Packet();
+	Packet::Packet(uint8 type){
+		memset(&mHeader, 0, sizeof(mHeader));
+		mHeader.mContentType = type;
+		mHeader.mChunkStreamID = 3;
+	}
+	
+	uint8 Packet::type() const {
+		return mHeader.mContentType;
 	}
 
-	RTMPPacket::~RTMPPacket(){
-		delete mBody;
-	}
-
-	void PacketHeader::serialize(Packet* pak) const {
-		if(mChunkStreamID < 64){
-			pak->add<uint8>(mFormat << 6 | mChunkStreamID);
-		}else if(mChunkStreamID < 320){
-			pak->add<uint8>(mFormat << 6);
-			pak->add<uint8>(mChunkStreamID - 64);
+	void Packet::serialize(ByteStream& stream) const {
+		if(mHeader.mChunkStreamID < 64){
+			stream << uint8(mHeader.mFormat << 6 | mHeader.mChunkStreamID);
+		}else if(mHeader.mChunkStreamID < 320){
+			stream << uint8(mHeader.mFormat << 6);
+			stream << uint8(mHeader.mChunkStreamID - 64);
 		}else{
-			pak->add<uint8>(mFormat << 6 | 1);
-			pak->add<uint8>(0xFF & (mChunkStreamID - 64));
-			pak->add<uint8>((mChunkStreamID - 64) >> 8);
+			stream << uint8(mHeader.mFormat << 6 | 1);
+			stream << uint8(0xFF & (mHeader.mChunkStreamID - 64));
+			stream << uint8((mHeader.mChunkStreamID - 64) >> 8);
 		}
 
-		if(mFormat <= 2){
-			if(mTimeStamp >> 24)
-				pak->add<uint24>(0xFFFFFF);
+		if(mHeader.mFormat <= 2){
+			if(mHeader.mTimeStamp >> 24)
+				stream << uint24(0xFFFFFF);
 			else
-				pak->add<uint24>(mTimeStamp);
+				stream << uint24(mHeader.mTimeStamp);
 		}
 		
-		if(mFormat <= 1){
-			pak->add<uint24>(mBodySize);
-			pak->add<uint8>(mContentType);
+		if(mHeader.mFormat <= 1){
+			stream << uint24(mHeader.mBodySize);
+			stream << uint8(mHeader.mContentType);
 		}
 		
-		if(mFormat == 0){
-			pak->addLE<uint32>(mMessageStreamID);
-		}
+		if(mHeader.mFormat == 0)
+			stream << little_endian << uint32(mHeader.mMessageStreamID) << big_endian;
 
-		if(mTimeStamp >> 24)
-			pak->add<uint32>(mTimeStamp);
+		if(mHeader.mTimeStamp >> 24)
+			stream << uint32(mHeader.mTimeStamp);
 	}
 
-	void PacketHeader::deserialize(Packet* pak){
-		pak->seek(0);
+	void Packet::deserialize(ByteStream& stream){
+		uint8 header;
+		stream >> header;
 
-		uint8 header = pak->read<uint8>();
-		mFormat = header >> 6;
-		mChunkStreamID = header & 0x3F;
+		mHeader.mFormat = header >> 6;
+		mHeader.mChunkStreamID = header & 0x3F;
 
-		if(mChunkStreamID == 0){
-			mChunkStreamID = pak->read<uint8>() + 64;
-		}else if(mChunkStreamID == 1){
-			mChunkStreamID = pak->read<uint8>() + 64;
-			mChunkStreamID += pak->read<uint8>() << 8;
+		if(mHeader.mChunkStreamID <= 1){
+			uint8 chunk;
+			stream >> chunk;
+
+			if(mHeader.mChunkStreamID == 0){
+				mHeader.mChunkStreamID = chunk + 64;
+			}else{
+				mHeader.mChunkStreamID = chunk + 64;
+				stream >> chunk;
+				mHeader.mChunkStreamID += chunk << 8;
+			}
 		}
 		
-		if(mFormat <= 2){
-			mTimeStamp = pak->read<uint24>();
+		if(mHeader.mFormat <= 2){
+			stream >> uint24(mHeader.mTimeStamp);
 		}
 
-		if(mFormat <= 1){
-			mBodySize = pak->read<uint24>();
-			mContentType = pak->read<uint8>();
+		if(mHeader.mFormat <= 1){
+			stream >> uint24(mHeader.mBodySize);
+			stream >> mHeader.mContentType;
 		}
 		
-		if(mFormat == 0){
-			pak->readLE<uint32>(mMessageStreamID);
-		}
+		if(mHeader.mFormat == 0)
+			stream >> little_endian >> mHeader.mMessageStreamID >> big_endian;
 
-		if(mTimeStamp == 0xFFFFFF)
-			pak->read<uint32>(mTimeStamp);
+		if(mHeader.mTimeStamp == 0xFFFFFF)
+			stream >> mHeader.mTimeStamp;
 	}
 
-	uint32 PacketHeader::getHeaderSize(Packet* pak){
+	uint32 Packet::getHeaderSize(ByteStream& data){
+		uint32 pos = data.tell();
+		data.seek(0);
+
 		uint32 hSize = 1;
-		uint8 header = pak->get<uint8>(0);
+		uint8 header;
+		data >> header;
+
 		uint8 format = header >> 6;
 		uint8 strmID = header & 0x3F;
 
@@ -86,14 +100,17 @@ namespace rtmp {
 		if(format <= 2){
 			hSize += 3;
 
-			if(pak->size() >= hSize)
-				pak->get(hSize - 3, timestamp);
+			if(data.size() >= hSize){
+				data.seek(hSize - 3);
+				data >> uint24(timestamp);
+			}
 		}
 
 		if(format <= 1) hSize += 4;
 		if(format == 0) hSize += 4;
 		if(timestamp == 0xFFFFFF) hSize += 4;
 
+		data.seek(pos);
 		return hSize;
 	}
 };

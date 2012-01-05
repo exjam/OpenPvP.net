@@ -55,13 +55,13 @@
     <ClInclude Include="amf\amf3.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
-    <ClInclude Include="rtmp\packet.h">
-      <Filter>Header Files\rtmp</Filter>
-    </ClInclude>
     <ClInclude Include="rtmp\rtmp.h">
       <Filter>Header Files\rtmp</Filter>
     </ClInclude>
     <ClInclude Include="rtmp\types.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\bytestream.h">
       <Filter>Header Files\rtmp</Filter>
     </ClInclude>
   </ItemGroup>

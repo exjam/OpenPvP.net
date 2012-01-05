@@ -5,19 +5,28 @@
 #include <WinSock2.h>
 #include <openssl/ssl.h>
 
-class Packet;
+class ByteStream;
 
 namespace rtmp {
-	enum ProtocolControlMessages {
-		RTMP_SET_CHUNK_SIZE = 1,
-		RTMP_ABORT_MESSAGE,
-		RTMP_ACK,
-		RTMP_CONTROL,
-		RTMP_WINDOW_ACK_SIZE,
-		RTMP_SET_PEER_BW,
-	};
+	class Packet;
 
-	struct RTMPPacket;
+	enum ProtocolControlMessages {
+		SET_CHUNK_SIZE = 1,
+		ABORT_MESSAGE,
+		ACKNOWLEDGEMENT,
+		CONTROL,
+		WINDOW_ACK_SIZE,
+		SET_PEER_BW,
+		AUDIO = 8,
+		VIDEO,
+		AMF3_METADATA = 15,
+		AMF3_SHARED_OBJECT,
+		AMF3_COMMAND,
+		AMF0_METADATA,
+		AMF0_SHARED_OBJECT,
+		AMF0_COMMAND,
+		AGGREGATE = 22,
+	};
 
 	class Client {
 	private:
@@ -37,15 +46,16 @@ namespace rtmp {
 
 		void recvThread();
 	
-		void sendPacket(Packet* pak);
-		void sendPacket(RTMPPacket* pak);
+		void send(Packet& pak);
+		void send(ByteStream& pak);
+		void send(const uint8* data, uint32 length);
 
 	private:
-		void onReceivePacket(RTMPPacket* mPacket);
+		void onReceivePacket(Packet& pak);
 
 		uint32 startHandshake();
 		uint32 waitHandshake(int stage);
-		uint32 onReceiveHandshake(Packet* pak);
+		uint32 onReceiveHandshake(ByteStream& pak);
 
 		bool resolve(const char* host, sockaddr_in& address);
 
@@ -57,32 +67,28 @@ namespace rtmp {
 	};
 
 #pragma pack(push, 1)
-	struct PacketHeader : public Serializable {
+	class Packet : public Serializable {
+	public:
 		//fmt = 0 = abs timestamp, 1-3 = delta
-		PacketHeader()
-			: mFormat(0), mChunkStreamID(0), mTimeStamp(0), mBodySize(0), mContentType(0), mMessageStreamID(0)
-		{
-		}
+		Packet(uint8 type = 0);
 
-		uint32 mFormat;
-		uint32 mChunkStreamID;
-		uint32 mTimeStamp;
-		uint32 mBodySize;
-		uint32 mContentType;
-		uint32 mMessageStreamID;
+		struct {
+			uint32 mFormat;
+			uint32 mChunkStreamID;
+			uint32 mTimeStamp;
+			uint32 mBodySize;
+			uint8 mContentType;
+			uint32 mMessageStreamID;
+		} mHeader;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		uint8 type() const;
 
-		static uint32 getHeaderSize(Packet* pak);
-	};
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-	struct RTMPPacket {
-		RTMPPacket();
-		~RTMPPacket();
+		static uint32 getHeaderSize(ByteStream& stream);
 
-		PacketHeader mHeader;
-		Packet* mBody;
+		ByteStream mData;
 	};
 
 	struct HandshakeVersion {

@@ -1,7 +1,6 @@
 #include "amf.h"
 #include "amf0.h"
 #include "amf3.h"
-#include "rtmp/packet.h"
 
 namespace amf {
 	namespace log {
@@ -10,6 +9,21 @@ namespace amf {
 		obj::indent_t indent(1);
 		obj::indent_t outdent(-1);
 	};
+
+	null_t null;
+	undefined_t undefined;
+
+	void object_begin(Container* c){
+		(*c) << object_begin_t();
+	}
+
+	void object_end(Container* c){
+		(*c) << object_end_t();
+	}
+
+	object_begin_t object_begin(const std::string& name){
+		return object_begin_t(name);
+	}
 
 	/*
 	Base AMFx Entity
@@ -25,12 +39,12 @@ namespace amf {
 		return mType;
 	}
 
-	void Entity::serialize(Packet* pak) const {
-		pak->add<uint8>(mType);
+	void Entity::serialize(ByteStream& stream) const {
+		stream << mType;
 	}
 
-	void Entity::deserialize(Packet* pak){
-		pak->read<uint8>(mType);
+	void Entity::deserialize(ByteStream& stream){
+		stream >> mType;
 	}
 
 	std::string Entity::toString() const {
@@ -39,6 +53,23 @@ namespace amf {
 	
 	Entity* Entity::create(Entity* value){
 		return value;
+	}
+
+	Entity* Entity::createObject(const std::string& name){
+		if(mActiveVersion == AMF0){
+			if(name.length())
+				return new amf0::TypedObject(name);
+			else
+				return new amf0::Object();
+		}else
+			return new amf3::Object(name);
+	}
+
+	Entity* Entity::create(const undefined_t&){
+		if(mActiveVersion == AMF0)
+			return new amf0::Undefined();
+		else
+			return new amf3::Undefined();
 	}
 
 	Entity* Entity::create(const bool& value){
@@ -100,11 +131,11 @@ namespace amf {
 			return new amf3::String(value);
 	}
 
-	Entity* Entity::readAMF0(Packet* pak){
+	Entity* Entity::readAMF0(ByteStream& stream){
 		using namespace amf0;
 
 		Entity* result = NULL;
-		uint8 type = pak->peek<uint8>();
+		uint8 type = stream.peek();
 
 		switch(type){
 			case AMF0_NUMBER:
@@ -117,7 +148,7 @@ namespace amf {
 				result = new String();
 				break;
 			case AMF0_OBJECT:
-				result = new Object();
+				result = new amf0::Object();
 				break;
 			case AMF0_MOVIECLIP:
 				result = new MovieClip();
@@ -159,23 +190,23 @@ namespace amf {
 				result = new TypedObject();
 				break;
 			case AMF0_AVMPLUS:
-				pak->skip(1);
-				return Entity::read(AMF3, pak);
+				stream.skip(1);
+				return Entity::read(AMF3, stream);
 			default:
 				throw new DecodeException("Unsupported AMF0 marker %d\n", type);
 		}
 
 		if(result)
-			result->deserialize(pak);
+			result->deserialize(stream);
 
 		return result;
 	}
 
-	Entity* Entity::readAMF3(Packet* pak){
+	Entity* Entity::readAMF3(ByteStream& stream){
 		using namespace amf3;
 
 		Entity* result = NULL;
-		uint8 type = pak->peek<uint8>();
+		uint8 type = stream.peek();
 
 		switch(type){
 			case AMF3_UNDEFINED:
@@ -209,7 +240,7 @@ namespace amf {
 				result = new Array();
 				break;
 			case AMF3_OBJECT:
-				result = new Object();
+				result = new amf3::Object();
 				break;
 			case AMF3_XML:
 				result = new Xml();
@@ -218,31 +249,32 @@ namespace amf {
 				result = new ByteArray();
 				break;
 			case AMF3_AVMPLUS:
-				pak->skip(1);
+				stream.skip(1);
 				break;
 			default:
 				throw new DecodeException("Unsupported AMF3 marker %d\n", type);
 		}
 
 		if(result)
-			result->deserialize(pak);
+			result->deserialize(stream);
 
 		return result;
 	}
 
-	Entity* Entity::read(Packet* pak){
-		return (mActiveVersion == AMF0) ? readAMF0(pak) : readAMF3(pak);
+	Entity* Entity::read(ByteStream& stream){
+		return (mActiveVersion == AMF0) ? readAMF0(stream) : readAMF3(stream);
 	}
 
-	Entity* Entity::read(uint32 version, Packet* pak){
+	Entity* Entity::read(uint32 version, ByteStream& stream){
 		mActiveVersion = version;
-		return read(pak);
+		return read(stream);
 	}
 
 	/*
 	AMFx Container
 	*/
-	Container::Container(){
+	Container::Container()
+	{
 	}
 
 	Container::~Container(){
@@ -265,14 +297,14 @@ namespace amf {
 		return obj;
 	}
 	
-	void Container::serialize(Packet* pak) const {
+	void Container::serialize(ByteStream& stream) const {
 		for(auto itr = mChildren.begin(); itr != mChildren.end(); ++itr)
-			(*itr)->serialize(pak);
+			(*itr)->serialize(stream);
 	}
 
-	void Container::deserialize(Packet* pak){
-		while(pak->position() < pak->size())
-			add(Entity::read(pak));
+	void Container::deserialize(ByteStream& stream){
+		while(!stream.eof())
+			add(Entity::read(stream));
 	}
 
 	/*

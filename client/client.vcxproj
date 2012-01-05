@@ -88,7 +88,7 @@
     <ClInclude Include="amf\amf.h" />
     <ClInclude Include="amf\amf0.h" />
     <ClInclude Include="amf\amf3.h" />
-    <ClInclude Include="rtmp\packet.h" />
+    <ClInclude Include="rtmp\bytestream.h" />
     <ClInclude Include="rtmp\rtmp.h" />
     <ClInclude Include="rtmp\types.h" />
   </ItemGroup>

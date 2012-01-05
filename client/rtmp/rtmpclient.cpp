@@ -1,7 +1,7 @@
 #include "rtmp.h"
-#include "packet.h"
 #include "amf/amf0.h"
 #include "amf/amf3.h"
+#include "bytestream.h"
 
 #include <iostream>
 #include <ws2tcpip.h>
@@ -59,73 +59,83 @@ namespace rtmp {
 		mSocket = 0;
 	}
 
-	void Client::sendPacket(Packet* pak){
-		int result = SSL_write(mSSL, pak->data(), pak->size());
+	void Client::send(const uint8* data, uint32 length){
+		int result = SSL_write(mSSL, data, length);
 
-		if(result != pak->size())
-			printf("send result = %d, should be %u\n", result, pak->size());
+		if(result != length)//TODO: throw exception
+			printf("send result = %d, should be %u\n", result, length);
 	}
 
-	void Client::sendPacket(RTMPPacket* pak){
-		static Packet* header = new Packet();
-		header->seek(0);
-		header->setSize(0);
+	void Client::send(ByteStream& stream){
+		send(stream.data(), stream.size());
+	}
+
+	void Client::send(Packet& pak){
+		static ByteStream bs;
+		bs.clear();
 	
-		pak->mHeader.mBodySize = pak->mBody->size();
+		pak.mHeader.mBodySize = pak.mData.size();
+		pak.mData.chunk(mChunkSize);
+		
+		pak.serialize(bs);
 
-		pak->mBody->chunk(mChunkSize);
-		pak->mHeader.serialize(header);
-
-		sendPacket(header);
-		sendPacket(pak->mBody);
+		send(bs);
+		send(pak.mData);
 	}
 
-	void Client::onReceivePacket(RTMPPacket* rtmpPacket){
-		Packet* pak = rtmpPacket->mBody;
-
-		switch(rtmpPacket->mHeader.mContentType){
-			case rtmp::RTMP_WINDOW_ACK_SIZE:
-				printf("RTMP_WINDOW_ACK_SIZE: %d\n", pak->read<uint32>());
+	void Client::onReceivePacket(Packet& pak){
+		ByteStream& stream = pak.mData;
+		switch(pak.type()){
+			case WINDOW_ACK_SIZE:
+				{
+					uint32 ack_size;
+					stream >> ack_size;
+					std::cout << "WINDOW_ACK_SIZE: " << ack_size << std::endl;
+				}
 				break;
-			case rtmp::RTMP_SET_PEER_BW:
-				printf("RTMP_SET_PEER_BW: %d %d\n", pak->read<uint32>(), pak->read<uint8>());
+			case SET_PEER_BW:
+				{
+					uint32 bw1; uint8 bw2;
+					stream >> bw1 >> bw2;
+					std::cout << "SET_PEER_BW: " << bw1 << " " << (uint32)bw2 << std::endl;
+				}
 				break;
-			case 0x14:
+			case AMF0_COMMAND:
 				{
 					amf::Container result;
-					result.deserialize(pak);
+					result.deserialize(stream);
+
+					std::cout << "AMF0_COMMAND: " << std::endl;
 					std::cout << result.toString() << std::endl;
-					printf("yay\n");
 				}
 				break;
 			default:
-				printf("Unhandled RTMP packet type %u:\n", rtmpPacket->mHeader.mContentType);
+				printf("Unhandled RTMP packet type %u:\n", pak.type());
 			
-				for(uint32 i = 0; i < pak->size(); ++i)
-					printf("%02x ", pak->data()[i]);
+				for(uint32 i = 0; i < stream.size(); ++i)
+					printf("%02x ", stream.data()[i]);
+
 				printf("\n");
 		};
 	}
 
 	uint32 Client::startHandshake(){
 		rtmp::HandshakeVersion version = { 3 };
-		Packet pak = Packet::create(version);
-		sendPacket(&pak);
+		send((uint8*)&version, sizeof(rtmp::HandshakeVersion));
 
 		rtmp::HandshakeSignature signature;
 		memset(&signature, 0, sizeof(rtmp::HandshakeSignature));
-		pak = Packet::create(signature);
-		sendPacket(&pak);
+		send((uint8*)&signature, sizeof(rtmp::HandshakeSignature));
 
 		return waitHandshake(HS_WAIT_SRV_VERSION);
 	}
 
-	uint32 Client::onReceiveHandshake(Packet* pak){
+	uint32 Client::onReceiveHandshake(ByteStream& pak){
 		switch(mHandshakeStage){
 			case HS_WAIT_SRV_VERSION:
 				return waitHandshake(HS_WAIT_SRV_SIGNATURE);
 			case HS_WAIT_SRV_SIGNATURE:
-				sendPacket(pak);
+				send(pak);
 				return waitHandshake(HS_WAIT_CLI_SIGNATURE);
 			case HS_WAIT_CLI_SIGNATURE:
 				return waitHandshake(HS_COMPLETE);
@@ -144,38 +154,30 @@ namespace rtmp {
 			case Client::HS_WAIT_SRV_SIGNATURE:
 				return sizeof(rtmp::HandshakeSignature);
 			case Client::HS_COMPLETE:
-				//INVOKE CONNECT
 				{
-					RTMPPacket rtmpPacket;
+					using namespace amf;
 
-					//lets try create an AMF0 connect object...
-					//connect(transaction_id, command_object, opt_user_args)
-					amf0::Container obj;
-					obj.add("connect");
-					obj.add(1.0);
-
-					amf0::Object* cmdObj = new amf0::Object();
-					obj.add(cmdObj);
-
-					cmdObj->set("app", "");
-					cmdObj->set("audioCodecs", 3191);
-					cmdObj->set("capabilities", 239);
-					cmdObj->set("flashVer", "WIN 10,1,85,3");
-					cmdObj->set("fpad", false);
-					cmdObj->set("objectEncoding", 3);
-					cmdObj->set("pageUrl", new amf0::Undefined());
-					cmdObj->set("swfUrl", "app:/mod_ser.dat");
-					cmdObj->set("tcUrl", "rtmps://prod.na1.lol.riotgames.com:2099");
-					cmdObj->set("videoCodecs", 252);
-					cmdObj->set("videoFunction", 1);
-	
-					obj.serialize(rtmpPacket.mBody);
-
-					rtmpPacket.mHeader.mChunkStreamID = 3;
-					rtmpPacket.mHeader.mContentType = 0x14;
-					rtmpPacket.mHeader.mMessageStreamID = 0;
-
-					sendPacket(&rtmpPacket);
+					Container connect;
+					connect
+						<< "connect"
+						<< 1.0
+						<< object_begin
+							<< var("app", "")
+							<< var("audioCodecs", 3191)
+							<< var("capabilities", 239)
+							<< var("flashVer", "WIN 10,1,85,3")
+							<< var("fpad", false)
+							<< var("objectEncoding", 3)
+							<< var("pageUrl", undefined)
+							<< var("swfUrl", "app:/mod_ser.dat")
+							<< var("tcUrl", "rtmps://prod.na1.lol.riotgames.com:2099")
+							<< var("videoCodecs", 252)
+							<< var("videoFunction", 1)
+						<< object_end;
+					
+					Packet pak(AMF0_COMMAND);
+					connect.serialize(pak.mData);
+					send(pak);
 				}
 				return 1;
 			default:
@@ -184,60 +186,62 @@ namespace rtmp {
 	}
 
 	void Client::recvThread(){
-		bool headerComplete = false;
+		bool hasHeader = false;
+		
+		Packet pak;
+		ByteStream header;
+		ByteStream* read = &header;
+		
+		pak.mData.reserve(1024);
 
-		RTMPPacket* rtmpPacket = new RTMPPacket();
-		Packet* headerPacket = new Packet();
-
-		Packet* readPacket = headerPacket;
-		readPacket->setSize(startHandshake());
+		header.reserve(16);
+		header.setDataSize(startHandshake());
 
 		int result, error = 0;
 		do {
-			Sleep(100);
+			Sleep(20);
 
-			if(readPacket->size() == 0){
-				result = 1;
+			if(read->size() == 0)
 				continue;
-			}
 
-			result = SSL_read(mSSL, &readPacket->data()[readPacket->position()], readPacket->size() - readPacket->position());
+			result = SSL_read(mSSL, read->data() + read->tell(), read->size() - read->tell());
 			if(result == -1 && (error = SSL_get_error(mSSL, result)))
 				break;
 
-			readPacket->skip(result);
-			if(readPacket->position() != readPacket->size())
+			read->skip(result);
+			if(read->tell() != read->size())
 				continue;
 
 			if(mHandshakeStage != HS_COMPLETE){
-				readPacket->setSize(onReceiveHandshake(readPacket));
-				readPacket->seek(0);
+				read->setDataSize(onReceiveHandshake(*read));
+				read->seek(0);
 				continue;
 			}
 
-			if(!headerComplete){
-				uint32 hSize = rtmp::PacketHeader::getHeaderSize(readPacket);
-				if(readPacket->size() < hSize){
-					readPacket->setSize(hSize);
+			if(!hasHeader){
+				uint32 hSize = Packet::getHeaderSize(*read);
+				if(read->size() < hSize){
+					read->setDataSize(hSize);
 					continue;
 				}
 
-				rtmpPacket->mHeader.deserialize(readPacket);
-				headerComplete = true;
+				read->seek(0);
+				pak.deserialize(*read);
+				hasHeader = true;
 
-				readPacket = rtmpPacket->mBody;
-				readPacket->seek(0);
-				readPacket->setSize(rtmpPacket->mHeader.mBodySize + rtmpPacket->mHeader.mBodySize / mChunkSize);
+				read = &pak.mData;
+				read->seek(0);
+				read->setDataSize(pak.mHeader.mBodySize + pak.mHeader.mBodySize / mChunkSize);
 			}else{
-				readPacket->dechunk(mChunkSize);
-				readPacket->seek(0);
-				onReceivePacket(rtmpPacket);
+				read->dechunk(mChunkSize);
+				read->seek(0);
+				onReceivePacket(pak);
 			
-				headerComplete = false;
+				hasHeader = false;
 
-				readPacket = headerPacket;
-				readPacket->seek(0);
-				readPacket->setSize(1);
+				read = &header;
+				read->seek(0);
+				read->setDataSize(1);
 			}
 		} while(error == SSL_ERROR_NONE);
 		
@@ -250,7 +254,7 @@ namespace rtmp {
 		struct addrinfo *ptr = NULL;
 		struct addrinfo hints;
 
-		ZeroMemory( &hints, sizeof(hints) );
+		ZeroMemory(&hints, sizeof(hints));
 		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
@@ -261,7 +265,10 @@ namespace rtmp {
 		for(addrinfo* itr = result; itr != NULL; itr = itr->ai_next){
 			if(itr->ai_family != AF_INET) continue;
 			address = *(sockaddr_in*)itr->ai_addr;
-			printf("Resolved %s to %d.%d.%d.%d\n", host, address.sin_addr.S_un.S_un_b.s_b1, address.sin_addr.S_un.S_un_b.s_b2, address.sin_addr.S_un.S_un_b.s_b3, address.sin_addr.S_un.S_un_b.s_b4);
+
+			printf("Resolved %s to %d.%d.%d.%d\n", host,address.sin_addr.S_un.S_un_b.s_b1,
+				address.sin_addr.S_un.S_un_b.s_b2, address.sin_addr.S_un.S_un_b.s_b3, address.sin_addr.S_un.S_un_b.s_b4);
+
 			return true;
 		}
 

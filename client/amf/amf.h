@@ -3,6 +3,7 @@
 #include "rtmp/types.h"
 
 #include <string>
+#include <stack>
 #include <vector>
 #include <sstream>
 #include <stdarg.h>
@@ -12,6 +13,12 @@ namespace amf {
 		AMF0,
 		AMF3,
 	} Version;
+	
+	struct null_t {};
+	struct undefined_t {};
+	
+	extern null_t null;
+	extern undefined_t undefined;
 
 	class Entity : public Serializable {
 	public:
@@ -19,8 +26,8 @@ namespace amf {
 		
 		uint32 type() const;
 
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
 		virtual std::string toString() const;
 		
@@ -36,18 +43,60 @@ namespace amf {
 		static Entity* create(const double& value);
 		static Entity* create(const char* value);
 		static Entity* create(const std::string& value);
+		static Entity* create(const undefined_t& value);
+		static Entity* createObject(const std::string& name = std::string());
 
-		static Entity* read(Packet* pak);
-		static Entity* read(uint32 version, Packet* pak);
+		static Entity* read(ByteStream& stream);
+		static Entity* read(uint32 version, ByteStream& stream);
 		
-		static Entity* readAMF0(Packet* pak);
-		static Entity* readAMF3(Packet* pak);
+		static Entity* readAMF0(ByteStream& stream);
+		static Entity* readAMF3(ByteStream& stream);
 
 	private:
 		uint8 mType;
 		uint32 mVersion;
 		static uint32 mActiveVersion;
 	};
+
+	class Object : public Entity {
+	public:
+		Object(uint32 type, uint32 version) : Entity(type, version) {}
+
+		template<typename T>
+		void set(const std::string& n, const T& v){
+			setProperty(n, Entity::create(v));
+		}
+
+		template<typename T>
+		void set(uint32 n, const T& v){
+			setProperty(n, Entity::create(v));
+		}
+		
+		virtual void setProperty(uint32 n, Entity* v){}
+		virtual void setProperty(const std::string& n, Entity* v){}
+
+		virtual Entity* getProperty(uint32 n){ return NULL; }
+		virtual Entity* getProperty(const std::string& n){ return NULL; }
+	};
+
+	struct object_begin_t {
+		object_begin_t(){}
+		object_begin_t(const std::string& n) : mName(n) {}
+		std::string mName;
+	};
+	struct object_end_t {};
+
+	struct var {
+		template<typename T>
+		var(const std::string& n, const T& v) : mName(n) { mValue = Entity::create(v); }
+
+		std::string mName;
+		Entity* mValue;
+	};
+
+	void object_begin(class Container*);
+	void object_end(class Container*);
+	object_begin_t object_begin(const std::string& name);
 	
 	class Container : public Serializable {
 	public:
@@ -56,19 +105,51 @@ namespace amf {
 
 		std::string toString() const;
 	
-		virtual void serialize(Packet* pak) const;
-		virtual void deserialize(Packet* pak);
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
 
-		template<typename T> void add(T value){
+		template<typename T>
+		void add(const T& value){
 			add(Entity::create(value));
 		}
 
-		template<> void add(Entity* child){
+		void add(Entity* child){
 			if(child)
 				mChildren.push_back(child);
 		}
 
+		template<typename T>
+		Container& operator<<(const T& value){
+			add(Entity::create(value));
+			return *this;
+		}
+
+		Container& operator<<(const var& obj){
+			if(mStreamObjects.size() > 0)
+				mStreamObjects.top()->setProperty(obj.mName, obj.mValue);
+
+			return *this;
+		}
+
+		Container& operator<<(const object_begin_t& _obj){
+			Object* obj = (Object*)Entity::createObject(_obj.mName);
+			mStreamObjects.push(obj);
+			add((Entity*)obj);
+			return *this;
+		}
+
+		Container& operator<<(const object_end_t& obj){
+			mStreamObjects.pop();
+			return *this;
+		}
+		
+		Container& operator<<(void (*pf)(Container*)){
+			(*pf)(this);
+			return *this;
+		}
+
 	private:
+		std::stack<Object*> mStreamObjects;
 		std::vector<Entity*> mChildren;
 	};
 

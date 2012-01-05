@@ -1,5 +1,4 @@
 #include "amf3.h"
-#include "rtmp/packet.h"
 
 namespace amf3 {
 	/*
@@ -44,15 +43,17 @@ namespace amf3 {
 		return obj;
 	}
 	
-	void Boolean::serialize(Packet* pak) const {
+	void Boolean::serialize(ByteStream& stream) const {
 		if(mValue)
-			pak->add<uint8>(AMF3_TRUE);
+			stream << uint8(AMF3_TRUE);
 		else
-			pak->add<uint8>(AMF3_FALSE);
+			stream << uint8(AMF3_FALSE);
 	}
 
-	void Boolean::deserialize(Packet* pak){
-		mValue = pak->read<uint8>() == AMF3_TRUE;
+	void Boolean::deserialize(ByteStream& stream){
+		uint8 value;
+		stream >> value;
+		mValue = value == AMF3_TRUE;
 	}
 
 	/*
@@ -69,27 +70,27 @@ namespace amf3 {
 		return obj;
 	}
 	
-	void Integer::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		serialize(mValue, pak);
+	void Integer::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		serialize(mValue, stream);
 	}
 
-	void Integer::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		deserialize(mValue, pak);
+	void Integer::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		deserialize(mValue, stream);
 	}
 
-	void Integer::deserialize(uint32& value, Packet* pak){
+	void Integer::deserialize(uint32& value, ByteStream& stream){
 		int32 tmp;
-		deserialize(tmp, pak);
+		deserialize(tmp, stream);
 		value = tmp;
 	}
 
-	void Integer::deserialize(int32& value, Packet* pak){
+	void Integer::deserialize(int32& value, ByteStream& stream){
 		value = 0;
-
-		for(int i = 0, byte = 0x80; i < 4 && byte & 0x80; ++i){
-			byte = pak->read<uint8>();
+		uint8 byte = 0x80;
+		for(int i = 0; i < 4 && byte & 0x80; ++i){
+			stream >> byte;
 			if(i < 3){
 				value <<= 7;
 				value |= byte & 0x7F;
@@ -99,29 +100,29 @@ namespace amf3 {
 		}
 
 		if(value & 0x10000000)
-            value |= ~0x1fffffff;
+			value |= ~0x1fffffff;
 	}
 
-	void Integer::serialize(int32 value, Packet* pak){
+	void Integer::serialize(int32 value, ByteStream& stream){
 		uint32 tmp = value;
 
 		if(value < 0)
 			tmp = (1 << 29) + value;
 
 		if(tmp < 1 << 7){
-			pak->add<uint8>(tmp);
+			stream << uint8(tmp);
 		}else if(tmp < 1 << 14){
-			pak->add<uint8>(0x80 | ((tmp >>  7) & 0xFF));
-			pak->add<uint8>(tmp & 0x7F);
+			stream << uint8(0x80 | ((tmp >>  7) & 0xFF));
+			stream << uint8(tmp & 0x7F);
 		}else if(tmp < 1 << 21){
-			pak->add<uint8>(0x80 | ((tmp >> 14) & 0xFF));
-			pak->add<uint8>(0x80 | ((tmp >>  7) & 0xFF));
-			pak->add<uint8>(tmp & 0x7F);
+			stream << uint8(0x80 | ((tmp >> 14) & 0xFF));
+			stream << uint8(0x80 | ((tmp >>  7) & 0xFF));
+			stream << uint8(tmp & 0x7F);
 		}else{
-			pak->add<uint8>(0x80 | ((tmp >> 22) & 0xFF));
-			pak->add<uint8>(0x80 | ((tmp >> 15) & 0xFF));
-			pak->add<uint8>(0x80 | ((tmp >>  8) & 0xFF));
-			pak->add<uint8>(tmp & 0xFF);
+			stream << uint8(0x80 | ((tmp >> 22) & 0xFF));
+			stream << uint8(0x80 | ((tmp >> 15) & 0xFF));
+			stream << uint8(0x80 | ((tmp >>  8) & 0xFF));
+			stream << uint8(tmp & 0xFF);
 		}
 	}
 
@@ -139,22 +140,22 @@ namespace amf3 {
 		return obj;
 	}
 	
-	void Double::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		serialize(mValue, pak);
+	void Double::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		serialize(mValue, stream);
 	}
 
-	void Double::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		deserialize(mValue, pak);
+	void Double::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		deserialize(mValue, stream);
 	}
 	
-	void Double::serialize(double value, Packet* pak){
-		pak->add<double>(value);
+	void Double::serialize(double value, ByteStream& stream){
+		stream << value;
 	}
 
-	void Double::deserialize(double& value, Packet* pak){
-		pak->read<double>(value);
+	void Double::deserialize(double& value, ByteStream& stream){
+		stream >> value;
 	}
 
 	/*
@@ -176,25 +177,25 @@ namespace amf3 {
 		return obj;
 	}
 	
-	void String::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		serialize(mValue, pak);
+	void String::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		serialize(mValue, stream);
 	}
 
-	void String::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		deserialize(mValue, pak);
+	void String::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		deserialize(mValue, stream);
 	}
 
-	void String::deserialize(std::string& str, Packet* pak){
+	void String::deserialize(std::string& str, ByteStream& stream){
 		uint32 length;
-		Integer::deserialize(length, pak);
+		Integer::deserialize(length, stream);
 
 		if(length & 1){
 			length >>= 1;
 			if(length > 0){
-				str.assign((char*)pak->data() + pak->position(), length);
-				pak->skip(length);
+				str.assign((char*)stream.data() + stream.tell(), length);
+				stream.skip(length);
 
 				ReferenceTables::Strings.add(str);
 			}
@@ -203,9 +204,9 @@ namespace amf3 {
 		}
 	}
 
-	void String::serialize(const std::string& str, Packet* pak){
-		Integer::serialize((str.length() << 1) | 1, pak);
-		pak->add(str.c_str(), str.length());
+	void String::serialize(const std::string& str, ByteStream& stream){
+		Integer::serialize((str.length() << 1) | 1, stream);
+		stream.write(str.c_str(), str.length());
 	}
 
 	/*
@@ -231,14 +232,14 @@ namespace amf3 {
 		return obj;
 	}
 	
-	void XmlDocument::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		String::serialize(mValue, pak);
+	void XmlDocument::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		String::serialize(mValue, stream);
 	}
 
-	void XmlDocument::deserialize(Packet* pak){
-		Entity::deserialize(pak);
-		String::deserialize(mValue, pak);
+	void XmlDocument::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
+		String::deserialize(mValue, stream);
 	}
 
 	/*
@@ -260,20 +261,20 @@ namespace amf3 {
 		return obj;
 	}
 	
-	void Date::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void Date::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
-		pak->add<uint8>(1);
-		pak->add<double>(mValue);
+		stream << uint8(1);
+		stream << mValue;
 	}
 
-	void Date::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void Date::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 
 		uint32 length;
-		Integer::deserialize(length, pak);
+		Integer::deserialize(length, stream);
 		if(length & 1){
-			pak->read<double>(mValue);
+			stream >> mValue;
 		}else{
 			throw DecodeException("TODO: Date references not supported");
 		}
@@ -320,39 +321,39 @@ namespace amf3 {
 		return obj;
 	}
 
-	void Array::serialize(Packet* pak) const {
-		Entity::serialize(pak);
-		Integer::serialize(mDense.size() << 1 | 1, pak);
+	void Array::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		Integer::serialize(mDense.size() << 1 | 1, stream);
 
 		for(auto itr = mAssociative.begin(); itr != mAssociative.end(); ++itr){
-			String::serialize(itr->first, pak);
-			itr->second->serialize(pak);
+			String::serialize(itr->first, stream);
+			itr->second->serialize(stream);
 		}
 
 		for(auto itr = mDense.begin(); itr != mDense.end(); ++itr)
-			(*itr)->serialize(pak);
+			(*itr)->serialize(stream);
 	}
 
-	void Array::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void Array::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 			
 		uint32 length;
-		Integer::deserialize(length, pak);
+		Integer::deserialize(length, stream);
 
 		if(length & 1){
 			length >>= 1;
 				
 			while(true){
 				std::string key;
-				String::deserialize(key, pak);
+				String::deserialize(key, stream);
 
 				if(key.length() == 0) break;
 
-				mAssociative[key] = Entity::read(pak);
+				mAssociative[key] = Entity::read(stream);
 			}
 
 			for(uint32 i = 0; i < length; ++i)
-				mDense.push_back(Entity::read(pak));
+				mDense.push_back(Entity::read(stream));
 		}else{
 			throw DecodeException("TODO: Array references not supported");
 		}
@@ -362,7 +363,12 @@ namespace amf3 {
 	AMF3_OBJECT
 	*/
 	Object::Object()
-		: Entity(Type, AMF3), mDefinition(nullptr)
+		: Entity(Type, AMF3)
+	{
+	}
+
+	Object::Object(const std::string& name)
+		: Entity(Type, AMF3), mName(name)
 	{
 	}
 
@@ -377,7 +383,7 @@ namespace amf3 {
 	std::string Object::toString() const {
 		log::obj obj;
 
-		obj << "{ object " << mDefinition->mTypename << std::endl;
+		obj << "{ object " << mName << std::endl;
 		obj << log::indent;
 
 		for(auto itr = mStaticValues.begin(); itr != mStaticValues.end(); ++itr){
@@ -396,82 +402,88 @@ namespace amf3 {
 		return obj;
 	}
 
-	void Object::serialize(Packet* pak) const {
-		if(mDefinition->mMembers.size() != mStaticValues.size())
-			throw new EncodeException("Class definition member count != value count");
-
-		Entity::serialize(pak);
+	void Object::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
+		ExternalDefinition* ext = ExternalDefinition::find(mName);
 
 		uint32 ref = 0;
 		ref |= 1;//Not an object reference
 		ref |= 1 << 1;//Not a class definition reference
-		ref |= (mDefinition->mExternalizable ? 1 : 0) << 2;//extern
+		ref |= (ext ? 1 : 0) << 2;
 		ref |= (mDynamicMembers.size() > 0 ? 1 : 0) << 3;
-		ref |= mDefinition->mMembers.size() << 4;
+		ref |= mStaticValues.size() << 4;
 
-		for(auto itr = mDefinition->mMembers.begin(); itr != mDefinition->mMembers.end(); ++itr)
-			String::serialize(*itr, pak);
+		Integer::serialize(ref, stream);
+		String::serialize(mName, stream);
+
+		if(ext)
+			throw new EncodeException("TODO: add serialize of external classes");
 
 		for(auto itr = mStaticValues.begin(); itr != mStaticValues.end(); ++itr)
-			itr->second->serialize(pak);
+			String::serialize(itr->first, stream);
+
+		for(auto itr = mStaticValues.begin(); itr != mStaticValues.end(); ++itr)
+			itr->second->serialize(stream);
 			
 		for(auto itr = mDynamicMembers.begin(); itr != mDynamicMembers.end(); ++itr){
-			String::serialize(itr->first, pak);
-			itr->second->serialize(pak);
+			String::serialize(itr->first, stream);
+			itr->second->serialize(stream);
 		}
 	}
 
-	void Object::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void Object::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 
 		uint32 ref;
-		Integer::deserialize(ref, pak);
+		Integer::deserialize(ref, stream);
 		if(ref & 1){
 			ref >>= 1;
 
-			mDefinition = NULL;
+			ClassDefinition* def = NULL;
 			if(ref & 1){
 				ref >>= 1;
 
-				mDefinition = new ClassDefinition();
-				String::deserialize(mDefinition->mTypename, pak);
-				mDefinition->mExternalizable = (ref & 1) != 0;
-				mDefinition->mDynamic = ((ref >> 1) & 1) != 0;
+				def = new ClassDefinition();
+				String::deserialize(def->mTypename, stream);
+				def->mExternalizable = (ref & 1) != 0;
+				def->mDynamic = ((ref >> 1) & 1) != 0;
 					
 				uint32 members = ref >> 2;
 				for(uint32 i = 0; i < members; ++i){
 					std::string tmp;
-					String::deserialize(tmp, pak);
-					mDefinition->mMembers.push_back(tmp);
+					String::deserialize(tmp, stream);
+					def->mMembers.push_back(tmp);
 				}
 				
-				ReferenceTables::ClassDefinitions.add(mDefinition);
+				ReferenceTables::ClassDefinitions.add(def);
 			}else{
-				mDefinition = ReferenceTables::ClassDefinitions.get(ref >> 1);
+				def = ReferenceTables::ClassDefinitions.get(ref >> 1);
 			}
 
-			if(!mDefinition)
-				throw DecodeException("Object class definition '%s' not found", mDefinition->mTypename);
-				
-			if(mDefinition->mExternalizable){
-				ExternalDefinition* extDef = ExternalDefinition::find(mDefinition->mTypename);
+			if(!def)
+				throw DecodeException("Object class definition '%s' not found", def->mTypename);
+			
+			mName = def->mTypename;
+
+			if(def->mExternalizable){
+				ExternalDefinition* extDef = ExternalDefinition::find(def->mTypename);
 
 				if(!extDef)
-					throw DecodeException("Externalizable class '%s' not found", mDefinition->mTypename);
+					throw DecodeException("Externalizable class '%s' not found", def->mTypename);
 
-				extDef->read(this, pak);
+				extDef->read(this, stream);
 			}else{
-				for(auto itr = mDefinition->mMembers.begin(); itr != mDefinition->mMembers.end(); ++itr)
-					mStaticValues[*itr] = Entity::read(pak);
+				for(auto itr = def->mMembers.begin(); itr != def->mMembers.end(); ++itr)
+					mStaticValues[*itr] = Entity::read(stream);
 			}
 
-			if(mDefinition->mDynamic){
+			if(def->mDynamic){
 				while(true){
 					std::string key;
-					String::deserialize(key, pak);
+					String::deserialize(key, stream);
 					if(key.length() == 0) break;
 					
-					mDynamicMembers[key] = Entity::read(pak);
+					mDynamicMembers[key] = Entity::read(stream);
 				}
 			}
 		}else{
@@ -497,22 +509,22 @@ namespace amf3 {
 		return obj;
 	}
 
-	void Xml::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void Xml::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
-		Integer::serialize((mValue.length() << 1) | 1, pak);
-		pak->add(mValue.c_str(), mValue.length());
+		Integer::serialize((mValue.length() << 1) | 1, stream);
+		stream.write(mValue.c_str(), mValue.length());
 	}
 
-	void Xml::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void Xml::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 
 		uint32 length;
-		Integer::deserialize(length, pak);
+		Integer::deserialize(length, stream);
 		if(length & 1){
 			length >>= 1;
-			mValue.assign((char*)pak->data() + pak->position(), length);
-			pak->skip(length);
+			mValue.assign((char*)stream.data() + stream.tell(), length);
+			stream.skip(length);
 		}else{
 			throw new DecodeException("TODO: XML Object references are unsupported"); 
 		}
@@ -550,22 +562,22 @@ namespace amf3 {
 		return obj;
 	}
 
-	void ByteArray::serialize(Packet* pak) const {
-		Entity::serialize(pak);
+	void ByteArray::serialize(ByteStream& stream) const {
+		Entity::serialize(stream);
 
-		Integer::serialize((mLength << 1) | 1, pak);
-		pak->add(mValue, mLength);
+		Integer::serialize((mLength << 1) | 1, stream);
+		stream.write(mValue, mLength);
 	}
 
-	void ByteArray::deserialize(Packet* pak){
-		Entity::deserialize(pak);
+	void ByteArray::deserialize(ByteStream& stream){
+		Entity::deserialize(stream);
 
-		Integer::deserialize(mLength, pak);
+		Integer::deserialize(mLength, stream);
 		if(mLength & 1){
 			mLength >>= 1;
 			mValue = new uint8[mLength];
-			memcpy(mValue, (char*)pak->data() + pak->position(), mLength);
-			pak->skip(mLength);
+			memcpy(mValue, (char*)stream.data() + stream.tell(), mLength);
+			stream.skip(mLength);
 		}else{
 			throw new DecodeException("TODO: Byte Array references are unsupported"); 
 		}
