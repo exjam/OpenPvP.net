@@ -1,11 +1,17 @@
 #pragma once
 
 #include "types.h"
-
-#include <WinSock2.h>
-#include <openssl/ssl.h>
+#include <string>
 
 class ByteStream;
+
+typedef __w64 unsigned int SOCKET;
+typedef struct ssl_st SSL;
+struct sockaddr_in;
+
+namespace amf {
+	class Object;
+};
 
 namespace rtmp {
 	class Packet;
@@ -57,13 +63,31 @@ namespace rtmp {
 		uint32 waitHandshake(int stage);
 		uint32 onReceiveHandshake(ByteStream& pak);
 
-		bool resolve(const char* host, sockaddr_in& address);
+		bool resolve(const char* host, sockaddr_in* address);
 
 	private:
 		SSL* mSSL;
 		SOCKET mSocket;
 		int mChunkSize;
 		int mHandshakeStage;
+	};
+
+	class Amf3Command : public Serializable {
+	public:
+		static const int Type = rtmp::AMF3_COMMAND;
+
+		Amf3Command(amf::Object* obj = nullptr);
+	
+		virtual void serialize(ByteStream& stream) const;
+		virtual void deserialize(ByteStream& stream);
+
+		void setObject(amf::Object* object);
+
+		virtual std::string toString() const;
+
+	private:
+		double mNumber;
+		amf::Object* mObject;
 	};
 
 #pragma pack(push, 1)

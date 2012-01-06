@@ -1,5 +1,7 @@
 #include "rtmp.h"
 #include "bytestream.h"
+#include "amf/amf.h"
+#include "amf/amf0.h"
 
 ByteStream::endian_t little_endian(ByteStream::LITTLE_ENDIAN);
 ByteStream::endian_t big_endian(ByteStream::BIG_ENDIAN);
@@ -112,5 +114,52 @@ namespace rtmp {
 
 		data.seek(pos);
 		return hSize;
+	}
+
+	Amf3Command::Amf3Command(amf::Object* obj)
+		: mNumber(0), mObject(obj)
+	{
+	}
+
+	void Amf3Command::setObject(amf::Object* object){
+		mObject = object;
+	}
+
+	std::string Amf3Command::toString() const {
+		amf::log::obj obj;
+		obj << "{ amf3command " << std::endl;
+		obj << amf::log::indent;
+		obj << mNumber << std::endl;
+		obj << mObject->toString() << std::endl;
+		obj << amf::log::outdent;
+		obj << "}" << std::endl;
+		return obj;
+	}
+	
+	void Amf3Command::serialize(ByteStream& stream) const {
+		stream << uint8(0);
+		stream << uint8(amf0::AMF0_NULL);
+		amf0::Number::serialize(mNumber, stream);
+		stream << uint8(amf0::AMF0_NULL);
+		stream << uint8(amf0::AMF0_AVMPLUS);
+		mObject->serialize(stream);
+	}
+
+	void Amf3Command::deserialize(ByteStream& stream){
+		uint8 unk;
+		stream >> unk;
+		if(unk != 0)
+			throw new amf::DecodeException("First byte of Amf3Command %u != 0", unk);
+
+		amf::Container* container = new amf::Container();
+		amf::Entity::setVersion(amf::AMF0);
+		container->deserialize(stream);
+
+		uint32 count = container->entityCount();
+		if(count != 4)
+			throw new amf::DecodeException("Amf3Command child count %u != 4", count);
+
+		mNumber = container->entity(1)->to<double>();
+		mObject = container->entity(3)->to<amf::Object*>();
 	}
 };

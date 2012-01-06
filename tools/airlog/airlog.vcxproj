@@ -39,6 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\..\rtmp;D:\Programming\Libraries\OpenSSL-Win32\include;D:\Programming\Projects\PSPC\common;D:\Programming\pspsdk\psp\sdk\include;D:\Programming\Libraries\glew-1.5.2\include;D:\Programming\Libraries\DirectX SDK March 2009\Include;D:\Programming\Libraries\tinyxml++\include;D:\Programming\Projects\R3E;D:\Programming\Libraries\oglbmfont;D:\Programming\Libraries\ftgl\src;D:\Programming\Libraries\freetype2\include;D:\Applications\Cg\include;D:\Programming\Libraries\winpcap\Include;D:\Programming\Libraries\sqlapi\include;D:\Programming\Libraries\DevIL\include;D:\Programming\Libraries\unrar;D:\Programming\Projects\TitanVFS;D:\Programming\Libraries\ExLIB;C:\Program Files\Microsoft Visual Studio 10.0\VC\ATLMFC\INCLUDE;C:\Program Files\Microsoft Visual Studio 10.0\VC\INCLUDE;C:\Program Files\Microsoft SDKs\Windows\v7.0A\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Programming\Libraries\glew-1.5.2\lib;D:\Programming\Libraries\DirectX SDK March 2009\Lib\x86;D:\Programming\Libraries\tinyxml++\lib;D:\Programming\Libraries\oglbmfont\bin;D:\Programming\Libraries\ftgl\msvc\build;D:\Programming\Libraries\freetype2\objs\win32\vc2008;D:\Applications\Cg\lib;D:\Programming\Libraries\DevIL\lib;D:\Programming\Libraries\winpcap\Lib;D:\Programming\Libraries\sqlapi\vs2008\lib;D:\Programming\Libraries\unrar;C:\Program Files\Microsoft Visual Studio 10.0\VC\ATLMFC\LIB;C:\Program Files\Microsoft Visual Studio 10.0\VC\LIB;C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -50,7 +52,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;AIRLOG_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

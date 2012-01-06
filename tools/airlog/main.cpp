@@ -1,41 +1,153 @@
-/* Logs RTMP packets sent from adobe air before SSL encryption */
+/*
+Logs RTMP packets sent from adobe air before SSL encryption
+*/
+
+#include "rtmp/rtmp.h"
+#include "amf/amf.h"
+#include "amf/amf3.h"
 
 #include <iostream>
 #include <windows.h>
 #include <tlhelp32.h>
 
+#pragma comment(lib, "../../Debug/rtmp.lib")
+
 FILE* gLogFile = NULL;
 
-void __stdcall onReceivePacket(unsigned char* buffer, int size){
-	if(size < 0) return;
-	
-	printf("Recv> %d bytes\n", size);
-	fprintf(gLogFile, "Recv> %d bytes", size);
+void processPacket(bool isSend, rtmp::Packet& pak){
+	amf3::ReferenceTables::Objects.reset();
+	amf3::ReferenceTables::Strings.reset();
+	amf3::ReferenceTables::ClassDefinitions.reset();
 
-	for(int i = 0; i < size; ++i){
-		if(i % 16 == 0)
-			fprintf(gLogFile, "\n");
+	switch(pak.type()){
+		case rtmp::AMF0_COMMAND:
+			{
+				amf::Container result;
+				result.deserialize(pak.mData);
+				
+				printf("AMF0_COMMAND\n");
+				fprintf(gLogFile, "AMF0_COMMAND\n");
+				fputs(result.toString().c_str(), gLogFile);
+				fputs("\n", gLogFile);
+			}
+			break;
+		case rtmp::AMF3_COMMAND:
+			{
+				rtmp::Amf3Command cmd;
+				cmd.deserialize(pak.mData);
+				
+				printf("AMF3_COMMAND\n");
+				fprintf(gLogFile, "AMF3_COMMAND\n");
+				fputs(cmd.toString().c_str(), gLogFile);
+				fputs("\n", gLogFile);
+			}
+			break;
+		default:
+			printf("Unhandled RTMP packet %u\n", pak.type());
+			fprintf(gLogFile, "Unhandled RTMP packet %u\n", pak.type());
+	}
+}
 
-		fprintf(gLogFile, "%02x ", buffer[i]);
+void processPacket(bool isSend, unsigned char* buffer, int size){
+	static unsigned int sendBytes = 0;
+	static unsigned int recvBytes = 0;
+	bool decode = false;
+
+	if(isSend){
+		static bool skipNext = false;
+		decode = (sendBytes >= 2099+1537);
+		sendBytes += size;
+		printf("Send>");
+		fprintf(gLogFile, "Send>");
+
+		if(size == 4096){
+			skipNext = true;
+			decode = false;
+		}else if(skipNext){
+			skipNext = false;
+			decode = false;
+		}
+	}else{
+		static bool skipNext = false;
+
+		decode = (recvBytes >= 33);
+		recvBytes += size;
+
+		printf("Recv>");
+		fprintf(gLogFile, "Recv>");
+		
+		if(size == 4096){
+			skipNext = true;
+			decode = false;
+		}else if(skipNext){
+			skipNext = false;
+			decode = false;
+		}
 	}
 
-	fprintf(gLogFile, "\n");
+	if(decode){
+		ByteStream header;
+		header.write(buffer, 16);
+		
+		uint32 hSize = rtmp::Packet::getHeaderSize(header);
+
+		rtmp::Packet pak;
+		pak.deserialize(header);
+
+		ByteStream data;
+		pak.mData.write(buffer + hSize, size - hSize);
+		pak.mData.dechunk(128);
+		pak.mData.setDataSize(pak.mHeader.mBodySize);
+
+		try {
+			processPacket(isSend, pak);
+		}catch(amf::DecodeException* e){
+			printf("Decode Exception: %s\n", e->what());
+			fprintf(gLogFile, "Decode Exception: %s\n", e->what());
+			
+			fprintf(gLogFile, "Stream> pos: %u size: %u\n", pak.mData.tell(), pak.mData.size());
+			fprintf(gLogFile, "Header> %d bytes", hSize);
+
+			for(uint32 i = 0; i < hSize; ++i){
+				if(i % 16 == 0)
+					fprintf(gLogFile, "\n");
+
+				fprintf(gLogFile, "%02x ", header.data()[i]);
+			}
+
+			fprintf(gLogFile, "\n");
+
+			fprintf(gLogFile, "Data> %d bytes", pak.mData.size());
+
+			for(uint32 i = 0; i < pak.mData.size(); ++i){
+				if(i % 16 == 0)
+					fprintf(gLogFile, "\n");
+
+				fprintf(gLogFile, "%02x ", pak.mData.data()[i]);
+			}
+
+			fprintf(gLogFile, "\n");
+		}
+	}else{
+		fprintf(gLogFile, " %d bytes", size);
+
+		for(int i = 0; i < size; ++i){
+			if(i % 16 == 0)
+				fprintf(gLogFile, "\n");
+
+			fprintf(gLogFile, "%02x ", buffer[i]);
+		}
+
+		fprintf(gLogFile, "\n");
+	}
+}
+
+void __stdcall onReceivePacket(unsigned char* buffer, int size){
+	processPacket(false, buffer, size);
 }
 
 void __stdcall onSendPacket(unsigned char* buffer, int size){
-	if(size < 0) return;
-
-	printf("Send> %d bytes\n", size);
-	fprintf(gLogFile, "Send> %d bytes", size);
-
-	for(int i = 0; i < size; ++i){
-		if(i % 16 == 0)
-			fprintf(gLogFile, "\n");
-
-		fprintf(gLogFile, "%02x ", buffer[i]);
-	}
-
-	fprintf(gLogFile, "\n");
+	processPacket(true, buffer, size);
 }
 
 unsigned int gEncodeFunction = 0;
@@ -216,7 +328,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved){
 		DWORD airModuleSize;
 		FindModule(GetCurrentProcessId(), "Adobe AIR.dll", airModuleLoc, airModuleSize);
 		
-		fopen_s(&gLogFile, "airlog.txt", "w");
+		char logFilePath[MAX_PATH];
+		GetModuleFileName(hModule, logFilePath, MAX_PATH);
+
+		char* pch = strrchr(logFilePath, '.');
+		memcpy(pch + 1, "txt", 4);
+		
+		printf("Logging to %s\n", logFilePath);
+
+		fopen_s(&gLogFile, logFilePath, "w");
 
 		unsigned int locEncode = findCode(rawEncode, 27, airModuleLoc, airModuleLoc + airModuleSize);
 		if(locEncode){

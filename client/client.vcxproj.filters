@@ -9,60 +9,18 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\amf">
-      <UniqueIdentifier>{79a0222a-1a67-422f-a206-3cd16c027c29}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\rtmp">
-      <UniqueIdentifier>{3ff9bce5-5c58-4a7b-90e0-b665831c017b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\amf">
-      <UniqueIdentifier>{91229efb-bc98-4ef2-bb6c-8c3163cd1787}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\rtmp">
-      <UniqueIdentifier>{ea18ff30-e235-4fd6-a6aa-c68ef967e401}</UniqueIdentifier>
+    <Filter Include="Header Files\riotgames">
+      <UniqueIdentifier>{aea9e547-29fe-46d0-872d-5061ee8e8e8c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="amf\amf.cpp">
-      <Filter>Source Files\amf</Filter>
-    </ClCompile>
-    <ClCompile Include="amf\amf0_entities.cpp">
-      <Filter>Source Files\amf</Filter>
-    </ClCompile>
-    <ClCompile Include="amf\amf3.cpp">
-      <Filter>Source Files\amf</Filter>
-    </ClCompile>
-    <ClCompile Include="amf\amf3_entities.cpp">
-      <Filter>Source Files\amf</Filter>
-    </ClCompile>
-    <ClCompile Include="rtmp\rtmp.cpp">
-      <Filter>Source Files\rtmp</Filter>
-    </ClCompile>
-    <ClCompile Include="rtmp\rtmpclient.cpp">
-      <Filter>Source Files\rtmp</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="amf\amf.h">
-      <Filter>Header Files\amf</Filter>
-    </ClInclude>
-    <ClInclude Include="amf\amf0.h">
-      <Filter>Header Files\amf</Filter>
-    </ClInclude>
-    <ClInclude Include="amf\amf3.h">
-      <Filter>Header Files\amf</Filter>
-    </ClInclude>
-    <ClInclude Include="rtmp\rtmp.h">
-      <Filter>Header Files\rtmp</Filter>
-    </ClInclude>
-    <ClInclude Include="rtmp\types.h">
-      <Filter>Header Files\rtmp</Filter>
-    </ClInclude>
-    <ClInclude Include="rtmp\bytestream.h">
-      <Filter>Header Files\rtmp</Filter>
+    <ClInclude Include="riotgames\riotgames.h">
+      <Filter>Header Files\riotgames</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

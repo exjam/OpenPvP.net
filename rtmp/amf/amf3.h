@@ -29,6 +29,7 @@ namespace amf3 {
 		AMF3_XML,
 		AMF3_BYTE_ARRAY,
 		AMF3_AVMPLUS = 17,
+		AMF3_BOOLEAN = 0xFE,
 		AMF3_INVALID = 0xFF,
 	} DataTypes;
 
@@ -52,7 +53,7 @@ namespace amf3 {
 
 	class Boolean : public Entity {
 	public:
-		static const int Type = AMF3_INVALID;
+		static const int Type = AMF3_BOOLEAN;
 
 		Boolean(bool value = false);
 
@@ -60,6 +61,8 @@ namespace amf3 {
 
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+		
+		bool value() const { return mValue; }
 
 	private:
 		bool mValue;
@@ -80,6 +83,8 @@ namespace amf3 {
 		static void deserialize(uint32& value, ByteStream& stream);
 		static void deserialize(int32& value, ByteStream& stream);
 
+		int32 value() const { return mValue; }
+
 	private:
 		int32 mValue;
 	};
@@ -97,6 +102,8 @@ namespace amf3 {
 
 		static void serialize(double value, ByteStream& stream);
 		static void deserialize(double& value, ByteStream& stream);
+
+		double value() const { return mValue; }
 
 	private:
 		double mValue;
@@ -116,6 +123,8 @@ namespace amf3 {
 
 		static void deserialize(std::string& str, ByteStream& stream);
 		static void serialize(const std::string& str, ByteStream& stream);
+		
+		const std::string& value() const { return mValue; }
 
 	private:
 		std::string mValue;
@@ -132,6 +141,8 @@ namespace amf3 {
 	
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+		
+		const std::string& value() const { return mValue; }
 
 	private:
 		std::string mValue;
@@ -148,12 +159,14 @@ namespace amf3 {
 	
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+		
+		double value() const { return mValue; }
 
 	private:
 		double mValue;
 	};
 
-	class Array : public Entity {
+	class Array : public amf::Object {
 	public:
 		static const int Type = AMF3_ARRAY;
 
@@ -164,6 +177,28 @@ namespace amf3 {
 
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+
+		virtual void setProperty(const std::string& key, Entity* value){
+			mAssociative[key] = value;
+		}
+
+		virtual Entity* getProperty(const std::string& key){
+			auto itr = mAssociative.find(key);
+			if(itr == mAssociative.end()) return nullptr;
+			return itr->second;
+		}
+
+		virtual void setProperty(uint32 key, Entity* value){
+			while(key >= mDense.size())
+				mDense.push_back(nullptr);
+
+			mDense[key] = value;
+		}
+
+		virtual Entity* getProperty(uint32 key){
+			if(key > mDense.size()) return nullptr;
+			return mDense[key];
+		}
 
 	private:
 		std::vector<Entity*> mDense;
@@ -182,9 +217,9 @@ namespace amf3 {
 
 	class ExternalDefinition {
 	public:
-		ExternalDefinition(const std::string& name);
+		ExternalDefinition(const std::string& name, bool useFlags = true);
 	
-		uint32 readFlags(ByteStream& stream);
+		uint32 readFlags(std::vector<uint8>& flags, ByteStream& stream);
 		void read(class Object* obj, ByteStream& stream);
 
 		void addField(const std::string& name);
@@ -196,14 +231,14 @@ namespace amf3 {
 		static ExternalDefinition* find(const std::string& name);
 
 	private:
+		bool mUsesFlags;
 		std::string mName;
 		ExternalDefinition* mParent;
-		std::vector<uint8> mFlags;
 		std::vector<std::string> mFields;
 		static std::map<std::string, ExternalDefinition*> mDefinitions;
 	};
 
-	class Object : public Entity {
+	class Object : public amf::Object {
 	public:
 		static const int Type = AMF3_OBJECT;
 
@@ -215,23 +250,28 @@ namespace amf3 {
 
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
-		
-		template<typename T>
-		void set(const std::string& str, T value){
-			set(str, Entity::create(value));
-		}
-		
-		template<>
-		void set(const std::string& str, Entity* entity){
-			if(mStaticValues.find(str) != mStaticValues.end()){
-				delete mStaticValues[str];
-				mStaticValues[str] = entity;
-			}else{
-				if(mDynamicMembers.find(str) != mDynamicMembers.end())
-					delete mDynamicMembers[str];
 
-				mDynamicMembers[str] = entity;
+		virtual void setProperty(const std::string& key, Entity* value){
+			if(mStaticValues.find(key) != mStaticValues.end()){
+				delete mStaticValues[key];
+				mStaticValues[key] = value;
+			}else{
+				if(mDynamicMembers.find(key) != mDynamicMembers.end())
+					delete mDynamicMembers[key];
+
+				mDynamicMembers[key] = value;
 			}
+		}
+
+		virtual Entity* getProperty(const std::string& key){
+			auto itr = mStaticValues.find(key);
+			if(itr == mStaticValues.end()){
+				itr = mDynamicMembers.find(key);
+				if(itr == mDynamicMembers.end())
+					return nullptr;
+			}
+
+			return itr->second;
 		}
 
 	private:
@@ -250,6 +290,8 @@ namespace amf3 {
 
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+		
+		const std::string& value() const { return mValue; }
 
 	private:
 		std::string mValue;
@@ -266,6 +308,9 @@ namespace amf3 {
 
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+		
+		uint32 length() const { return mLength; }
+		uint8* value() const { return mValue; }
 
 	private:
 		uint32 mLength;

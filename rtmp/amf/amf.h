@@ -14,6 +14,8 @@ namespace amf {
 		AMF3,
 	} Version;
 	
+	class Object;
+
 	struct null_t {};
 	struct undefined_t {};
 	
@@ -30,6 +32,19 @@ namespace amf {
 		virtual void deserialize(ByteStream& stream);
 
 		virtual std::string toString() const;
+
+		template<typename T> T to() const;
+		template<> bool to() const { return asBool(); }
+		template<> int32 to() const { return asInt(); }
+		template<> double to() const { return asDouble(); }
+		template<> Object* to() const { return asObject(); }
+		template<> std::string to() const { return asString(); }
+
+		bool asBool() const;
+		int32 asInt() const;
+		double asDouble() const;
+		Object* asObject() const;
+		std::string asString() const;
 		
 		static Entity* create(Entity* value);
 		static Entity* create(const bool& value);
@@ -52,6 +67,8 @@ namespace amf {
 		static Entity* readAMF0(ByteStream& stream);
 		static Entity* readAMF3(ByteStream& stream);
 
+		static void setVersion(uint32 version);
+
 	private:
 		uint8 mType;
 		uint32 mVersion;
@@ -67,16 +84,34 @@ namespace amf {
 			setProperty(n, Entity::create(v));
 		}
 
+		template<>
+		void set(const std::string& n, const std::string& v){
+			if(v.length() == 0)
+				setProperty(n, (Entity*)nullptr);
+			else
+				setProperty(n, Entity::create(v));
+		}
+
 		template<typename T>
 		void set(uint32 n, const T& v){
 			setProperty(n, Entity::create(v));
 		}
+
+		virtual std::string name(){ return std::string(); }
 		
 		virtual void setProperty(uint32 n, Entity* v){}
 		virtual void setProperty(const std::string& n, Entity* v){}
 
 		virtual Entity* getProperty(uint32 n){ return NULL; }
 		virtual Entity* getProperty(const std::string& n){ return NULL; }
+	};
+
+	class ObjectWrapper {
+	public:
+		ObjectWrapper(amf::Object* obj) : mObject(obj) {}
+
+	protected:
+		amf::Object* mObject;
 	};
 
 	struct object_begin_t {
@@ -146,6 +181,14 @@ namespace amf {
 		Container& operator<<(void (*pf)(Container*)){
 			(*pf)(this);
 			return *this;
+		}
+
+		uint32 entityCount(){
+			return mChildren.size();
+		}
+
+		Entity* entity(uint32 i){
+			return mChildren[i];
 		}
 
 	private:

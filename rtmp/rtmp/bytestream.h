@@ -21,6 +21,11 @@ public:
 	{
 	}
 
+	ByteStream(uint8* data, uint32 length)
+		: mDataLength(length), mBuffer(data), mBufferLength(length), mCursor(0), mEndian(BIG_ENDIAN)
+	{
+	}
+
 	~ByteStream(){}
 
 	template<typename T>

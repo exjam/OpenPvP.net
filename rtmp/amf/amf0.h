@@ -50,6 +50,8 @@ namespace amf0 {
 		static void serialize(double value, ByteStream& stream);
 		static void deserialize(double& value, ByteStream& stream);
 
+		double value() const { return mValue; }
+
 	private:
 		double mValue;
 	};
@@ -67,6 +69,8 @@ namespace amf0 {
 
 		static void serialize(bool value, ByteStream& stream);
 		static void deserialize(bool& value, ByteStream& stream);
+
+		bool value() const { return mValue; }
 
 	private:
 		bool mValue;
@@ -89,7 +93,9 @@ namespace amf0 {
 		}
 
 		virtual Entity* getProperty(const std::string& key){ 
-			return mProperties[key];
+			auto itr = mProperties.find(key);
+			if(itr == mProperties.end()) return nullptr;
+			return itr->second;
 		}
 
 	private:
@@ -134,6 +140,8 @@ namespace amf0 {
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
 
+		uint16 value() const { return mValue; }
+
 	private:
 		uint16 mValue;
 	};
@@ -154,8 +162,10 @@ namespace amf0 {
 			mEntries[key] = value;
 		}
 
-		virtual Entity* getProperty(const std::string& key){ 
-			return mEntries[key];
+		virtual Entity* getProperty(const std::string& key){
+			auto itr = mEntries.find(key);
+			if(itr == mEntries.end()) return nullptr;
+			return itr->second;
 		}
 
 	private:
@@ -189,6 +199,7 @@ namespace amf0 {
 		}
 
 		virtual Entity* getProperty(uint32 key){
+			if(key > mEntries.size()) return nullptr;
 			return mEntries[key];
 		}
 
@@ -206,6 +217,9 @@ namespace amf0 {
 	
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+
+		double value() const { return mValue; }
+		uint16 timezone() const { return mTimeZone; }
 
 	private:
 		double mValue;
@@ -241,6 +255,8 @@ namespace amf0 {
 
 		virtual void serialize(ByteStream& stream) const;
 		virtual void deserialize(ByteStream& stream);
+		
+		const std::string& value() const { return mValue; }
 
 	private:
 		std::string mValue;
@@ -265,8 +281,12 @@ namespace amf0 {
 		}
 
 		virtual Entity* getProperty(const std::string& key){ 
-			return mProperties[key];
+			auto itr = mProperties.find(key);
+			if(itr == mProperties.end()) return nullptr;
+			return itr->second;
 		}
+
+		virtual std::string name(){ return mTypename; }
 
 	private:
 		std::string mTypename;
@@ -320,6 +340,8 @@ namespace amf0 {
 			value.assign((char*)stream.data() + stream.tell(), length);
 			stream.skip(length);
 		}
+		
+		const std::string& value() const { return mValue; }
 
 	private:
 		std::string mValue;

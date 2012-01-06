@@ -6,6 +6,7 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "ssleay32MDd.lib")
 #pragma comment(lib, "libeay32MDd.lib")
+#pragma comment(lib, "../Debug/rtmp.lib")
 
 int main(int argc, char** argv){
 	WSADATA wd;

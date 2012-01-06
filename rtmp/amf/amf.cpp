@@ -52,6 +52,13 @@ namespace amf {
 	}
 	
 	Entity* Entity::create(Entity* value){
+		if(!value){
+			if(mActiveVersion == AMF0)
+				return new amf0::Null();
+			else if(mActiveVersion == AMF3)
+				return new amf3::Null();
+		}
+
 		return value;
 	}
 
@@ -129,6 +136,102 @@ namespace amf {
 			return new amf0::String(value);
 		else
 			return new amf3::String(value);
+	}
+		
+	int32 Entity::asInt() const {
+		if(mVersion == AMF0){
+			if(mType == amf0::AMF0_NUMBER)
+				return (int32)((amf0::Number*)this)->value();
+			else if(mType == amf0::AMF0_NULL)
+				return 0;
+		}else if(mVersion == AMF3){
+			if(mType == amf3::AMF3_INTEGER)
+				return ((amf3::Integer*)this)->value();
+			else if(mType == amf3::AMF3_NULL)
+				return 0;
+		}
+		
+		throw new DecodeException("Invalid cast to uint32");
+	}
+	
+	double Entity::asDouble() const {
+		if(mVersion == AMF0){
+			if(mType == amf0::AMF0_NUMBER)
+				return ((amf0::Number*)this)->value();
+			else if(mType == amf0::AMF0_NULL)
+				return 0;
+		}else if(mVersion == AMF3){
+			if(mType == amf3::AMF3_DOUBLE)
+				return ((amf3::Double*)this)->value();
+			else if(mType == amf3::AMF3_NULL)
+				return 0;
+		}
+
+		throw new DecodeException("Invalid cast to double");
+	}
+	
+	bool Entity::asBool() const {
+		if(mVersion == AMF0){
+			if(mType == amf0::AMF0_BOOLEAN)
+				return ((amf0::Boolean*)this)->value();
+			else if(mType == amf0::AMF0_NULL)
+				return false;
+		}else if(mVersion == AMF3){
+			if(mType == amf3::AMF3_BOOLEAN)
+				return ((amf3::Boolean*)this)->value();
+			else if(mType == amf3::AMF3_NULL)
+				return false;
+		}
+
+		throw new DecodeException("Invalid cast to boolean");
+	}
+	
+	Object* Entity::asObject() const {
+		if(mVersion == AMF0){
+			if(mType == amf0::AMF0_OBJECT)
+				return (Object*)this;
+			else if(mType == amf0::AMF0_TYPED_OBJECT)
+				return (Object*)this;
+			else if(mType == amf0::AMF0_ECMA_ARRAY)
+				return (Object*)this;
+			else if(mType == amf0::AMF0_STRICT_ARRAY)
+				return (Object*)this;
+			else if(mType == amf3::AMF3_NULL)
+				return nullptr;
+		}else if(mVersion == AMF3){
+			if(mType == amf3::AMF3_OBJECT)
+				return (Object*)this;
+			else if(mType == amf3::AMF3_ARRAY)
+				return (Object*)this;
+			else if(mType == amf3::AMF3_NULL)
+				return nullptr;
+		}
+		
+		throw new DecodeException("Invalid cast to object");
+	}
+	
+	std::string Entity::asString() const {
+		if(mVersion == AMF0){
+			if(mType == amf0::AMF0_STRING)
+				return ((amf0::String*)this)->value();
+			else if(mType == amf0::AMF0_LONG_STRING)
+				return ((amf0::LongString*)this)->value();
+			else if(mType == amf0::AMF0_XML_DOC)
+				return ((amf0::XmlDocument*)this)->value();
+			else if(mType == amf0::AMF0_NULL)
+				return std::string();
+		}else if(mVersion == AMF3){
+			if(mType == amf3::AMF3_STRING)
+				return ((amf3::String*)this)->value();
+			else if(mType == amf3::AMF3_XML)
+				return ((amf3::Xml*)this)->value();
+			else if(mType == amf3::AMF3_XML_DOC)
+				return ((amf3::XmlDocument*)this)->value();
+			else if(mType == amf3::AMF3_NULL)
+				return std::string();
+		}
+		
+		throw new DecodeException("Invalid cast to string");
 	}
 
 	Entity* Entity::readAMF0(ByteStream& stream){
@@ -260,6 +363,10 @@ namespace amf {
 
 		return result;
 	}
+	
+	void Entity::setVersion(uint32 version){
+		mActiveVersion = version;
+	}
 
 	Entity* Entity::read(ByteStream& stream){
 		return (mActiveVersion == AMF0) ? readAMF0(stream) : readAMF3(stream);
@@ -273,8 +380,7 @@ namespace amf {
 	/*
 	AMFx Container
 	*/
-	Container::Container()
-	{
+	Container::Container(){
 	}
 
 	Container::~Container(){

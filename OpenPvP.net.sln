@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "airlog", "tools\airlog\airl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{22BDCF1D-57E9-43DD-824F-E4C74C4009E6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtmp", "rtmp\rtmp.vcxproj", "{BEF24D64-EFA0-48EF-847A-801CDBF2704C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,12 +29,16 @@ Global
 		{AEBDD5C8-406F-478C-B8BF-FD8D7BF62DDD}.Debug|Win32.Build.0 = Debug|Win32
 		{AEBDD5C8-406F-478C-B8BF-FD8D7BF62DDD}.Release|Win32.ActiveCfg = Release|Win32
 		{AEBDD5C8-406F-478C-B8BF-FD8D7BF62DDD}.Release|Win32.Build.0 = Release|Win32
+		{BEF24D64-EFA0-48EF-847A-801CDBF2704C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BEF24D64-EFA0-48EF-847A-801CDBF2704C}.Debug|Win32.Build.0 = Debug|Win32
+		{BEF24D64-EFA0-48EF-847A-801CDBF2704C}.Release|Win32.ActiveCfg = Release|Win32
+		{BEF24D64-EFA0-48EF-847A-801CDBF2704C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{324A84FC-FED7-4DED-83A8-7CCCDD9631A4} = {22BDCF1D-57E9-43DD-824F-E4C74C4009E6}
 		{AEBDD5C8-406F-478C-B8BF-FD8D7BF62DDD} = {22BDCF1D-57E9-43DD-824F-E4C74C4009E6}
+		{324A84FC-FED7-4DED-83A8-7CCCDD9631A4} = {22BDCF1D-57E9-43DD-824F-E4C74C4009E6}
 	EndGlobalSection
 EndGlobal

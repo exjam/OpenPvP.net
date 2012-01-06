@@ -4,6 +4,7 @@
 #include "bytestream.h"
 
 #include <iostream>
+#include <WinSock2.h>
 #include <ws2tcpip.h>
 #include <openssl/ssl.h>
 
@@ -29,7 +30,7 @@ namespace rtmp {
 
 	bool Client::connect(const char* host, uint16 port){
 		sockaddr_in address;
-		if(!resolve(host, address))
+		if(!resolve(host, &address))
 			return false;
 
 		address.sin_port = htons(port);
@@ -249,7 +250,7 @@ namespace rtmp {
 		disconnect();
 	}
 
-	bool Client::resolve(const char* host, sockaddr_in& address){
+	bool Client::resolve(const char* host, sockaddr_in* address){
 		struct addrinfo *result = NULL;
 		struct addrinfo *ptr = NULL;
 		struct addrinfo hints;
@@ -264,10 +265,10 @@ namespace rtmp {
 		
 		for(addrinfo* itr = result; itr != NULL; itr = itr->ai_next){
 			if(itr->ai_family != AF_INET) continue;
-			address = *(sockaddr_in*)itr->ai_addr;
+			*address = *(sockaddr_in*)itr->ai_addr;
 
-			printf("Resolved %s to %d.%d.%d.%d\n", host,address.sin_addr.S_un.S_un_b.s_b1,
-				address.sin_addr.S_un.S_un_b.s_b2, address.sin_addr.S_un.S_un_b.s_b3, address.sin_addr.S_un.S_un_b.s_b4);
+			printf("Resolved %s to %d.%d.%d.%d\n", host,address->sin_addr.S_un.S_un_b.s_b1,
+				address->sin_addr.S_un.S_un_b.s_b2, address->sin_addr.S_un.S_un_b.s_b3, address->sin_addr.S_un.S_un_b.s_b4);
 
 			return true;
 		}

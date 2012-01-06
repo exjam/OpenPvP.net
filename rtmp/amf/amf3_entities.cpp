@@ -284,7 +284,7 @@ namespace amf3 {
 	AMF3_ARRAY
 	*/
 	Array::Array()
-		: Entity(Type, AMF3)
+		: amf::Object(Type, AMF3)
 	{
 	}
 
@@ -363,12 +363,12 @@ namespace amf3 {
 	AMF3_OBJECT
 	*/
 	Object::Object()
-		: Entity(Type, AMF3)
+		: amf::Object(Type, AMF3)
 	{
 	}
 
 	Object::Object(const std::string& name)
-		: Entity(Type, AMF3), mName(name)
+		: amf::Object(Type, AMF3), mName(name)
 	{
 	}
 

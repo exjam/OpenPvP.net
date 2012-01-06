@@ -21,6 +21,10 @@ namespace amf3 {
 				"operation", NULL
 			};
 
+			const char* arrayCollectionFields[] = {
+				"source", NULL
+			};
+
 			ExternalDefinition* abstractMessage = new ExternalDefinition("flex.messaging.messages.AbstractMessage");
 			for(const char** ptr = abstractMessageFields; *ptr; ++ptr)
 				abstractMessage->addField(*ptr);
@@ -38,10 +42,15 @@ namespace amf3 {
 			for(const char** ptr = commandMessageFields; *ptr; ++ptr)
 				commandMessageExt->addField(*ptr);
 
+			ExternalDefinition* arrayCollectionExt = new ExternalDefinition("flex.messaging.io.ArrayCollection", false);
+			for(const char** ptr = arrayCollectionFields; *ptr; ++ptr)
+				arrayCollectionExt->addField(*ptr);
+
 			ExternalDefinition::add(abstractMessage);
 			ExternalDefinition::add(asyncMessageExt);
 			ExternalDefinition::add(acknowledgeMessageExt);
 			ExternalDefinition::add(commandMessageExt);
+			ExternalDefinition::add(arrayCollectionExt);
 
 			ExternalDefinition::alias("DSA", asyncMessageExt);
 			ExternalDefinition::alias("DSK", acknowledgeMessageExt);
@@ -54,17 +63,17 @@ namespace amf3 {
 	{
 	}
 
-	ExternalDefinition::ExternalDefinition(const std::string& name)
-		: mParent(nullptr), mName(name)
+	ExternalDefinition::ExternalDefinition(const std::string& name, bool useFlags)
+		: mParent(nullptr), mName(name), mUsesFlags(useFlags)
 	{
 	}
 	
-	uint32 ExternalDefinition::readFlags(ByteStream& stream){
+	uint32 ExternalDefinition::readFlags(std::vector<uint8>& flags, ByteStream& stream){
 		uint8 flag;
 		uint32 count = 0;
 		do {
 			stream >> flag;
-			mFlags.push_back(flag);
+			flags.push_back(flag);
 		} while(flag & 0x80);
 
 		return count;
@@ -74,21 +83,27 @@ namespace amf3 {
 		if(mParent)
 			mParent->read(obj, stream);
 
-		readFlags(stream);
+		if(mUsesFlags){
+			std::vector<uint8> flags;
+			readFlags(flags, stream);
 
-		for(uint32 i = 0; i < mFlags.size(); ++i){
-			uint8 byte = mFlags[i];
+			for(uint32 i = 0; i < flags.size(); ++i){
+				uint8 byte = flags[i];
 
-			for(uint32 j = 0; j < 7; ++j){
-				uint32 index = i*7 + j;
-				if((byte >> j) & 1){
-					Entity* entity = Entity::read(amf::AMF3, stream);
-					if(index > mFields.size())
-						delete entity;
-					else
-						obj->set(mFields[i*7 + j], entity);
+				for(uint32 j = 0; j < 7; ++j){
+					uint32 index = i*7 + j;
+					if((byte >> j) & 1){
+						Entity* entity = Entity::read(stream);
+						if(index >= mFields.size())
+							delete entity;
+						else
+							obj->set(mFields[i*7 + j], entity);
+					}
 				}
 			}
+		}else{
+			for(auto itr = mFields.begin(); itr != mFields.end(); ++itr)
+				obj->set(*itr, Entity::read(stream));
 		}
 	}
 
