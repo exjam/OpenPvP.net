@@ -1,118 +1,43 @@
 #pragma once
 
-#include "rtmp/types.h"
-
-#include <string>
 #include <stack>
+#include <string>
 #include <vector>
-#include <sstream>
-#include <stdarg.h>
+#include "rtmp/types.h"
 
 namespace amf {
 	typedef enum {
-		AMF0,
-		AMF3,
-	} Version;
-	
+		AMF_NULL,
+		AMF_NUMBER,
+		AMF_INTEGER,
+		AMF_BOOLEAN,
+		AMF_STRING,
+		AMF_DATE,
+		AMF_ARRAY,
+		AMF_BYTE_ARRAY,
+		AMF_OBJECT,
+		AMF_UNKNOWN_TYPE,
+	} AmfTypes;
+
+	class Variant;
 	class Object;
-
-	struct null_t {};
-	struct undefined_t {};
+	class Null;
+	class Number;
+	class Integer;
+	class Boolean;
+	class String;
+	class Date;
+	class Array;
+	class ByteArray;
+	class Container;
 	
-	extern null_t null;
-	extern undefined_t undefined;
+	void setVersion(uint8 version);
 
-	class Entity : public Serializable {
-	public:
-		Entity(uint32 type, uint32 version);
-		
-		uint32 type() const;
+	Variant* deserialise(ByteStream& stream);
+	void serialise(Variant* value, ByteStream& stream);
 
-		virtual void serialize(ByteStream& stream) const;
-		virtual void deserialize(ByteStream& stream);
-
-		virtual std::string toString() const;
-
-		template<typename T> T to() const;
-		template<> bool to() const { return asBool(); }
-		template<> int32 to() const { return asInt(); }
-		template<> double to() const { return asDouble(); }
-		template<> Object* to() const { return asObject(); }
-		template<> std::string to() const { return asString(); }
-
-		bool asBool() const;
-		int32 asInt() const;
-		double asDouble() const;
-		Object* asObject() const;
-		std::string asString() const;
-		
-		static Entity* create(Entity* value);
-		static Entity* create(const bool& value);
-		static Entity* create(const uint8& value);
-		static Entity* create(const uint16& value);
-		static Entity* create(const uint32& value);
-		static Entity* create(const int8& value);
-		static Entity* create(const int16& value);
-		static Entity* create(const int32& value);
-		static Entity* create(const float& value);
-		static Entity* create(const double& value);
-		static Entity* create(const char* value);
-		static Entity* create(const std::string& value);
-		static Entity* create(const undefined_t& value);
-		static Entity* createObject(const std::string& name = std::string());
-
-		static Entity* read(ByteStream& stream);
-		static Entity* read(uint32 version, ByteStream& stream);
-		
-		static Entity* readAMF0(ByteStream& stream);
-		static Entity* readAMF3(ByteStream& stream);
-
-		static void setVersion(uint32 version);
-
-	private:
-		uint8 mType;
-		uint32 mVersion;
-		static uint32 mActiveVersion;
-	};
-
-	class Object : public Entity {
-	public:
-		Object(uint32 type, uint32 version) : Entity(type, version) {}
-
-		template<typename T>
-		void set(const std::string& n, const T& v){
-			setProperty(n, Entity::create(v));
-		}
-
-		template<>
-		void set(const std::string& n, const std::string& v){
-			if(v.length() == 0)
-				setProperty(n, (Entity*)nullptr);
-			else
-				setProperty(n, Entity::create(v));
-		}
-
-		template<typename T>
-		void set(uint32 n, const T& v){
-			setProperty(n, Entity::create(v));
-		}
-
-		virtual std::string name(){ return std::string(); }
-		
-		virtual void setProperty(uint32 n, Entity* v){}
-		virtual void setProperty(const std::string& n, Entity* v){}
-
-		virtual Entity* getProperty(uint32 n){ return NULL; }
-		virtual Entity* getProperty(const std::string& n){ return NULL; }
-	};
-
-	class ObjectWrapper {
-	public:
-		ObjectWrapper(amf::Object* obj) : mObject(obj) {}
-
-	protected:
-		amf::Object* mObject;
-	};
+	void deserialise(Container* container, ByteStream& stream);
+	void serialise(Container* container, ByteStream& stream);
 
 	struct object_begin_t {
 		object_begin_t(){}
@@ -120,80 +45,50 @@ namespace amf {
 		std::string mName;
 	};
 	struct object_end_t {};
-
-	struct var {
-		template<typename T>
-		var(const std::string& n, const T& v) : mName(n) { mValue = Entity::create(v); }
-
-		std::string mName;
-		Entity* mValue;
-	};
-
+	
 	void object_begin(class Container*);
 	void object_end(class Container*);
 	object_begin_t object_begin(const std::string& name);
-	
-	class Container : public Serializable {
+
+	struct var_t {
+		var_t(const std::string& name, Variant* value)
+			: mName(name), mValue(value) {}
+
+		std::string mName;
+		Variant* mValue;
+	};
+
+	struct object_creator_t {
+		object_creator_t(bool value);
+		object_creator_t(int32 value);
+		object_creator_t(uint32 value);
+		object_creator_t(double value);
+		object_creator_t(const std::string& value);
+
+		Variant* mValue;
+	};
+
+	var_t var(const std::string& name, Variant* value);
+	var_t var(const std::string& name, object_creator_t obj);
+
+	class Container {
 	public:
-		Container();
-		~Container();
+		Container& operator<<(Variant* obj);
+		Container& operator<<(object_creator_t obj);
 
-		std::string toString() const;
-	
-		virtual void serialize(ByteStream& stream) const;
-		virtual void deserialize(ByteStream& stream);
+		Container& operator<<(const var_t& var);
+		Container& operator<<(const object_begin_t& obj);
+		Container& operator<<(const object_end_t& obj);
 
-		template<typename T>
-		void add(const T& value){
-			add(Entity::create(value));
-		}
+		Container& operator<<(void (*pf)(Container*));
 
-		void add(Entity* child){
-			if(child)
-				mChildren.push_back(child);
-		}
-
-		template<typename T>
-		Container& operator<<(const T& value){
-			add(Entity::create(value));
-			return *this;
-		}
-
-		Container& operator<<(const var& obj){
-			if(mStreamObjects.size() > 0)
-				mStreamObjects.top()->setProperty(obj.mName, obj.mValue);
-
-			return *this;
-		}
-
-		Container& operator<<(const object_begin_t& _obj){
-			Object* obj = (Object*)Entity::createObject(_obj.mName);
-			mStreamObjects.push(obj);
-			add((Entity*)obj);
-			return *this;
-		}
-
-		Container& operator<<(const object_end_t& obj){
-			mStreamObjects.pop();
-			return *this;
-		}
-		
-		Container& operator<<(void (*pf)(Container*)){
-			(*pf)(this);
-			return *this;
-		}
-
-		uint32 entityCount(){
-			return mChildren.size();
-		}
-
-		Entity* entity(uint32 i){
-			return mChildren[i];
-		}
+		size_t size() const;
+		Variant* at(size_t index) const;
+		void push_back(Variant* child);
 
 	private:
 		std::stack<Object*> mStreamObjects;
-		std::vector<Entity*> mChildren;
+		std::vector<Variant*> mChildren;
 	};
 
 	class DecodeException : public std::exception {
@@ -217,92 +112,7 @@ namespace amf {
 	private:
 		std::string mWhat;
 	};
-
-	namespace log {
-		struct hex {
-			template<typename T>
-			hex(const T& value){
-				sprintf_s(v, 16, "%X", value);
-
-				if(strlen(v) % 2){
-					memcpy(v+1, v, 15);
-					v[0] = '0';
-				}
-			}
-
-			char v[16];
-		};
-
-		class obj {
-		public:
-			struct indent_t {
-				indent_t(int i) : i(i) {}
-				int i;
-			};
-
-			struct format_t {
-				typedef enum {
-					FMT_DECIMAL,
-					FMT_HEX,
-				};
-
-				format_t(int f) : f(f) {}
-				int f;
-			};
-
-		public:
-			obj(){}
-
-			obj& operator<< (const indent_t& i){
-				mIndent += i.i;
-
-				if(mIndent < 0)
-					mIndent = 0;
-
-				return *this;
-			}
-
-			obj& operator<< (const hex& h){
-				(*this) << h.v;
-				return *this;
-			}
-
-			obj& operator<< (std::ostream& ( *pf )(std::ostream&)){
-				if(pf == std::endl)
-					mLineStart = true;
-
-				mOut << pf;
-				return *this;
-			}
-
-			template<typename T> 
-			obj& operator<< (const T& x){
-				if(mLineStart){
-					for(int i = 0; i < mIndent; ++i)
-						mOut << "\t";
-
-					mLineStart = false;
-				}
-
-				mOut << x;
-				return *this;
-			}
-
-			std::string str() const {
-				return mOut.str();
-			}
-
-			operator std::string() const {
-				return mOut.str();
-			}
-
-		private:
-			static int mIndent;
-			static bool mLineStart;
-			std::stringstream mOut;
-		};
-
-		extern obj::indent_t indent;
-		extern obj::indent_t outdent;
-	};
 };
+
+#include "amf/amf_types.h"
+#include "amf/amf_log.h"

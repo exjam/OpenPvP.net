@@ -35,17 +35,23 @@
     <ClInclude Include="rtmp\rtmp.h">
       <Filter>Header Files\rtmp</Filter>
     </ClInclude>
-    <ClInclude Include="amf\amf.h">
+    <ClInclude Include="flex\flex.h">
+      <Filter>Header Files\flex</Filter>
+    </ClInclude>
+    <ClInclude Include="amf\amf0.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
     <ClInclude Include="amf\amf3.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
-    <ClInclude Include="amf\amf0.h">
+    <ClInclude Include="amf\amf_log.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
-    <ClInclude Include="flex\flex.h">
-      <Filter>Header Files\flex</Filter>
+    <ClInclude Include="amf\amf.h">
+      <Filter>Header Files\amf</Filter>
+    </ClInclude>
+    <ClInclude Include="amf\amf_types.h">
+      <Filter>Header Files\amf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -58,13 +64,10 @@
     <ClCompile Include="amf\amf.cpp">
       <Filter>Source Files\amf</Filter>
     </ClCompile>
-    <ClCompile Include="amf\amf3_entities.cpp">
-      <Filter>Source Files\amf</Filter>
-    </ClCompile>
-    <ClCompile Include="amf\amf0_entities.cpp">
-      <Filter>Source Files\amf</Filter>
-    </ClCompile>
     <ClCompile Include="amf\amf3.cpp">
+      <Filter>Source Files\amf</Filter>
+    </ClCompile>
+    <ClCompile Include="amf\amf0.cpp">
       <Filter>Source Files\amf</Filter>
     </ClCompile>
   </ItemGroup>

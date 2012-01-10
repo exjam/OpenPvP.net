@@ -80,6 +80,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="riotgames\riotgames.h" />
+    <ClInclude Include="riotgames\service.h" />
+    <ClInclude Include="riotgames\summonerservice.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

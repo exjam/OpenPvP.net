@@ -2,16 +2,152 @@
 #include "amf0.h"
 #include "amf3.h"
 
-namespace amf {
-	namespace log {
-		int obj::mIndent = 0;
-		bool obj::mLineStart = true;
-		obj::indent_t indent(1);
-		obj::indent_t outdent(-1);
-	};
+#include <stdarg.h>
+#include <assert.h>
 
-	null_t null;
-	undefined_t undefined;
+namespace amf {
+	log::indent_t amf::log::indent(1);
+	log::indent_t amf::log::outdent(-1);
+	int log::obj::mIndent = 0;
+	bool log::obj::mLineStart = true;
+
+	uint8 mCurrentVersion;
+
+	void setVersion(uint8 version){
+		mCurrentVersion = version;
+	}
+
+	Variant* deserialise(ByteStream& stream){
+		assert(stream.tell() < stream.size());
+
+		if(mCurrentVersion == 0)
+			return amf0::deserialise(mCurrentVersion, stream);
+		else if(mCurrentVersion == 3)
+			return amf3::deserialise(mCurrentVersion, stream);
+
+		throw new DecodeException("Invalid AMF version %d", mCurrentVersion);
+	}
+
+	void serialise(Variant* value, ByteStream& stream){
+		if(mCurrentVersion == 0)
+			return amf0::serialise(mCurrentVersion, value, stream);
+		else if(mCurrentVersion == 3)
+			return amf3::serialise(mCurrentVersion, value, stream);
+
+		throw new DecodeException("Invalid AMF version %d", mCurrentVersion);
+	}
+
+	void deserialise(Container* container, ByteStream& stream){
+		setVersion(0);
+		amf3::ReferenceTable::startGroup();
+
+		while(!stream.eof())
+			container->push_back(amf::deserialise(stream));
+	}
+
+	void serialise(Container* container, ByteStream& stream){
+		setVersion(0);
+
+		for(size_t i = 0; i < container->size(); ++i)
+			amf::serialise(container->at(i), stream);
+	}
+
+	int32 Variant::toInt() const {
+		switch(mType){
+			case AMF_NUMBER:
+				return (int32)((Number*)this)->value();
+			case AMF_INTEGER:
+				return ((Integer*)this)->value();
+			case AMF_BOOLEAN:
+				return ((Boolean*)this)->value() ? 1 : 0;
+			case AMF_STRING:
+				return atoi(((String*)this)->value().c_str());
+			case AMF_DATE:
+				return (int32)((Date*)this)->value();
+			default:
+				return 0;
+		};
+	}
+
+	bool Variant::toBool() const {
+		switch(mType){
+			case AMF_NUMBER:
+				return ((Number*)this)->value() > 0.0;
+			case AMF_INTEGER:
+				return ((Integer*)this)->value() > 0;
+			case AMF_BOOLEAN:
+				return ((Boolean*)this)->value();
+			case AMF_STRING:
+				return ((String*)this)->value().compare("true") == 0;
+			default:
+				throw std::bad_cast();
+		};
+	}
+
+	uint32 Variant::toUInt() const {
+		return toInt();
+	}
+
+	double Variant::toDate() const {
+		return toDouble();
+	}
+
+	double Variant::toDouble() const {
+		switch(mType){
+			case AMF_NUMBER:
+				return ((Number*)this)->value();
+			case AMF_INTEGER:
+				return ((Integer*)this)->value();
+			case AMF_STRING:
+				return atof(((String*)this)->value().c_str());
+			case AMF_DATE:
+				return ((Date*)this)->value();
+			default:
+				throw std::bad_cast();
+		};
+	}
+
+	Array* Variant::toArray() const {
+		if(mType != AMF_ARRAY)
+			throw std::bad_cast();
+
+		return (Array*)this;
+	}
+
+	ByteArray* Variant::toByteArray() const {
+		if(mType != AMF_BYTE_ARRAY)
+			throw std::bad_cast();
+
+		return (ByteArray*)this;
+	}
+
+	Object* Variant::toObject() const {
+		if(mType != AMF_OBJECT)
+			throw std::bad_cast();
+
+		return (Object*)this;
+	}
+
+	std::string Variant::toString() const {
+		char buffer[32];
+		switch(mType){
+			case AMF_NUMBER:
+				sprintf_s(buffer, 32, "%Lf", ((Number*)this)->value());
+				return buffer;
+			case AMF_INTEGER:
+				sprintf_s(buffer, 32, "%d", ((Integer*)this)->value());
+				return buffer;
+			case AMF_BOOLEAN:
+				return ((Boolean*)this)->value() ? "true" : "false";
+			case AMF_STRING:
+				return ((String*)this)->value();
+			case AMF_DATE:
+				sprintf_s(buffer, 32, "%Lf", ((Date*)this)->value());
+				return buffer;
+			default:
+				throw std::bad_cast();
+		};
+	}
 
 	void object_begin(Container* c){
 		(*c) << object_begin_t();
@@ -24,398 +160,84 @@ namespace amf {
 	object_begin_t object_begin(const std::string& name){
 		return object_begin_t(name);
 	}
-
-	/*
-	Base AMFx Entity
-	*/
-	Entity::Entity(uint32 type, uint32 version)
-		: mType(type), mVersion(version)
-	{
-	}
-
-	uint32 Entity::mActiveVersion = AMF0;
-		
-	uint32 Entity::type() const {
-		return mType;
-	}
-
-	void Entity::serialize(ByteStream& stream) const {
-		stream << mType;
-	}
-
-	void Entity::deserialize(ByteStream& stream){
-		stream >> mType;
-	}
-
-	std::string Entity::toString() const {
-		return std::string();
-	}
 	
-	Entity* Entity::create(Entity* value){
-		if(!value){
-			if(mActiveVersion == AMF0)
-				return new amf0::Null();
-			else if(mActiveVersion == AMF3)
-				return new amf3::Null();
-		}
-
-		return value;
+	object_creator_t::object_creator_t(bool value){
+		mValue = new Boolean(value);
 	}
 
-	Entity* Entity::createObject(const std::string& name){
-		if(mActiveVersion == AMF0){
-			if(name.length())
-				return new amf0::TypedObject(name);
-			else
-				return new amf0::Object();
-		}else
-			return new amf3::Object(name);
+	object_creator_t::object_creator_t(int32 value){
+		mValue = new Integer(value);
 	}
 
-	Entity* Entity::create(const undefined_t&){
-		if(mActiveVersion == AMF0)
-			return new amf0::Undefined();
-		else
-			return new amf3::Undefined();
+	object_creator_t::object_creator_t(uint32 value){
+		mValue = new Integer(value);
 	}
 
-	Entity* Entity::create(const bool& value){
-		if(mActiveVersion == AMF0)
-			return new amf0::Boolean(value);
-		else
-			return new amf3::Boolean(value);
-	}
-	
-	Entity* Entity::create(const uint8& value){
-		return create((uint32)value);
+	object_creator_t::object_creator_t(double value){
+		mValue = new Number(value);
 	}
 
-	Entity* Entity::create(const uint16& value){
-		return create((uint32)value);
+	object_creator_t::object_creator_t(const std::string& value){
+		mValue = new String(value);
 	}
 
-	Entity* Entity::create(const uint32& value){
-		if(mActiveVersion == AMF0)
-			return new amf0::Number((double)value);
-		else
-			return new amf3::Integer(value);
+	var_t var(const std::string& name, object_creator_t value){
+		return var_t(name, value.mValue);
 	}
 
-	Entity* Entity::create(const int8& value){
-		return create((int32)value);
+	var_t var(const std::string& name, Variant* value){
+		if(value == nullptr)
+			return var_t(name, new Null());
+
+		return var_t(name, value);
 	}
 
-	Entity* Entity::create(const int16& value){
-		return create((int32)value);
+	size_t Container::size() const {
+		return mChildren.size();
 	}
 
-	Entity* Entity::create(const int32& value){
-		if(mActiveVersion == AMF0)
-			return new amf0::Number((double)value);
-		else
-			return new amf3::Integer(value);
+	Variant* Container::at(size_t index) const {
+		return mChildren.at(index);
 	}
 
-	Entity* Entity::create(const float& value){
-		return create((double)value);
+	void Container::push_back(Variant* child){
+		mChildren.push_back(child);
 	}
 
-	Entity* Entity::create(const double& value){
-		if(mActiveVersion == AMF0)
-			return new amf0::Number(value);
-		else
-			return new amf3::Double(value);
+	Container& Container::operator<<(object_creator_t obj){
+		mChildren.push_back(obj.mValue);
+		return *this;
 	}
 
-	Entity* Entity::create(const char* value){
-		return create(std::string(value));
+	Container& Container::operator<<(Variant* obj){
+		mChildren.push_back(obj);
+		return *this;
 	}
 
-	Entity* Entity::create(const std::string& value){
-		if(mActiveVersion == AMF0)
-			return new amf0::String(value);
-		else
-			return new amf3::String(value);
-	}
-		
-	int32 Entity::asInt() const {
-		if(mVersion == AMF0){
-			if(mType == amf0::AMF0_NUMBER)
-				return (int32)((amf0::Number*)this)->value();
-			else if(mType == amf0::AMF0_NULL)
-				return 0;
-		}else if(mVersion == AMF3){
-			if(mType == amf3::AMF3_INTEGER)
-				return ((amf3::Integer*)this)->value();
-			else if(mType == amf3::AMF3_NULL)
-				return 0;
-		}
-		
-		throw new DecodeException("Invalid cast to uint32");
-	}
-	
-	double Entity::asDouble() const {
-		if(mVersion == AMF0){
-			if(mType == amf0::AMF0_NUMBER)
-				return ((amf0::Number*)this)->value();
-			else if(mType == amf0::AMF0_NULL)
-				return 0;
-		}else if(mVersion == AMF3){
-			if(mType == amf3::AMF3_DOUBLE)
-				return ((amf3::Double*)this)->value();
-			else if(mType == amf3::AMF3_NULL)
-				return 0;
-		}
-
-		throw new DecodeException("Invalid cast to double");
-	}
-	
-	bool Entity::asBool() const {
-		if(mVersion == AMF0){
-			if(mType == amf0::AMF0_BOOLEAN)
-				return ((amf0::Boolean*)this)->value();
-			else if(mType == amf0::AMF0_NULL)
-				return false;
-		}else if(mVersion == AMF3){
-			if(mType == amf3::AMF3_BOOLEAN)
-				return ((amf3::Boolean*)this)->value();
-			else if(mType == amf3::AMF3_NULL)
-				return false;
-		}
-
-		throw new DecodeException("Invalid cast to boolean");
-	}
-	
-	Object* Entity::asObject() const {
-		if(mVersion == AMF0){
-			if(mType == amf0::AMF0_OBJECT)
-				return (Object*)this;
-			else if(mType == amf0::AMF0_TYPED_OBJECT)
-				return (Object*)this;
-			else if(mType == amf0::AMF0_ECMA_ARRAY)
-				return (Object*)this;
-			else if(mType == amf0::AMF0_STRICT_ARRAY)
-				return (Object*)this;
-			else if(mType == amf3::AMF3_NULL)
-				return nullptr;
-		}else if(mVersion == AMF3){
-			if(mType == amf3::AMF3_OBJECT)
-				return (Object*)this;
-			else if(mType == amf3::AMF3_ARRAY)
-				return (Object*)this;
-			else if(mType == amf3::AMF3_NULL)
-				return nullptr;
-		}
-		
-		throw new DecodeException("Invalid cast to object");
-	}
-	
-	std::string Entity::asString() const {
-		if(mVersion == AMF0){
-			if(mType == amf0::AMF0_STRING)
-				return ((amf0::String*)this)->value();
-			else if(mType == amf0::AMF0_LONG_STRING)
-				return ((amf0::LongString*)this)->value();
-			else if(mType == amf0::AMF0_XML_DOC)
-				return ((amf0::XmlDocument*)this)->value();
-			else if(mType == amf0::AMF0_NULL)
-				return std::string();
-		}else if(mVersion == AMF3){
-			if(mType == amf3::AMF3_STRING)
-				return ((amf3::String*)this)->value();
-			else if(mType == amf3::AMF3_XML)
-				return ((amf3::Xml*)this)->value();
-			else if(mType == amf3::AMF3_XML_DOC)
-				return ((amf3::XmlDocument*)this)->value();
-			else if(mType == amf3::AMF3_NULL)
-				return std::string();
-		}
-		
-		throw new DecodeException("Invalid cast to string");
+	Container& Container::operator<<(const object_begin_t& obj){
+		Object* object = new Object(obj.mName);
+		mStreamObjects.push(object);
+		mChildren.push_back(object);
+		return *this;
 	}
 
-	Entity* Entity::readAMF0(ByteStream& stream){
-		using namespace amf0;
+	Container& Container::operator<<(const var_t& var){
+		if(mStreamObjects.size() > 0)
+			mStreamObjects.top()->set(var.mName, var.mValue);
 
-		Entity* result = NULL;
-		uint8 type = stream.peek();
-
-		switch(type){
-			case AMF0_NUMBER:
-				result = new Number();
-				break;
-			case AMF0_BOOLEAN:
-				result = new Boolean();
-				break;
-			case AMF0_STRING:
-				result = new String();
-				break;
-			case AMF0_OBJECT:
-				result = new amf0::Object();
-				break;
-			case AMF0_MOVIECLIP:
-				result = new MovieClip();
-				break;
-			case AMF0_NULL:
-				result = new Null();
-				break;
-			case AMF0_UNDEFINED:
-				result = new Undefined();
-				break;
-			case AMF0_REFERENCE:
-				result = new Reference();
-				break;
-			case AMF0_ECMA_ARRAY:
-				result = new AssociativeArray();
-				break;
-			case AMF0_OBJECT_END:
-				result = new ObjectEnd();
-				break;
-			case AMF0_STRICT_ARRAY:
-				result = new StrictArray();
-				break;
-			case AMF0_DATE:
-				result = new Date();
-				break;
-			case AMF0_LONG_STRING:
-				result = new LongString();
-				break;
-			case AMF0_UNSUPPORTED:
-				result = new Unsupported();
-				break;
-			case AMF0_RECORDSET:
-				result = new RecordSet();
-				break;
-			case AMF0_XML_DOC:
-				result = new XmlDocument();
-				break;
-			case AMF0_TYPED_OBJECT:
-				result = new TypedObject();
-				break;
-			case AMF0_AVMPLUS:
-				stream.skip(1);
-				return Entity::read(AMF3, stream);
-			default:
-				throw new DecodeException("Unsupported AMF0 marker %d\n", type);
-		}
-
-		if(result)
-			result->deserialize(stream);
-
-		return result;
+		return *this;
 	}
 
-	Entity* Entity::readAMF3(ByteStream& stream){
-		using namespace amf3;
-
-		Entity* result = NULL;
-		uint8 type = stream.peek();
-
-		switch(type){
-			case AMF3_UNDEFINED:
-				result = new Undefined();
-				break;
-			case AMF3_NULL:
-				result = new Null();
-				break;
-			case AMF3_FALSE:
-				result = new Boolean();
-				break;
-			case AMF3_TRUE:
-				result = new Boolean();
-				break;
-			case AMF3_INTEGER:
-				result = new Integer();
-				break;
-			case AMF3_DOUBLE:
-				result = new Double();
-				break;
-			case AMF3_STRING:
-				result = new String();
-				break;
-			case AMF3_XML_DOC:
-				result = new XmlDocument();
-				break;
-			case AMF3_DATE:
-				result = new Date();
-				break;
-			case AMF3_ARRAY:
-				result = new Array();
-				break;
-			case AMF3_OBJECT:
-				result = new amf3::Object();
-				break;
-			case AMF3_XML:
-				result = new Xml();
-				break;
-			case AMF3_BYTE_ARRAY:
-				result = new ByteArray();
-				break;
-			case AMF3_AVMPLUS:
-				stream.skip(1);
-				break;
-			default:
-				throw new DecodeException("Unsupported AMF3 marker %d\n", type);
-		}
-
-		if(result)
-			result->deserialize(stream);
-
-		return result;
-	}
-	
-	void Entity::setVersion(uint32 version){
-		mActiveVersion = version;
+	Container& Container::operator<<(const object_end_t& obj){
+		mStreamObjects.pop();
+		return *this;
 	}
 
-	Entity* Entity::read(ByteStream& stream){
-		return (mActiveVersion == AMF0) ? readAMF0(stream) : readAMF3(stream);
+	Container& Container::operator<<(void (*pf)(Container*)){
+		(*pf)(this);
+		return *this;
 	}
 
-	Entity* Entity::read(uint32 version, ByteStream& stream){
-		mActiveVersion = version;
-		return read(stream);
-	}
-
-	/*
-	AMFx Container
-	*/
-	Container::Container(){
-	}
-
-	Container::~Container(){
-		for(auto itr = mChildren.begin(); itr != mChildren.end(); ++itr)
-			delete *itr;
-	}
-
-	std::string Container::toString() const {
-		log::obj obj;
-
-		obj << "{" << std::endl;
-		obj << log::indent;
-
-		for(auto itr = mChildren.begin(); itr != mChildren.end(); ++itr)
-			obj << (*itr)->toString() << std::endl;
-			
-		obj << log::outdent;
-		obj << "}";
-
-		return obj;
-	}
-	
-	void Container::serialize(ByteStream& stream) const {
-		for(auto itr = mChildren.begin(); itr != mChildren.end(); ++itr)
-			(*itr)->serialize(stream);
-	}
-
-	void Container::deserialize(ByteStream& stream){
-		while(!stream.eof())
-			add(Entity::read(stream));
-	}
-
-	/*
-	Decode Exception
-	*/
 	DecodeException::DecodeException(const std::string& what)
 		: mWhat(what)
 	{
@@ -435,10 +257,7 @@ namespace amf {
 	const char* DecodeException::what() const throw() {
 		return mWhat.c_str();
 	}
-	
-	/*
-	Encode Exception
-	*/
+
 	EncodeException::EncodeException(const std::string& what)
 		: mWhat(what)
 	{

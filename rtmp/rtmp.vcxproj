@@ -11,19 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="amf\amf.h" />
     <ClInclude Include="amf\amf0.h" />
     <ClInclude Include="amf\amf3.h" />
+    <ClInclude Include="amf\amf_log.h" />
+    <ClInclude Include="amf\amf.h" />
+    <ClInclude Include="amf\amf_types.h" />
     <ClInclude Include="flex\flex.h" />
     <ClInclude Include="rtmp\bytestream.h" />
     <ClInclude Include="rtmp\rtmp.h" />
     <ClInclude Include="rtmp\types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="amf\amf.cpp" />
-    <ClCompile Include="amf\amf0_entities.cpp" />
+    <ClCompile Include="amf\amf0.cpp" />
     <ClCompile Include="amf\amf3.cpp" />
-    <ClCompile Include="amf\amf3_entities.cpp" />
+    <ClCompile Include="amf\amf.cpp" />
     <ClCompile Include="rtmp\rtmp.cpp" />
     <ClCompile Include="rtmp\rtmpclient.cpp" />
   </ItemGroup>

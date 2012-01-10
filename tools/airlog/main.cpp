@@ -15,26 +15,25 @@ Logs RTMP packets sent from adobe air before SSL encryption
 FILE* gLogFile = NULL;
 
 void processPacket(bool isSend, rtmp::Packet& pak){
-	amf3::ReferenceTables::Objects.reset();
-	amf3::ReferenceTables::Strings.reset();
-	amf3::ReferenceTables::ClassDefinitions.reset();
-
 	switch(pak.type()){
 		case rtmp::AMF0_COMMAND:
 			{
 				amf::Container result;
-				result.deserialize(pak.mData);
+				amf::deserialise(&result, pak.mData);
 				
+				amf::log::obj log;
+				log << result;
+
 				printf("AMF0_COMMAND\n");
 				fprintf(gLogFile, "AMF0_COMMAND\n");
-				fputs(result.toString().c_str(), gLogFile);
+				fputs(log.str().c_str(), gLogFile);
 				fputs("\n", gLogFile);
 			}
 			break;
 		case rtmp::AMF3_COMMAND:
 			{
 				rtmp::Amf3Command cmd;
-				cmd.deserialize(pak.mData);
+				cmd.deserialise(pak.mData);
 				
 				printf("AMF3_COMMAND\n");
 				fprintf(gLogFile, "AMF3_COMMAND\n");
@@ -92,7 +91,7 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 		uint32 hSize = rtmp::Packet::getHeaderSize(header);
 
 		rtmp::Packet pak;
-		pak.deserialize(header);
+		pak.deserialise(header);
 
 		ByteStream data;
 		pak.mData.write(buffer + hSize, size - hSize);
@@ -129,6 +128,7 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 			fprintf(gLogFile, "\n");
 		}
 	}else{
+		printf(" %d bytes\n", size);
 		fprintf(gLogFile, " %d bytes", size);
 
 		for(int i = 0; i < size; ++i){

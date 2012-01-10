@@ -22,5 +22,11 @@
     <ClInclude Include="riotgames\riotgames.h">
       <Filter>Header Files\riotgames</Filter>
     </ClInclude>
+    <ClInclude Include="riotgames\summonerservice.h">
+      <Filter>Header Files\riotgames</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\service.h">
+      <Filter>Header Files\riotgames</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

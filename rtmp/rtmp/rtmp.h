@@ -72,18 +72,21 @@ namespace rtmp {
 		int mHandshakeStage;
 	};
 
-	class Amf3Command : public Serializable {
+	class Amf3Command : public Serialisable {
 	public:
 		static const int Type = rtmp::AMF3_COMMAND;
 
 		Amf3Command(amf::Object* obj = nullptr);
-	
-		virtual void serialize(ByteStream& stream) const;
-		virtual void deserialize(ByteStream& stream);
-
-		void setObject(amf::Object* object);
-
+		
 		virtual std::string toString() const;
+		virtual void serialise(ByteStream& stream) const;
+		virtual void deserialise(ByteStream& stream);
+		
+		double number() const;
+		amf::Object* object() const;
+
+		void setNumber(double number);
+		void setObject(amf::Object* object);
 
 	private:
 		double mNumber;
@@ -91,7 +94,7 @@ namespace rtmp {
 	};
 
 #pragma pack(push, 1)
-	class Packet : public Serializable {
+	class Packet : public Serialisable {
 	public:
 		//fmt = 0 = abs timestamp, 1-3 = delta
 		Packet(uint8 type = 0);
@@ -107,8 +110,10 @@ namespace rtmp {
 
 		uint8 type() const;
 
-		virtual void serialize(ByteStream& stream) const;
-		virtual void deserialize(ByteStream& stream);
+		
+		virtual std::string toString() const;
+		virtual void serialise(ByteStream& stream) const;
+		virtual void deserialise(ByteStream& stream);
 
 		static uint32 getHeaderSize(ByteStream& stream);
 

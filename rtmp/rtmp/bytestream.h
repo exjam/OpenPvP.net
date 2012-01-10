@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include <string.h>
+#include <assert.h>
 
 class ByteStream {
 public:
@@ -197,13 +198,8 @@ public:
 
 private:
 	void checkRead(uint32 size){
-		if(!mBuffer){
-			//TODO: throw exception
-		}
-
-		if(mCursor + size >= mDataLength){
-			//TODO: throw exception
-		}
+		assert(mBuffer);
+		assert(mCursor + size <= mDataLength);
 	}
 
 	void checkWrite(uint32 size){

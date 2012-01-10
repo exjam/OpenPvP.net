@@ -1,4 +1,5 @@
- /*
+//out of date
+/*
 { object com.riotgames.platform.account.AccountSummary
 	accountId = 3.22884e+007
 	admin = false
@@ -58,6 +59,21 @@ namespace riotgames {
 				}
 			};
 
+/*
+public class AuthenticationCredentials extends Object
+{
+public var partnerCredentials:String;
+public var oldPassword:String;
+public var domain:String;
+public var ipAddress:String;
+public var authToken:String;
+public var locale:String;
+public var clientVersion:String;
+public var password:String;
+public var username:String;
+public var securityAnswer:String;
+}
+*/
 			class AuthenticationCredentials : public amf::ObjectWrapper {
 			public:
 				AuthenticationCredentials(amf::Object* obj)

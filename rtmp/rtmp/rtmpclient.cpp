@@ -78,7 +78,7 @@ namespace rtmp {
 		pak.mHeader.mBodySize = pak.mData.size();
 		pak.mData.chunk(mChunkSize);
 		
-		pak.serialize(bs);
+		pak.serialise(bs);
 
 		send(bs);
 		send(pak.mData);
@@ -104,10 +104,13 @@ namespace rtmp {
 			case AMF0_COMMAND:
 				{
 					amf::Container result;
-					result.deserialize(stream);
+					amf::deserialise(&result, stream);
+
+					amf::log::obj obj;
+					obj << result << std::endl;
 
 					std::cout << "AMF0_COMMAND: " << std::endl;
-					std::cout << result.toString() << std::endl;
+					std::cout << obj.str() << std::endl;
 				}
 				break;
 			default:
@@ -169,7 +172,6 @@ namespace rtmp {
 							<< var("flashVer", "WIN 10,1,85,3")
 							<< var("fpad", false)
 							<< var("objectEncoding", 3)
-							<< var("pageUrl", undefined)
 							<< var("swfUrl", "app:/mod_ser.dat")
 							<< var("tcUrl", "rtmps://prod.na1.lol.riotgames.com:2099")
 							<< var("videoCodecs", 252)
@@ -177,7 +179,7 @@ namespace rtmp {
 						<< object_end;
 					
 					Packet pak(AMF0_COMMAND);
-					connect.serialize(pak.mData);
+					amf::serialise(&connect, pak.mData);
 					send(pak);
 				}
 				return 1;
@@ -227,7 +229,7 @@ namespace rtmp {
 				}
 
 				read->seek(0);
-				pak.deserialize(*read);
+				pak.deserialise(*read);
 				hasHeader = true;
 
 				read = &pak.mData;

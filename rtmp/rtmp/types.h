@@ -2,6 +2,8 @@
 
 #pragma warning(disable:4200) //zero-sized array
 
+#include <string>
+
 typedef char int8;
 typedef short int16;
 typedef int int32;
@@ -41,7 +43,9 @@ struct uint24 {
 
 #include "bytestream.h"
 
-struct Serializable {
-	virtual void serialize(ByteStream& stream) const = 0;
-	virtual void deserialize(ByteStream& stream) = 0;
+struct Serialisable {
+	virtual void serialise(ByteStream& stream) const = 0;
+	virtual void deserialise(ByteStream& stream) = 0;
+	
+	virtual std::string toString() const = 0;
 };
