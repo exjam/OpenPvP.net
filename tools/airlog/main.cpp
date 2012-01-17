@@ -2,9 +2,11 @@
 Logs RTMP packets sent from adobe air before SSL encryption
 */
 
-#include "rtmp/rtmp.h"
+#include "amf/log.h"
 #include "amf/amf.h"
 #include "amf/amf3.h"
+#include "rtmp/packet.h"
+#include "rtmp/messages.h"
 
 #include <iostream>
 #include <windows.h>
@@ -18,11 +20,10 @@ void processPacket(bool isSend, rtmp::Packet& pak){
 	switch(pak.type()){
 		case rtmp::AMF0_COMMAND:
 			{
-				amf::Container result;
-				amf::deserialise(&result, pak.mData);
-				
+				rtmp::messages::Amf0Command cmd(pak);
+
 				amf::log::obj log;
-				log << result;
+				log << cmd.information();
 
 				printf("AMF0_COMMAND\n");
 				fprintf(gLogFile, "AMF0_COMMAND\n");
@@ -32,12 +33,14 @@ void processPacket(bool isSend, rtmp::Packet& pak){
 			break;
 		case rtmp::AMF3_COMMAND:
 			{
-				rtmp::Amf3Command cmd;
-				cmd.deserialise(pak.mData);
+				rtmp::messages::Amf3Command cmd(pak);
 				
+				amf::log::obj log;
+				log << cmd.object();
+
 				printf("AMF3_COMMAND\n");
 				fprintf(gLogFile, "AMF3_COMMAND\n");
-				fputs(cmd.toString().c_str(), gLogFile);
+				fputs(log.str().c_str(), gLogFile);
 				fputs("\n", gLogFile);
 			}
 			break;
@@ -47,10 +50,17 @@ void processPacket(bool isSend, rtmp::Packet& pak){
 	}
 }
 
+unsigned int send_big_buffer_offset = 0;
+unsigned char* send_big_buffer = new unsigned char[4096*10];
+
+unsigned int recv_big_buffer_offset = 0;
+unsigned char* recv_big_buffer = new unsigned char[4096*10];
+
 void processPacket(bool isSend, unsigned char* buffer, int size){
 	static unsigned int sendBytes = 0;
 	static unsigned int recvBytes = 0;
 	bool decode = false;
+	bool printBytes = true;
 
 	if(isSend){
 		static bool skipNext = false;
@@ -60,11 +70,24 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 		fprintf(gLogFile, "Send>");
 
 		if(size == 4096){
+			memcpy(send_big_buffer + send_big_buffer_offset, buffer, size);
+			send_big_buffer_offset += size;
+
 			skipNext = true;
 			decode = false;
+			printBytes = false;
 		}else if(skipNext){
+			memcpy(send_big_buffer + send_big_buffer_offset, buffer, size);
+
+			buffer = send_big_buffer;
+			size = send_big_buffer_offset + size;
+
+			send_big_buffer_offset = 0;
+
 			skipNext = false;
-			decode = false;
+			decode = true;
+		}else{
+			send_big_buffer_offset = 0;
 		}
 	}else{
 		static bool skipNext = false;
@@ -76,11 +99,24 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 		fprintf(gLogFile, "Recv>");
 		
 		if(size == 4096){
+			memcpy(recv_big_buffer + recv_big_buffer_offset, buffer, size);
+			recv_big_buffer_offset += size;
+
 			skipNext = true;
 			decode = false;
+			printBytes = false;
 		}else if(skipNext){
+			memcpy(recv_big_buffer + recv_big_buffer_offset, buffer, size);
+
+			buffer = recv_big_buffer;
+			size = recv_big_buffer_offset + size;
+
+			recv_big_buffer_offset = 0;
+
 			skipNext = false;
-			decode = false;
+			decode = true;
+		}else{
+			recv_big_buffer_offset = 0;
 		}
 	}
 
@@ -127,7 +163,7 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 
 			fprintf(gLogFile, "\n");
 		}
-	}else{
+	}else if(printBytes){
 		printf(" %d bytes\n", size);
 		fprintf(gLogFile, " %d bytes", size);
 

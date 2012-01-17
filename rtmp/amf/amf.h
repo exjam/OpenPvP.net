@@ -1,9 +1,7 @@
 #pragma once
 
-#include <stack>
-#include <string>
-#include <vector>
-#include "rtmp/types.h"
+#include "types.h"
+#include "rtmp/bytestream.h"
 
 namespace amf {
 	typedef enum {
@@ -18,78 +16,39 @@ namespace amf {
 		AMF_OBJECT,
 		AMF_UNKNOWN_TYPE,
 	} AmfTypes;
-
+	
 	class Variant;
-	class Object;
 	class Null;
-	class Number;
-	class Integer;
-	class Boolean;
-	class String;
 	class Date;
 	class Array;
+	class Object;
+	class Number;
+	class String;
+	class Integer;
+	class Boolean;
 	class ByteArray;
-	class Container;
+	class EncoderImpl;
 	
-	void setVersion(uint8 version);
+	class Encoder_ {
+		static const int mMaxVersion = 3;
 
-	Variant* deserialise(ByteStream& stream);
-	void serialise(Variant* value, ByteStream& stream);
-
-	void deserialise(Container* container, ByteStream& stream);
-	void serialise(Container* container, ByteStream& stream);
-
-	struct object_begin_t {
-		object_begin_t(){}
-		object_begin_t(const std::string& n) : mName(n) {}
-		std::string mName;
-	};
-	struct object_end_t {};
-	
-	void object_begin(class Container*);
-	void object_end(class Container*);
-	object_begin_t object_begin(const std::string& name);
-
-	struct var_t {
-		var_t(const std::string& name, Variant* value)
-			: mName(name), mValue(value) {}
-
-		std::string mName;
-		Variant* mValue;
-	};
-
-	struct object_creator_t {
-		object_creator_t(bool value);
-		object_creator_t(int32 value);
-		object_creator_t(uint32 value);
-		object_creator_t(double value);
-		object_creator_t(const std::string& value);
-
-		Variant* mValue;
-	};
-
-	var_t var(const std::string& name, Variant* value);
-	var_t var(const std::string& name, object_creator_t obj);
-
-	class Container {
 	public:
-		Container& operator<<(Variant* obj);
-		Container& operator<<(object_creator_t obj);
+		Encoder_();
 
-		Container& operator<<(const var_t& var);
-		Container& operator<<(const object_begin_t& obj);
-		Container& operator<<(const object_end_t& obj);
+		void setVersion(uint8 version);
+		
+		Variant* deserialise(ByteStream& stream);
+		void serialise(Variant* value, ByteStream& stream);
 
-		Container& operator<<(void (*pf)(Container*));
-
-		size_t size() const;
-		Variant* at(size_t index) const;
-		void push_back(Variant* child);
+		void start(uint8 version);
+		void end();
 
 	private:
-		std::stack<Object*> mStreamObjects;
-		std::vector<Variant*> mChildren;
+		uint8 mVersion;
+		EncoderImpl* mVersions[mMaxVersion + 1];
 	};
+
+	extern Encoder_ Encoder;
 
 	class DecodeException : public std::exception {
 	public:
@@ -112,7 +71,32 @@ namespace amf {
 	private:
 		std::string mWhat;
 	};
-};
 
-#include "amf/amf_types.h"
-#include "amf/amf_log.h"
+	class EncoderImpl {
+	public:
+		virtual void start() = 0;
+		virtual void end() = 0;
+
+		virtual void serialise(uint8 version, Variant* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Null* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Number* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Integer* number, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Boolean* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, String* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Date* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Array* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, ByteArray* value, ByteStream& stream) = 0;
+		virtual void serialise(uint8 type, Object* value, ByteStream& stream) = 0;
+		
+		virtual Variant* deserialise(uint8 version, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Null* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Number* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Integer* number, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Boolean* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, String* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Date* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Array* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, ByteArray* value, ByteStream& stream) = 0;
+		virtual void deserialise(uint8 type, Object* value, ByteStream& stream) = 0;
+	};
+};

@@ -1,12 +1,15 @@
 #pragma once
 
 #include "amf.h"
+
 #include <map>
+#include <vector>
 
 namespace amf {
 	class Variant {
 	public:
 		Variant(int type) : mType(type) {}
+		virtual ~Variant() {}
 
 		int type() const { return mType; }
 
@@ -19,6 +22,13 @@ namespace amf {
 		Object* toObject() const;
 		std::string toString() const;
 		ByteArray* toByteArray() const;
+
+		static Variant* fromValue(const std::string& value);
+		static Variant* fromValue(const char* value);
+		static Variant* fromValue(const uint32& value);
+		static Variant* fromValue(const int32& value);
+		static Variant* fromValue(const bool& value);
+		static Variant* fromValue(const double& value);
 
 	private:
 		int mType;
@@ -195,6 +205,7 @@ namespace amf {
 		static const int Type = AMF_BYTE_ARRAY;
 
 		ByteArray() : Variant(Type), mSize(0), mData(0) {}
+
 		~ByteArray(){
 			if(mData)
 				delete [] mData;
@@ -221,12 +232,45 @@ namespace amf {
 		uint32 mSize;
 		uint8* mData;
 	};
+
+	struct var_t {
+		var_t(const std::string& name, Variant* value) : mName(name), mValue(value) {}
+
+		std::string mName;
+		Variant* mValue;
+	};
+
+	struct object_creator_t {
+		object_creator_t(Variant* value) : mValue(value) {}
+		object_creator_t(const std::string& value) : mValue(Variant::fromValue(value)) {}
+		object_creator_t(const char* value) : mValue(Variant::fromValue(value)) {}
+		object_creator_t(const uint32& value) : mValue(Variant::fromValue(value)) {}
+		object_creator_t(const int32& value) : mValue(Variant::fromValue(value)) {}
+		object_creator_t(const bool& value) : mValue(Variant::fromValue(value)) {}
+		object_creator_t(const double& value) : mValue(Variant::fromValue(value)) {}
+
+		Variant* mValue;
+	};
+
+	var_t var(const std::string& name, object_creator_t obj);
 	
 	class Array : public Variant {
 	public:
 		static const int Type = AMF_ARRAY;
 
 		Array() : Variant(Type) {}
+		
+		~Array(){
+			for(auto itr = mAssociative.begin(); itr != mAssociative.end(); ++itr){
+				if(itr->second)
+					delete itr->second;
+			}
+
+			for(auto itr = mDense.begin(); itr != mDense.end(); ++itr){
+				if(*itr)
+					delete *itr;
+			}
+		}
 
 		Variant* at(size_t index) const {
 			if(index >= mDense.size())
@@ -285,6 +329,16 @@ namespace amf {
 		std::map<std::string, Variant*>::const_iterator end(){
 			return mAssociative.end();
 		}
+		
+		Array& operator<<(Variant* var){
+			push_back(var);
+			return *this;
+		}
+		
+		Array& operator<<(const var_t& var){
+			insert(var.mName, var.mValue);
+			return *this;
+		}
 
 	private:
 		std::vector<Variant*> mDense;
@@ -297,6 +351,13 @@ namespace amf {
 
 		Object() : Variant(Type) {}
 		Object(const std::string& name) : Variant(Type), mName(name) {}
+		
+		virtual ~Object(){
+			for(auto itr = mProperties.begin(); itr != mProperties.end(); ++itr){
+				if(itr->second)
+					delete itr->second;
+			}
+		}
 
 		Variant* get(const std::string& key) const {
 			auto itr = mProperties.find(key);
@@ -307,6 +368,10 @@ namespace amf {
 		}
 
 		void set(const std::string& key, Variant* value){
+			auto itr = mProperties.find(key);
+			if(itr != mProperties.end())
+				delete itr->second;
+
 			mProperties[key] = value;
 		}
 
@@ -332,6 +397,11 @@ namespace amf {
 
 		std::map<std::string, Variant*>::const_iterator end(){
 			return mProperties.end();
+		}
+		
+		Object& operator<<(const var_t& var){
+			insert(var.mName, var.mValue);
+			return *this;
 		}
 
 	private:

@@ -1,11 +1,26 @@
 #include "amf.h"
 #include "amf0.h"
+#include "variant.h"
+
 #include <assert.h>
 
-namespace amf0 {
-	using namespace amf;
+namespace amf {
+	amf0::amf0(){
+	}
 
-	void serialise(uint8 version, Variant* value, ByteStream& stream){
+	void amf0::start(){
+	}
+
+	void amf0::end(){
+	}
+	
+	void amf0::serialise(uint8 type, ByteArray* value, ByteStream& stream){
+	}
+	
+	void amf0::deserialise(uint8 type, ByteArray* value, ByteStream& stream){
+	}
+
+	void amf0::serialise(uint8 version, Variant* value, ByteStream& stream){
 		assert(version == 0);
 			
 		uint8 type = value ? value->type() : AMF_NULL;
@@ -40,13 +55,13 @@ namespace amf0 {
 		}
 	}
 		
-	void serialise(uint8 type, Null* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Null* value, ByteStream& stream){
 		assert(type == AMF0_INVALID);
 
 		stream << uint8(AMF0_NULL);
 	}
 
-	void serialise(uint8 type, Number* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Number* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_NUMBER);
 
 		if(type == AMF0_INVALID)
@@ -55,7 +70,7 @@ namespace amf0 {
 		stream << double(value->value());
 	}
 
-	void serialise(uint8 type, Integer* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Integer* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_NUMBER);
 			
 		if(type == AMF0_INVALID)
@@ -64,7 +79,7 @@ namespace amf0 {
 		stream << double(value->value());
 	}
 
-	void serialise(uint8 type, Boolean* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Boolean* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_BOOLEAN);
 			
 		if(type == AMF0_INVALID)
@@ -73,7 +88,7 @@ namespace amf0 {
 		stream << uint8(value->value() ? 1 : 0);
 	}
 
-	void serialise(uint8 type, String* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, String* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_STRING);
 			
 		if(type == AMF0_INVALID)
@@ -84,7 +99,7 @@ namespace amf0 {
 		stream.write(str.c_str(), str.length());
 	}
 
-	void serialise(uint8 type, Date* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Date* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_DATE);
 			
 		if(type == AMF0_DATE)
@@ -94,7 +109,7 @@ namespace amf0 {
 		stream << uint16(0);
 	}
 
-	void serialise(uint8 type, Array* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Array* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_ECMA_ARRAY || type == AMF0_STRICT_ARRAY);
 
 		if(value->hasAssociative() && value->hasDense())
@@ -110,7 +125,7 @@ namespace amf0 {
 
 			for(auto itr = value->begin(); itr != value->end(); ++itr){
 				serialise(AMF0_STRING, &String(itr->first), stream);
-				serialise(itr->second, stream);
+				Encoder.serialise(itr->second, stream);
 			}
 		}else if(value->hasDense()){
 			assert(type == AMF0_INVALID || type == AMF0_STRICT_ARRAY);
@@ -121,11 +136,11 @@ namespace amf0 {
 			stream << uint32(value->size());
 
 			for(size_t i = 0; i < value->size(); ++i)
-				serialise(value->at(i), stream);
+				Encoder.serialise(value->at(i), stream);
 		}
 	}
 
-	void serialise(uint8 type, Object* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, Object* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_OBJECT || type == AMF0_TYPED_OBJECT);
 
 		if(value->name().length()){
@@ -144,14 +159,14 @@ namespace amf0 {
 
 		for(auto itr = value->begin(); itr != value->end(); ++itr){
 			serialise(AMF0_STRING, &String(itr->first), stream);
-			serialise(itr->second, stream);
+			Encoder.serialise(itr->second, stream);
 		}
 
 		stream << uint16(0);
 		stream << uint8(AMF0_OBJECT_END);
 	}
 
-	Variant* deserialise(uint8 version, ByteStream& stream){
+	Variant* amf0::deserialise(uint8 version, ByteStream& stream){
 		assert(version == 0);
 
 		uint8 type;
@@ -196,8 +211,8 @@ namespace amf0 {
 				deserialise(type, (Null*)value, stream);
 				break;
 			case AMF0_AVMPLUS:
-				amf::setVersion(3);
-				return amf::deserialise(stream);
+				Encoder.setVersion(3);
+				return Encoder.deserialise(stream);
 			/*
 			case AMF0_REFERENCE:
 				break;
@@ -216,21 +231,21 @@ namespace amf0 {
 		return value;
 	}
 
-	void deserialise(uint8 type, Null* value, ByteStream& stream){
+	void amf0::deserialise(uint8 type, Null* value, ByteStream& stream){
 		assert(type == AMF0_NULL || type == AMF0_UNDEFINED);
 	}
 
-	void deserialise(uint8 type, Number* value, ByteStream& stream){			
+	void amf0::deserialise(uint8 type, Number* value, ByteStream& stream){			
 		assert(type == AMF0_NUMBER);
 
 		stream >> value->value();
 	}
 
-	void deserialise(uint8 type, Integer* number, ByteStream& stream){
+	void amf0::deserialise(uint8 type, Integer* number, ByteStream& stream){
 		__debugbreak();
 	}
 
-	void deserialise(uint8 type, Boolean* value, ByteStream& stream){
+	void amf0::deserialise(uint8 type, Boolean* value, ByteStream& stream){
 		assert(type == AMF0_BOOLEAN);
 
 		uint8 charValue;
@@ -238,7 +253,7 @@ namespace amf0 {
 		value->value() = charValue > 0;
 	}
 
-	void deserialise(uint8 type, String* value, ByteStream& stream){
+	void amf0::deserialise(uint8 type, String* value, ByteStream& stream){
 		assert(type == AMF0_STRING || type == AMF0_LONG_STRING || type == AMF0_XML_DOC);
 
 		uint32 size;
@@ -254,14 +269,14 @@ namespace amf0 {
 		stream.skip(size);
 	}
 
-	void deserialise(uint8 type, Date* value, ByteStream& stream){
+	void amf0::deserialise(uint8 type, Date* value, ByteStream& stream){
 		assert(type == AMF0_DATE);
 
 		stream >> value->value();
 		stream >> value->timezone();
 	}
 
-	void deserialise(uint8 type, Array* value, ByteStream& stream){
+	void amf0::deserialise(uint8 type, Array* value, ByteStream& stream){
 		assert(type == AMF0_STRICT_ARRAY || type == AMF0_ECMA_ARRAY);
 
 		uint32 size;
@@ -269,17 +284,17 @@ namespace amf0 {
 
 		if(type == AMF0_STRICT_ARRAY){
 			for(uint32 i = 0; i < size; ++i)
-				value->push_back(amf::deserialise(stream));
+				value->push_back(Encoder.deserialise(stream));
 		}else if(type == AMF0_ECMA_ARRAY){
 			for(uint32 i = 0; i < size; ++i){
 				String key;
 				deserialise(AMF0_STRING, &key, stream);
-				value->insert(key, amf::deserialise(stream));
+				value->insert(key, Encoder.deserialise(stream));
 			}
 		}
 	}
 
-	void deserialise(uint8 type, Object* value, ByteStream& stream){
+	void amf0::deserialise(uint8 type, Object* value, ByteStream& stream){
 		assert(type == AMF0_OBJECT || type == AMF0_TYPED_OBJECT);
 
 		if(type == AMF0_TYPED_OBJECT){
@@ -292,7 +307,7 @@ namespace amf0 {
 			String key;
 			deserialise(AMF0_STRING, &key, stream);
 
-			Variant* data = amf::deserialise(stream);
+			Variant* data = Encoder.deserialise(stream);
 			if(!data)
 				break;
 

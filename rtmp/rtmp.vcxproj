@@ -13,20 +13,25 @@
   <ItemGroup>
     <ClInclude Include="amf\amf0.h" />
     <ClInclude Include="amf\amf3.h" />
-    <ClInclude Include="amf\amf_log.h" />
+    <ClInclude Include="amf\log.h" />
     <ClInclude Include="amf\amf.h" />
-    <ClInclude Include="amf\amf_types.h" />
-    <ClInclude Include="flex\flex.h" />
+    <ClInclude Include="amf\variant.h" />
+    <ClInclude Include="flex\messages.h" />
+    <ClInclude Include="flex\services.h" />
     <ClInclude Include="rtmp\bytestream.h" />
-    <ClInclude Include="rtmp\rtmp.h" />
-    <ClInclude Include="rtmp\types.h" />
+    <ClInclude Include="rtmp\client.h" />
+    <ClInclude Include="rtmp\messages.h" />
+    <ClInclude Include="rtmp\packet.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="amf\amf0.cpp" />
     <ClCompile Include="amf\amf3.cpp" />
     <ClCompile Include="amf\amf.cpp" />
-    <ClCompile Include="rtmp\rtmp.cpp" />
-    <ClCompile Include="rtmp\rtmpclient.cpp" />
+    <ClCompile Include="amf\variant.cpp" />
+    <ClCompile Include="rtmp\messages.cpp" />
+    <ClCompile Include="rtmp\packet.cpp" />
+    <ClCompile Include="rtmp\client.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BEF24D64-EFA0-48EF-847A-801CDBF2704C}</ProjectGuid>

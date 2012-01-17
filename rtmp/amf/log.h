@@ -3,8 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "amf.h"
-#include "amf_types.h"
+#include "variant.h"
 
 namespace amf {
 	namespace log {
@@ -62,13 +61,13 @@ namespace amf {
 				return *this;
 			}
 			
-			obj& operator<< (const Container& c){
-				(*this) << &c;
+			obj& operator<< (const Object& var){
+				(*this) << &var;
 				return *this;
 			}
-			
-			obj& operator<< (Container* const& c){
-				(*this) << (const Container*)c;
+
+			obj& operator<< (Object* const& var){
+				(*this) << (const Variant*)var;
 				return *this;
 			}
 
@@ -171,18 +170,6 @@ namespace amf {
 						break;
 				}
 
-				return *this;
-			}
-
-			obj& operator<< (const Container* const& container){
-				(*this) << "{" << std::endl;
-				(*this) << indent;
-
-				for(size_t i = 0; i < container->size(); ++i)
-					(*this) << container->at(i) << std::endl;
-
-				(*this) << outdent;
-				(*this) << "}";
 				return *this;
 			}
 

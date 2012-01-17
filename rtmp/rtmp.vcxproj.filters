@@ -29,38 +29,41 @@
     <ClInclude Include="rtmp\bytestream.h">
       <Filter>Header Files\rtmp</Filter>
     </ClInclude>
-    <ClInclude Include="rtmp\types.h">
-      <Filter>Header Files\rtmp</Filter>
-    </ClInclude>
-    <ClInclude Include="rtmp\rtmp.h">
-      <Filter>Header Files\rtmp</Filter>
-    </ClInclude>
-    <ClInclude Include="flex\flex.h">
-      <Filter>Header Files\flex</Filter>
-    </ClInclude>
     <ClInclude Include="amf\amf0.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
     <ClInclude Include="amf\amf3.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
-    <ClInclude Include="amf\amf_log.h">
-      <Filter>Header Files\amf</Filter>
-    </ClInclude>
     <ClInclude Include="amf\amf.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
-    <ClInclude Include="amf\amf_types.h">
+    <ClInclude Include="flex\services.h">
+      <Filter>Header Files\flex</Filter>
+    </ClInclude>
+    <ClInclude Include="flex\messages.h">
+      <Filter>Header Files\flex</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\client.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\messages.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmp\packet.h">
+      <Filter>Header Files\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="amf\variant.h">
+      <Filter>Header Files\amf</Filter>
+    </ClInclude>
+    <ClInclude Include="amf\log.h">
       <Filter>Header Files\amf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="rtmp\rtmp.cpp">
-      <Filter>Source Files\rtmp</Filter>
-    </ClCompile>
-    <ClCompile Include="rtmp\rtmpclient.cpp">
-      <Filter>Source Files\rtmp</Filter>
-    </ClCompile>
     <ClCompile Include="amf\amf.cpp">
       <Filter>Source Files\amf</Filter>
     </ClCompile>
@@ -68,6 +71,18 @@
       <Filter>Source Files\amf</Filter>
     </ClCompile>
     <ClCompile Include="amf\amf0.cpp">
+      <Filter>Source Files\amf</Filter>
+    </ClCompile>
+    <ClCompile Include="rtmp\messages.cpp">
+      <Filter>Source Files\rtmp</Filter>
+    </ClCompile>
+    <ClCompile Include="rtmp\client.cpp">
+      <Filter>Source Files\rtmp</Filter>
+    </ClCompile>
+    <ClCompile Include="rtmp\packet.cpp">
+      <Filter>Source Files\rtmp</Filter>
+    </ClCompile>
+    <ClCompile Include="amf\variant.cpp">
       <Filter>Source Files\amf</Filter>
     </ClCompile>
   </ItemGroup>

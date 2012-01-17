@@ -1,7 +1,12 @@
-#include "rtmp.h"
+#include "client.h"
+#include "packet.h"
+#include "messages.h"
+#include "bytestream.h"
+
+#include "amf/log.h"
 #include "amf/amf0.h"
 #include "amf/amf3.h"
-#include "bytestream.h"
+#include "amf/variant.h"
 
 #include <iostream>
 #include <WinSock2.h>
@@ -67,26 +72,59 @@ namespace rtmp {
 			printf("send result = %d, should be %u\n", result, length);
 	}
 
-	void Client::send(ByteStream& stream){
-		send(stream.data(), stream.size());
+	void Client::send(ByteStream* stream){
+		send(stream->data(), stream->size());
 	}
 
-	void Client::send(Packet& pak){
+	void Client::send(Packet* pak){
 		static ByteStream bs;
 		bs.clear();
 	
-		pak.mHeader.mBodySize = pak.mData.size();
-		pak.mData.chunk(mChunkSize);
+		pak->mHeader.mBodySize = pak->mData.size();
+		pak->mData.chunk(mChunkSize);
 		
-		pak.serialise(bs);
+		pak->serialise(bs);
 
-		send(bs);
-		send(pak.mData);
+		send(&bs);
+		send(&pak->mData);
+	}
+	
+	void Client::send(messages::AmfCommand* command){
+		command->setID(getNextCommandID());
+		send(command->packet());
 	}
 
-	void Client::onReceivePacket(Packet& pak){
-		ByteStream& stream = pak.mData;
-		switch(pak.type()){
+	void Client::send(messages::AmfCommand* command, const CommandCallback& onResult){
+		command->setID(getNextCommandID());
+		mCallbacks.push_back(CommandIDCallback(command->id(), onResult));
+		send(command->packet());
+	}
+
+	CommandCallback Client::popCallback(double id){
+		for(auto itr = mCallbacks.begin(); itr != mCallbacks.end(); ++itr){
+			if(itr->mID == id){
+				auto func = itr->mFunction;
+				mCallbacks.erase(itr);
+				return func;
+			}
+		}
+
+		return CommandCallback();
+	}
+
+	uint32 Client::getNextCommandID(){
+		static uint32 id = 1;
+		return id++;
+	}
+	
+	Client& Client::instance(){
+		static Client client;
+		return client;
+	}
+
+	void Client::onReceivePacket(Packet* pak){
+		ByteStream& stream = pak->mData;
+		switch(pak->type()){
 			case WINDOW_ACK_SIZE:
 				{
 					uint32 ack_size;
@@ -103,18 +141,36 @@ namespace rtmp {
 				break;
 			case AMF0_COMMAND:
 				{
-					amf::Container result;
-					amf::deserialise(&result, stream);
+					messages::Amf0Command command(*pak);
+					auto callback = popCallback(command.id());
+					if(callback._Empty()){
+						std::cout << "Unhandled Amf0Command: " << command.name() << "[" << command.id() << "]" << std::endl;
 
-					amf::log::obj obj;
-					obj << result << std::endl;
+						amf::log::obj obj;
+						obj << command.information() << std::endl;
+						std::cout << obj.str() << std::endl;
+					}else{
+						callback(command.information());
+					}
+				}
+				break;
+			case AMF3_COMMAND:
+				{
+					messages::Amf3Command command(*pak);
+					auto callback = popCallback(command.id());
+					if(callback._Empty()){
+						std::cout << "Unhandled Amf3Command [" << command.id() << "]" << std::endl;
 
-					std::cout << "AMF0_COMMAND: " << std::endl;
-					std::cout << obj.str() << std::endl;
+						amf::log::obj obj;
+						obj << command.object() << std::endl;
+						std::cout << obj.str() << std::endl;
+					}else{
+						callback(command.object());
+					}
 				}
 				break;
 			default:
-				printf("Unhandled RTMP packet type %u:\n", pak.type());
+				printf("Unhandled RTMP packet type %u:\n", pak->type());
 			
 				for(uint32 i = 0; i < stream.size(); ++i)
 					printf("%02x ", stream.data()[i]);
@@ -124,17 +180,17 @@ namespace rtmp {
 	}
 
 	uint32 Client::startHandshake(){
-		rtmp::HandshakeVersion version = { 3 };
-		send((uint8*)&version, sizeof(rtmp::HandshakeVersion));
+		rtmp::messages::HandshakeVersion version = { 3 };
+		send((uint8*)&version, sizeof(rtmp::messages::HandshakeVersion));
 
-		rtmp::HandshakeSignature signature;
-		memset(&signature, 0, sizeof(rtmp::HandshakeSignature));
-		send((uint8*)&signature, sizeof(rtmp::HandshakeSignature));
+		rtmp::messages::HandshakeSignature signature;
+		memset(&signature, 0, sizeof(rtmp::messages::HandshakeSignature));
+		send((uint8*)&signature, sizeof(rtmp::messages::HandshakeSignature));
 
 		return waitHandshake(HS_WAIT_SRV_VERSION);
 	}
 
-	uint32 Client::onReceiveHandshake(ByteStream& pak){
+	uint32 Client::onReceiveHandshake(ByteStream* pak){
 		switch(mHandshakeStage){
 			case HS_WAIT_SRV_VERSION:
 				return waitHandshake(HS_WAIT_SRV_SIGNATURE);
@@ -148,41 +204,39 @@ namespace rtmp {
 		};
 	}
 
+	void Client::onConnect(amf::Variant* result){
+		amf::Object* object = result->toObject();
+		std::cout << "connect result: "<< object->get("code")->toString() << std::endl;
+	}
+
 	uint32 Client::waitHandshake(int stage){
 		mHandshakeStage = stage;
 
 		switch(stage){
 			case Client::HS_WAIT_SRV_VERSION:
-				return sizeof(rtmp::HandshakeVersion);
+				return sizeof(rtmp::messages::HandshakeVersion);
 			case Client::HS_WAIT_CLI_SIGNATURE:
 			case Client::HS_WAIT_SRV_SIGNATURE:
-				return sizeof(rtmp::HandshakeSignature);
+				return sizeof(rtmp::messages::HandshakeSignature);
 			case Client::HS_COMPLETE:
 				{
 					using namespace amf;
 
-					Container connect;
-					connect
-						<< "connect"
-						<< 1.0
-						<< object_begin
-							<< var("app", "")
-							<< var("audioCodecs", 3191)
-							<< var("capabilities", 239)
-							<< var("flashVer", "WIN 10,1,85,3")
-							<< var("fpad", false)
-							<< var("objectEncoding", 3)
-							<< var("swfUrl", "app:/mod_ser.dat")
-							<< var("tcUrl", "rtmps://prod.na1.lol.riotgames.com:2099")
-							<< var("videoCodecs", 252)
-							<< var("videoFunction", 1)
-						<< object_end;
+					Object object;
+					object
+						<< var("app", "")
+						<< var("audioCodecs", 3191)
+						<< var("capabilities", 239)
+						<< var("flashVer", "WIN 10,1,85,3")
+						<< var("fpad", false)
+						<< var("objectEncoding", 3)
+						<< var("swfUrl", "app:/mod_ser.dat")
+						<< var("tcUrl", "rtmps://prod.na1.lol.riotgames.com:2099")
+						<< var("videoCodecs", 252)
+						<< var("videoFunction", 1);
 					
-					Packet pak(AMF0_COMMAND);
-					amf::serialise(&connect, pak.mData);
-					send(pak);
+					send(&messages::Amf0Command("connect", &object), std::bind(&Client::onConnect, this, std::placeholders::_1));
 				}
-				return 1;
 			default:
 				return 1;
 		};
@@ -216,7 +270,7 @@ namespace rtmp {
 				continue;
 
 			if(mHandshakeStage != HS_COMPLETE){
-				read->setDataSize(onReceiveHandshake(*read));
+				read->setDataSize(onReceiveHandshake(read));
 				read->seek(0);
 				continue;
 			}
@@ -238,7 +292,7 @@ namespace rtmp {
 			}else{
 				read->dechunk(mChunkSize);
 				read->seek(0);
-				onReceivePacket(pak);
+				onReceivePacket(&pak);
 			
 				hasHeader = false;
 

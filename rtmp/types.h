@@ -40,12 +40,3 @@ struct uint24 {
 	uint32 _value;
 	uint32* _ptr;
 };
-
-#include "bytestream.h"
-
-struct Serialisable {
-	virtual void serialise(ByteStream& stream) const = 0;
-	virtual void deserialise(ByteStream& stream) = 0;
-	
-	virtual std::string toString() const = 0;
-};

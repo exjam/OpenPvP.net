@@ -1,26 +1,111 @@
-/*
-//lsat 2 params are fptr onResult and fptr onComplete
-function changeTalentRankings(param1:Number, param2:Object, param3:Function, param4:Function) : void;
-function checkSummonerName(param1:String, param2:Function, param3:Function) : void;
-function getSocialNetworkFriends(param1:Function, param2:Function, param3:Function) : void;
-function getAllSummonerData(param1:Number, param2:Function, param3:Function) : void;
-function getSummoner(param1:Number, param2:Function, param3:Function) : void;
-function getSummonerByName(param1:String, param2:Function, param3:Function) : void;
-function saveSocialNetworkFriendList(param1:Array, param2:Array, param3:String, param4:Function, param5:Function, param6:Function) : void;
-function getPublicSummonersByAccountIds(param1:Array, param2:Function, param3:Function) : void;
-function getAllPublicSummonerDataByAccount(param1:Number, param2:Function, param3:Function) : void;
-function saveSummoner(param1:Summoner, param2:Function, param3:Function, param4:Function) : void;
-function getSummonerByAccountId(param1:Number, param2:Function, param3:Function) : void;
-function getSummonerInternalNameByName(param1:String, param2:Function, param3:Function, param4:Function, param5:Object) : void;
-function createSummoner(param1:Summoner, param2:Function, param3:Function, param4:Function) : void;
-function getAllSummonerDataByAccount(param1:Number, param2:Function, param3:Function) : void;
-function updateProfileIconId(param1:int, param2:Function, param3:Function) : void;
-function getSummonerCatalog(param1:Function, param2:Function) : void;
-function updateSummonerSocialNetworkUser(param1:String, param2:String, param3:String, param4:Function, param5:Function, param6:Function) : void;
-function createStubSummoner(param1:Function, param2:Function) : void;
-function playerChangeSummonerName(param1:Number, param2:String, param3:Function, param4:Function, param5:Function) : void;
-function createDefaultSummoner(param1:String, param2:Function, param3:Function, param4:Function) : void;
-function getSummonerNames(param1:Array, param2:Function, param3:Function) : void;
-function getSocialNetworkUsers(param1:Array, param2:String, param3:Function, param4:Function, param5:Function) : void;
-function resetTalents(param1:Number, param2:Function, param3:Function) : void;
-*/
+#pragma once
+
+#include "flex/services.h"
+
+namespace riotgames {
+	namespace platform {
+		namespace gameclient {
+			namespace services {
+				class SummonerService : private flex::messaging::services::Service {
+				public:
+					SummonerService()
+						: flex::messaging::services::Service("summonerService")
+					{
+					}
+
+					void changeTalentRankings(double param1, amf::Object* param2, const rtmp::CommandCallback& callback){
+						invoke("changeTalentRankings", callback, &amf::Number(param1), param2);
+					}
+
+					void checkSummonerName(const std::string& param1, const rtmp::CommandCallback& callback){
+						invoke("checkSummonerName", callback, &amf::String(param1));
+					}
+
+					void getSocialNetworkFriends(const rtmp::CommandCallback& callback){
+						invoke("getSocialNetworkFriends", callback);
+					}
+
+					void getAllSummonerData(double param1, const rtmp::CommandCallback& callback){
+						invoke("getAllSummonerData", callback, &amf::Number(param1));
+					}
+
+					void getSummoner(double param1, const rtmp::CommandCallback& callback){
+						invoke("getSummoner", callback, &amf::Number(param1));
+					}
+
+					void getSummonerByName(const std::string& param1, const rtmp::CommandCallback& callback){
+						invoke("getSummonerByName", callback, &amf::String(param1));
+					}
+
+					void saveSocialNetworkFriendList(amf::Array* param1, amf::Array* param2, const std::string& param3, const rtmp::CommandCallback& callback){
+						invoke("saveSocialNetworkFriendList", callback, param1, param2, &amf::String(param3));
+					}
+
+					void getPublicSummonersByAccountIds(amf::Array* param1, const rtmp::CommandCallback& callback){
+						invoke("getPublicSummonersByAccountIds", callback, param1);
+					}
+
+					void getAllPublicSummonerDataByAccount(double param1, const rtmp::CommandCallback& callback){
+						invoke("getAllPublicSummonerDataByAccount", callback, &amf::Number(param1));
+					}
+
+					/*void saveSummoner(Summoner* param1, const rtmp::CommandCallback& callback){
+						invoke("saveSummoner", callback, param1);
+					}*/
+
+					void getSummonerByAccountId(double param1, const rtmp::CommandCallback& callback){
+						invoke("getSummonerByAccountId", callback, &amf::Number(param1));
+					}
+
+					void getSummonerInternalNameByName(const std::string& param1, amf::Object* param5, const rtmp::CommandCallback& callback){
+						invoke("getSummonerInternalNameByName", callback, &amf::String(param1), param5);
+					}
+
+					/*void createSummoner(Summoner* param1, const rtmp::CommandCallback& callback){
+						invoke("createSummoner", callback, param1);
+					}*/
+
+					void getAllSummonerDataByAccount(double param1, const rtmp::CommandCallback& callback){
+						invoke("getAllSummonerDataByAccount", callback, &amf::Number(param1));
+					}
+
+					void updateProfileIconId(int param1, const rtmp::CommandCallback& callback){
+						invoke("updateProfileIconId", callback, &amf::Integer(param1));
+					}
+
+					void getSummonerCatalog(const rtmp::CommandCallback& callback){
+						invoke("getSummonerCatalog", callback);
+					}
+
+					void updateSummonerSocialNetworkUser(const std::string& param1, const std::string& param2, const std::string& param3, const rtmp::CommandCallback& callback){
+						invoke("updateSummonerSocialNetworkUser", callback, &amf::String(param1), &amf::String(param2), &amf::String(param3));
+					}
+
+					void createStubSummoner(const rtmp::CommandCallback& callback){
+						invoke("createStubSummoner", callback);
+					}
+
+					void playerChangeSummonerName(double param1, const std::string& param2, const rtmp::CommandCallback& callback){
+						invoke("playerChangeSummonerName", callback, &amf::Number(param1), &amf::String(param2));
+					}
+
+					void createDefaultSummoner(const std::string& param1, const rtmp::CommandCallback& callback){
+						invoke("createDefaultSummoner", callback, &amf::String(param1));
+					}
+
+					void getSummonerNames(amf::Array* param1, const rtmp::CommandCallback& callback){
+						invoke("getSummonerNames", callback, param1);
+					}
+
+					void getSocialNetworkUsers(amf::Array* param1, const std::string& param2, const rtmp::CommandCallback& callback){
+						invoke("getSocialNetworkUsers", callback, param1, &amf::String(param2));
+					}
+
+					void resetTalents(double param1, const rtmp::CommandCallback& callback){
+						invoke("resetTalents", callback, &amf::Number(param1));
+					}
+				};
+			};
+		};
+	};
+};
