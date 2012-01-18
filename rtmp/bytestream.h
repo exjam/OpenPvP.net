@@ -27,6 +27,13 @@ public:
 	{
 	}
 
+	ByteStream(ByteStream* source)
+		: mCursor(0), mBuffer(0), mDataLength(source->mDataLength), mBufferLength(source->mDataLength), mEndian(source->mEndian)
+	{
+		mBuffer = new uint8[mDataLength];
+		memcpy(mBuffer, source->mBuffer, mDataLength);
+	}
+
 	~ByteStream(){}
 
 	template<typename T>

@@ -1,79 +1,77 @@
-#include "client.h"
-#include "packet.h"
-#include "messages.h"
-#include "bytestream.h"
-
 #include "amf/log.h"
 #include "amf/amf0.h"
 #include "amf/amf3.h"
 #include "amf/variant.h"
 
+#include "client.h"
+#include "packet.h"
+#include "messages.h"
+#include "bytestream.h"
+#include "socket.h"
+#include "securesocket.h"
+#include "criticalsection.h"
+
 #include <iostream>
-#include <WinSock2.h>
-#include <ws2tcpip.h>
 #include <openssl/ssl.h>
 
 namespace rtmp {
 	Client::Client()
-		: mChunkSize(128)
+		: mChunkSize(128), mSocket(nullptr)
 	{
-		SSL_library_init();
-		SSL_load_error_strings();
-		OpenSSL_add_all_digests();
-	
-		SSL_CTX* ctx = SSL_CTX_new(SSLv23_method());
-		SSL_CTX_set_options(ctx, SSL_OP_ALL);
-		SSL_CTX_set_default_verify_paths(ctx);
-
-		mSSL = SSL_new(ctx);
-		mSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		mSendLock = new CriticalSection();
 	}
 
 	Client::~Client(){
 		disconnect();
+
+		if(mSocket)
+			delete mSocket;
+
+		delete mSendLock;
 	}
 
-	bool Client::connect(const char* host, uint16 port){
-		sockaddr_in address;
-		if(!resolve(host, &address))
+	bool Client::connect(const std::string& url){
+		std::string protocol, host, port;
+		
+		int start = url.find("://");
+		if(start == std::string::npos)
 			return false;
 
-		address.sin_port = htons(port);
-		if(int ret = ::connect(mSocket, (SOCKADDR *)&address, sizeof(address)))
+		protocol = url.substr(0, start);
+
+		int end = url.find_last_of(":");
+		if(end == std::string::npos)
+			return false;
+
+		host = url.substr(start + 3, end - (start + 3));
+		if(host.length() == 0)
 			return false;
 		
-		SSL_set_fd(mSSL, mSocket);
-		int result = SSL_connect(mSSL);
-		if(result < 0){
-			printf("SSL_connect = %d\n", result);
-			return false;
-		}
+		start = end + 1;
+		end = url.find_first_not_of("0123456789", start);
+		port = url.substr(start, end - start);
 
-		return true;
+		if(port.length() == 0)
+			return false;
+
+		if(protocol.compare("rtmps") == 0)
+			mSocket = new SecureSocket();
+		else if(protocol.compare("rtmp") == 0)
+			mSocket = new Socket();
+		else
+			return false;
+
+		return mSocket->connect(host.c_str(), atoi(port.c_str()));
 	}
 
 	void Client::disconnect(){
-		if(mSSL){
-			SSL_shutdown(mSSL);
-			SSL_free(mSSL);
-		}
-
-		if(mSocket)
-			closesocket(mSocket);
-
-		mSSL = 0;
-		mSocket = 0;
-	}
-
-	void Client::send(const uint8* data, uint32 length){
-		int result = SSL_write(mSSL, data, length);
-
-		if(result != length)//TODO: throw exception
-			printf("send result = %d, should be %u\n", result, length);
+		mSocket->disconnect();
 	}
 
 	void Client::send(ByteStream* stream){
-		send(stream->data(), stream->size());
+		mSendLock->lock();
+		mSendData.push(new ByteStream(stream));
+		mSendLock->unlock();
 	}
 
 	void Client::send(Packet* pak){
@@ -181,11 +179,17 @@ namespace rtmp {
 
 	uint32 Client::startHandshake(){
 		rtmp::messages::HandshakeVersion version = { 3 };
-		send((uint8*)&version, sizeof(rtmp::messages::HandshakeVersion));
 
+		ByteStream bs1;
+		bs1.write((uint8*)&version, sizeof(rtmp::messages::HandshakeVersion));
+		send(&bs1);
+		
 		rtmp::messages::HandshakeSignature signature;
 		memset(&signature, 0, sizeof(rtmp::messages::HandshakeSignature));
-		send((uint8*)&signature, sizeof(rtmp::messages::HandshakeSignature));
+
+		ByteStream bs2;
+		bs2.write((uint8*)&signature, sizeof(rtmp::messages::HandshakeSignature));
+		send(&bs2);
 
 		return waitHandshake(HS_WAIT_SRV_VERSION);
 	}
@@ -242,7 +246,7 @@ namespace rtmp {
 		};
 	}
 
-	void Client::recvThread(){
+	void Client::start(){
 		bool hasHeader = false;
 		
 		Packet pak;
@@ -254,81 +258,71 @@ namespace rtmp {
 		header.reserve(16);
 		header.setDataSize(startHandshake());
 
-		int result, error = 0;
-		do {
-			Sleep(20);
+		bool error = false;
+		while(!error){
+			if(mSocket->canRead()){
+				int result = mSocket->read(read->data() + read->tell(), read->size() - read->tell());
 
-			if(read->size() == 0)
-				continue;
+				if(result == -1){
+					error = true;
+					break;
+				}else if(result > 0){
+					read->skip(result);
+					if(read->tell() != read->size())
+						continue;
 
-			result = SSL_read(mSSL, read->data() + read->tell(), read->size() - read->tell());
-			if(result == -1 && (error = SSL_get_error(mSSL, result)))
-				break;
+					if(mHandshakeStage != HS_COMPLETE){
+						read->setDataSize(onReceiveHandshake(read));
+						read->seek(0);
+						continue;
+					}
 
-			read->skip(result);
-			if(read->tell() != read->size())
-				continue;
+					if(!hasHeader){
+						uint32 hSize = Packet::getHeaderSize(*read);
+						if(read->size() < hSize){
+							read->setDataSize(hSize);
+							continue;
+						}
 
-			if(mHandshakeStage != HS_COMPLETE){
-				read->setDataSize(onReceiveHandshake(read));
-				read->seek(0);
-				continue;
-			}
+						read->seek(0);
+						pak.deserialise(*read);
+						hasHeader = true;
 
-			if(!hasHeader){
-				uint32 hSize = Packet::getHeaderSize(*read);
-				if(read->size() < hSize){
-					read->setDataSize(hSize);
-					continue;
+						read = &pak.mData;
+						read->seek(0);
+						read->setDataSize(pak.mHeader.mBodySize + pak.mHeader.mBodySize / mChunkSize);
+					}else{
+						read->dechunk(mChunkSize);
+						read->seek(0);
+						onReceivePacket(&pak);
+			
+						hasHeader = false;
+
+						read = &header;
+						read->seek(0);
+						read->setDataSize(1);
+					}
 				}
 
-				read->seek(0);
-				pak.deserialise(*read);
-				hasHeader = true;
-
-				read = &pak.mData;
-				read->seek(0);
-				read->setDataSize(pak.mHeader.mBodySize + pak.mHeader.mBodySize / mChunkSize);
-			}else{
-				read->dechunk(mChunkSize);
-				read->seek(0);
-				onReceivePacket(&pak);
-			
-				hasHeader = false;
-
-				read = &header;
-				read->seek(0);
-				read->setDataSize(1);
+				if(error)
+					break;
 			}
-		} while(error == SSL_ERROR_NONE);
 		
-		printf("Result: %d, SSL_get_error: %d, WSAGetLastError: %d\n", result, error, WSAGetLastError());
+			if(mSocket->canWrite() && mSendData.size()){
+				mSendLock->lock();
+
+				while(mSendData.size()){
+					ByteStream* stream = mSendData.front();
+					mSocket->write(stream->data(), stream->size());
+					delete stream;
+					mSendData.pop();
+				}
+
+				mSendLock->unlock();
+			}
+		};
+		
+		mSocket->getLastError();
 		disconnect();
-	}
-
-	bool Client::resolve(const char* host, sockaddr_in* address){
-		struct addrinfo *result = NULL;
-		struct addrinfo *ptr = NULL;
-		struct addrinfo hints;
-
-		ZeroMemory(&hints, sizeof(hints));
-		hints.ai_family = AF_INET;
-		hints.ai_socktype = SOCK_STREAM;
-		hints.ai_protocol = IPPROTO_TCP;
-
-		if(int ret = getaddrinfo(host, "0", &hints, &result))
-			return false;
-		
-		for(addrinfo* itr = result; itr != NULL; itr = itr->ai_next){
-			if(itr->ai_family != AF_INET) continue;
-			*address = *(sockaddr_in*)itr->ai_addr;
-
-			printf("Resolved %s to %d.%d.%d.%d\n", host,address->sin_addr.S_un.S_un_b.s_b1,
-				address->sin_addr.S_un.S_un_b.s_b2, address->sin_addr.S_un.S_un_b.s_b3, address->sin_addr.S_un.S_un_b.s_b4);
-
-			return true;
-		}
-
-		return false;
 	}
 };

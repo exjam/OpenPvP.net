@@ -16,12 +16,17 @@
     <ClInclude Include="amf\log.h" />
     <ClInclude Include="amf\amf.h" />
     <ClInclude Include="amf\variant.h" />
+    <ClInclude Include="basesocket.h" />
+    <ClInclude Include="bytestream.h" />
+    <ClInclude Include="criticalsection.h" />
     <ClInclude Include="flex\messages.h" />
     <ClInclude Include="flex\services.h" />
-    <ClInclude Include="rtmp\bytestream.h" />
+    <ClInclude Include="lock.h" />
     <ClInclude Include="rtmp\client.h" />
     <ClInclude Include="rtmp\messages.h" />
     <ClInclude Include="rtmp\packet.h" />
+    <ClInclude Include="securesocket.h" />
+    <ClInclude Include="socket.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>

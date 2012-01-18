@@ -2,17 +2,18 @@
 
 #include "types.h"
 
+#include <queue>
 #include <vector>
 #include <functional>
 
 class ByteStream;
-struct sockaddr_in;
-typedef struct ssl_st SSL;
-typedef __w64 unsigned int SOCKET;
 
 namespace amf {
 	class Variant;
 };
+
+class Lock;
+class BaseSocket;
 
 namespace rtmp {
 	class Packet;
@@ -46,14 +47,10 @@ namespace rtmp {
 		Client();
 		~Client();
 
-		bool connect(const char* host, uint16 port);
+		bool connect(const std::string& url);
 		void disconnect();
 
-		void recvThread();
-	
-		void send(Packet* pak);
-		void send(ByteStream* pak);
-		void send(const uint8* data, uint32 length);
+		void start();
 
 		void send(messages::AmfCommand* command);
 		void send(messages::AmfCommand* command, const CommandCallback& onResult);
@@ -61,6 +58,10 @@ namespace rtmp {
 		void onConnect(amf::Variant* result);
 
 		static Client& instance();
+	
+	private:
+		void send(Packet* pak);
+		void send(ByteStream* pak);
 
 	private:
 		uint32 getNextCommandID();
@@ -71,15 +72,17 @@ namespace rtmp {
 		uint32 waitHandshake(int stage);
 		uint32 onReceiveHandshake(ByteStream* pak);
 
-		bool resolve(const char* host, sockaddr_in* address);
-
 		CommandCallback popCallback(double id);
 		
 	private:
-		SSL* mSSL;
-		SOCKET mSocket;
+		BaseSocket* mSocket;
+
 		int mChunkSize;
 		int mHandshakeStage;
+
+		Lock* mSendLock;
+		std::queue<ByteStream*> mSendData;
+
 		std::vector<CommandIDCallback> mCallbacks;
 	};
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "rtmp/bytestream.h"
+#include "bytestream.h"
 
 namespace amf {
 	typedef enum {
