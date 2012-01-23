@@ -10,19 +10,35 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="riotgames\platform\common\domain\authenticationcredentials.h" />
+    <ClInclude Include="riotgames\platform\common\services\loginservice.h" />
+    <ClInclude Include="riotgames\platform\common\services\messagerouterservice.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\abstracteventdispatchingdomainobject.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\accountsummary.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\broadcast\broadcastnotification.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\playercomplaint.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\serversessionobject.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\systemstates\clientsystemstatesnotification.h" />
+    <ClInclude Include="riotgames\platform\gameclient\services\clientfacadeservice.h" />
+    <ClInclude Include="riotgames\platform\gameclient\services\matchmakerservice.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="riotgames.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1CBE8C89-CC6C-4DEE-B6DA-403998D22D2C}</ProjectGuid>
+    <ProjectGuid>{6FBEF47B-62CA-4514-A214-06E02ED55709}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Client</RootNamespace>
+    <RootNamespace>riotgames</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -38,12 +54,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
     <IncludePath>../rtmp/;.;D:\Programming\Projects\PSPC\common;D:\Programming\pspsdk\psp\sdk\include;D:\Programming\Libraries\glew-1.5.2\include;D:\Programming\Libraries\DirectX SDK March 2009\Include;D:\Programming\Libraries\tinyxml++\include;D:\Programming\Projects\R3E;D:\Programming\Libraries\oglbmfont;D:\Programming\Libraries\ftgl\src;D:\Programming\Libraries\freetype2\include;D:\Applications\Cg\include;D:\Programming\Libraries\winpcap\Include;D:\Programming\Libraries\sqlapi\include;D:\Programming\Libraries\DevIL\include;D:\Programming\Libraries\unrar;D:\Programming\Projects\TitanVFS;D:\Programming\Libraries\ExLIB;C:\Program Files\Microsoft Visual Studio 10.0\VC\ATLMFC\INCLUDE;C:\Program Files\Microsoft Visual Studio 10.0\VC\INCLUDE;C:\Program Files\Microsoft SDKs\Windows\v7.0A\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programming\Libraries\OpenSSL-Win32\lib\VC;D:\Programming\Libraries\glew-1.5.2\lib;D:\Programming\Libraries\DirectX SDK March 2009\Lib\x86;D:\Programming\Libraries\tinyxml++\lib;D:\Programming\Libraries\oglbmfont\bin;D:\Programming\Libraries\ftgl\msvc\build;D:\Programming\Libraries\freetype2\objs\win32\vc2008;D:\Applications\Cg\lib;D:\Programming\Libraries\DevIL\lib;D:\Programming\Libraries\winpcap\Lib;D:\Programming\Libraries\sqlapi\vs2008\lib;D:\Programming\Libraries\unrar;C:\Program Files\Microsoft Visual Studio 10.0\VC\ATLMFC\LIB;C:\Program Files\Microsoft Visual Studio 10.0\VC\LIB;C:\Program Files\Microsoft SDKs\Windows\v7.0A\Lib;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -51,10 +62,10 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -66,21 +77,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="riotgames\summonerservice.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

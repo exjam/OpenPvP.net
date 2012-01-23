@@ -1,6 +1,8 @@
 #include "amf.h"
 #include "amf3.h"
 #include "variant.h"
+#include "flex/messages.h"
+#include "flex/iexternalizable.h"
 
 #include <assert.h>
 #include <algorithm>
@@ -22,9 +24,9 @@ namespace amf {
 		return count;
 	}
 	
-	void ExternalisedDefinition::read(Object* obj, ByteStream& stream){
+	void ExternalisedDefinition::readExternal(Object* obj, ByteStream& stream){
 		if(mParent)
-			mParent->read(obj, stream);
+			mParent->readExternal(obj, stream);
 
 		if(mUsesFlags){
 			std::vector<uint8> flags;
@@ -48,6 +50,9 @@ namespace amf {
 			for(auto itr = mFields.begin(); itr != mFields.end(); ++itr)
 				obj->insert(*itr, Encoder.deserialise(stream));
 		}
+	}
+
+	void ExternalisedDefinition::writeExternal(amf::Object* object, ByteStream& stream){
 	}
 
 	std::string ExternalisedDefinition::name() const {
@@ -101,15 +106,15 @@ namespace amf {
 		for(auto ptr = arrf; *ptr; ++ptr)
 			arr->addField(*ptr);
 
-		addExternalisedDefinition(abstr);
-		addExternalisedDefinition(async);
-		addExternalisedDefinition(ack);
-		addExternalisedDefinition(cmd);
-		addExternalisedDefinition(arr);
+		addExternalizable(abstr);
+		addExternalizable(async);
+		addExternalizable(ack);
+		addExternalizable(cmd);
+		addExternalizable(arr);
 
-		addExternalisedDefinition("DSA", async);
-		addExternalisedDefinition("DSK", ack);
-		addExternalisedDefinition("DSC", cmd);
+		addExternalizable("DSA", async);
+		addExternalizable("DSK", ack);
+		addExternalizable("DSC", cmd);
 	}
 
 	amf3::amf3(){
@@ -120,13 +125,34 @@ namespace amf {
 		mStrings.clear();
 		mObjects.clear();
 
-		for(auto itr = mDefinitions.begin(); itr != mDefinitions.end(); ++itr)
-			delete *itr;
-
-		mDefinitions.clear();
+		for(auto itr = mDefinitions.begin(); itr != mDefinitions.end(); ){
+			amf::ObjectDefinition* def = *itr;
+			if(def->mTemporary){
+				delete def;
+				itr = mDefinitions.erase(itr);
+			}else{
+				++itr;
+			}
+		}
 	}
 
 	void amf3::end(){
+	}
+
+	void amf3::defineObject(Object* object){
+		if(getDefinition(object->name()))
+			return;
+
+		ObjectDefinition* def = new ObjectDefinition();
+		def->mName = object->name();
+		def->mDynamic = true;
+		def->mExternalisable = false;
+		def->mTemporary = false;
+		
+		for(auto itr = object->begin(); itr != object->end(); ++itr)
+			def->mMembers.push_back(itr->first);
+
+		addDefinition(def);
 	}
 
 	void amf3::addString(const std::string& str){
@@ -138,15 +164,18 @@ namespace amf {
 	}
 
 	void amf3::addDefinition(ObjectDefinition* def){
-		mDefinitions.push_back(def);
+		if(def->mTemporary)
+			mDefinitions.push_back(def);
+		else
+			mPermanentDefinitions.push_back(def);
 	}
 
-	void amf3::addExternalisedDefinition(ExternalisedDefinition* def){
-		mExternalisedDefinitions[def->name()] = def;
+	void amf3::addExternalizable(flex::utils::IExternalizable* def){
+		mExternalizables[def->name()] = def;
 	}
 
-	void amf3::addExternalisedDefinition(const std::string& name, ExternalisedDefinition* def){
-		mExternalisedDefinitions[name] = def;
+	void amf3::addExternalizable(const std::string& name, flex::utils::IExternalizable* def){
+		mExternalizables[name] = def;
 	}
 
 	std::string amf3::getString(uint32 index){
@@ -167,12 +196,17 @@ namespace amf {
 				return *itr;
 		}
 
+		for(auto itr = mPermanentDefinitions.begin(); itr != mPermanentDefinitions.end(); ++itr){
+			if((*itr)->mName.compare(name) == 0)
+				return *itr;
+		}
+
 		return nullptr;
 	}
 
-	ExternalisedDefinition* amf3::getExternalisedDefinition(const std::string& name){
-		auto itr = mExternalisedDefinitions.find(name);
-		if(itr == mExternalisedDefinitions.end())
+	flex::utils::IExternalizable* amf3::getExternalizable(const std::string& name){
+		auto itr = mExternalizables.find(name);
+		if(itr == mExternalizables.end())
 			return nullptr;
 
 		return itr->second;
@@ -234,7 +268,7 @@ namespace amf {
 	void amf3::serialise(uint8 type, Integer* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_INTEGER);
 			
-		if(type == AMF3_INTEGER)
+		if(type == AMF3_INVALID)
 			stream << uint8(AMF3_INTEGER);
 			
 		uint32 tmp = value->value();
@@ -271,14 +305,15 @@ namespace amf {
 			stream << uint8(AMF3_STRING);
 			
 		const std::string& str = value->value();
-		serialise(AMF3_INTEGER, &Integer((str.length() << 1) | 1), stream);
+		int length = str.length();
+		serialise(AMF3_INTEGER, &Integer((length << 1) | 1), stream);
 		stream.write(str.c_str(), str.length());
 	}
 
 	void amf3::serialise(uint8 type, Date* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_DATE);
 			
-		if(type == AMF3_DATE)
+		if(type == AMF3_INVALID)
 			stream << uint8(AMF3_DATE);
 		
 		//not a ref
@@ -293,7 +328,7 @@ namespace amf {
 		if(type == AMF3_INVALID)
 			stream << uint8(AMF3_ARRAY);
 			
-		serialise(AMF3_INTEGER, &Integer((value->keys() << 1) | 1), stream);
+		serialise(AMF3_INTEGER, &Integer((value->size() << 1) | 1), stream);
 
 		for(auto itr = value->begin(); itr != value->end(); ++itr){
 			serialise(AMF3_STRING, &String(itr->first), stream);
@@ -323,7 +358,7 @@ namespace amf {
 			stream << uint8(AMF3_OBJECT);
 			
 		ObjectDefinition* definition = getDefinition(value->name());
-		ExternalisedDefinition* extDef = getExternalisedDefinition(value->name());
+		flex::utils::IExternalizable* extDef = getExternalizable(value->name());
 			
 		uint32 dynamics = 0;
 		uint32 statics = 0;
@@ -340,16 +375,21 @@ namespace amf {
 			++dynamics;
 		}
 
+		extDef = 0;
+
 		uint32 ref = 0;
-		ref |= 1;
-		ref |= 1 << 1;
+		ref |= 1;//not ref'd
+		ref |= 1 << 1;//not def ptr
 		ref |= (extDef ? 1 : 0) << 2;
 		ref |= (dynamics > 0 ? 1 : 0) << 3;
 		ref |= statics << 4;
 
 		if(extDef)
 			throw new EncodeException("Serialisation of external data types not yet supported");
-			
+		
+		serialise(AMF3_INTEGER, &amf::Integer(ref), stream);
+		serialise(AMF3_STRING, &amf::String(value->name()), stream);
+
 		if(definition){
 			for(auto itr = definition->mMembers.begin(); itr != definition->mMembers.end(); ++itr)
 				serialise(AMF3_STRING, &String(*itr), stream);
@@ -368,6 +408,9 @@ namespace amf {
 			serialise(AMF3_STRING, &String(itr->first), stream);
 			Encoder.serialise(itr->second, stream);
 		}
+
+		if(dynamics > 0)
+			serialise(AMF3_STRING, &String(""), stream);
 	}
 		
 	Variant* amf3::deserialise(uint8 version, ByteStream& stream){
@@ -622,12 +665,12 @@ namespace amf {
 			value->setName(definition->mName);
 
 			if(definition->mExternalisable){
-				ExternalisedDefinition* extDef = getExternalisedDefinition(value->name());
+				flex::utils::IExternalizable* extDef = getExternalizable(value->name());
 
 				if(!extDef)
 					throw new DecodeException("Externalised Definition for object %s not found", value->name().c_str());
 
-				extDef->read(value, stream);
+				extDef->readExternal(value, stream);
 			}else{
 				for(auto itr = definition->mMembers.begin(); itr != definition->mMembers.end(); ++itr)
 					value->insert(*itr, Encoder.deserialise(stream));

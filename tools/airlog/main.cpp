@@ -7,6 +7,7 @@ Logs RTMP packets sent from adobe air before SSL encryption
 #include "amf/amf3.h"
 #include "rtmp/packet.h"
 #include "rtmp/messages.h"
+#include "riotgames/platform/gameclient/domain/systemstates/clientsystemstatesnotification.h"
 
 #include <iostream>
 #include <windows.h>
@@ -164,7 +165,6 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 			fprintf(gLogFile, "\n");
 		}
 	}else if(printBytes){
-		printf(" %d bytes\n", size);
 		fprintf(gLogFile, " %d bytes", size);
 
 		for(int i = 0; i < size; ++i){
@@ -176,6 +176,8 @@ void processPacket(bool isSend, unsigned char* buffer, int size){
 
 		fprintf(gLogFile, "\n");
 	}
+
+	fflush(gLogFile);
 }
 
 void __stdcall onReceivePacket(unsigned char* buffer, int size){

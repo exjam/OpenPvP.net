@@ -19,6 +19,9 @@
     <ClInclude Include="basesocket.h" />
     <ClInclude Include="bytestream.h" />
     <ClInclude Include="criticalsection.h" />
+    <ClInclude Include="flex\channelset.h" />
+    <ClInclude Include="flex\consumer.h" />
+    <ClInclude Include="flex\iexternalizable.h" />
     <ClInclude Include="flex\messages.h" />
     <ClInclude Include="flex\services.h" />
     <ClInclude Include="lock.h" />
@@ -27,6 +30,7 @@
     <ClInclude Include="rtmp\packet.h" />
     <ClInclude Include="securesocket.h" />
     <ClInclude Include="socket.h" />
+    <ClInclude Include="stringify.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +38,9 @@
     <ClCompile Include="amf\amf3.cpp" />
     <ClCompile Include="amf\amf.cpp" />
     <ClCompile Include="amf\variant.cpp" />
+    <ClInclude Include="base64.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClCompile Include="rtmp\messages.cpp" />
     <ClCompile Include="rtmp\packet.cpp" />
     <ClCompile Include="rtmp\client.cpp" />

@@ -61,7 +61,7 @@ namespace rtmp {
 		}
 
 		Amf3Command::Amf3Command(amf::Object* object)
-			: mObject(object)
+			: Packet(Type), mObject(object)
 		{
 		}
 
@@ -77,6 +77,7 @@ namespace rtmp {
 
 			uint8 tmp;
 			stream >> tmp;
+
 			delete amf::Encoder.deserialise(stream);
 			mID = amf::Encoder.deserialise(stream)->toDouble();
 			delete amf::Encoder.deserialise(stream);
@@ -93,6 +94,8 @@ namespace rtmp {
 			amf::Encoder.serialise(&amf::Number(mID), mData);
 			amf::Encoder.serialise(&amf::Null(), mData);
 			mData << uint8(amf::amf0::AMF0_AVMPLUS);
+
+			amf::Encoder.setVersion(3);
 			amf::Encoder.serialise(mObject, mData);
 
 			return (Packet*)this;

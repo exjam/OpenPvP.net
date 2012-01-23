@@ -15,8 +15,8 @@ namespace amf {
 
 		int32 toInt() const;
 		bool toBool() const;
+		Date* toDate() const;
 		uint32 toUInt() const;
-		double toDate() const;
 		Array* toArray() const;
 		double toDouble() const;
 		Object* toObject() const;
@@ -261,15 +261,6 @@ namespace amf {
 		Array() : Variant(Type) {}
 		
 		~Array(){
-			for(auto itr = mAssociative.begin(); itr != mAssociative.end(); ++itr){
-				if(itr->second)
-					delete itr->second;
-			}
-
-			for(auto itr = mDense.begin(); itr != mDense.end(); ++itr){
-				if(*itr)
-					delete *itr;
-			}
 		}
 
 		Variant* at(size_t index) const {
@@ -353,10 +344,6 @@ namespace amf {
 		Object(const std::string& name) : Variant(Type), mName(name) {}
 		
 		virtual ~Object(){
-			for(auto itr = mProperties.begin(); itr != mProperties.end(); ++itr){
-				if(itr->second)
-					delete itr->second;
-			}
 		}
 
 		Variant* get(const std::string& key) const {
@@ -403,6 +390,8 @@ namespace amf {
 			insert(var.mName, var.mValue);
 			return *this;
 		}
+		
+		void defineObject();
 
 	private:
 		std::string mName;

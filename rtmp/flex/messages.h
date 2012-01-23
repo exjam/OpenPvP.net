@@ -13,14 +13,22 @@ namespace flex {
 					set("body", new amf::Array());
 					set("clientId", new amf::Null());
 					set("destination", new amf::String());
-					set("headers", new amf::Null());
-					set("messageId", new amf::String());
+					set("messageId", new amf::String("1337"));
 					set("timeToLive", new amf::Integer());
 					set("timestamp", new amf::Integer());
+
+					amf::Object* headers = new amf::Object();
+					(*headers)
+						<< amf::var("DSEndpoint", "my-rtmps")
+						<< amf::var("DSId", "1337");
+
+					set("headers", headers);
+					
+					defineObject();
 				}
 
-				amf::Array* body(){
-					return get("body")->toArray();
+				amf::Variant* body(){
+					return get("body");
 				}
 
 				amf::Object* clientId(){
@@ -47,12 +55,12 @@ namespace flex {
 					return get("timestamp")->toInt();
 				}
 
-				void setBody(amf::Array* value){
+				void setBody(amf::Variant* value){
 					set("body", value);
 				}
 
-				void setClientId(amf::Object* value){
-					set("clientId", value);
+				void setClientId(const std::string& value){
+					set("clientId", amf::Variant::fromValue(value));
 				}
 
 				void setDestination(const std::string& value){
@@ -83,6 +91,9 @@ namespace flex {
 
 					set("operation", new amf::String());
 					set("source", new amf::String());
+					defineObject();
+		
+					headers()->set("DSRequestTimeout", amf::Variant::fromValue(60));
 				}
 
 				std::string operation(){
@@ -124,6 +135,7 @@ namespace flex {
 
 					set("operation", new amf::Integer());
 					set("correlationId", new amf::Integer());
+					defineObject();
 				}
 
 				int operation(){

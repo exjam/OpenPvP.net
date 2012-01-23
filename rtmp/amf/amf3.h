@@ -1,6 +1,7 @@
 #pragma once
 
 #include "amf.h"
+#include "flex/iexternalizable.h"
 
 #include <map>
 #include <vector>
@@ -14,17 +15,19 @@ namespace amf {
 		std::vector<std::string> mMembers;
 	};
 
-	class ExternalisedDefinition {
+	class ExternalisedDefinition : public flex::utils::IExternalizable {
 	public:
 		ExternalisedDefinition(const std::string& name, bool useFlags = true);
-	
-		uint32 readFlags(std::vector<uint8>& flags, ByteStream& stream);
-		void read(class Object* obj, ByteStream& stream);
-
-		void addField(const std::string& name);
-		void setParent(ExternalisedDefinition* parent);
 
 		std::string name() const;
+		void readExternal(amf::Object* object, ByteStream& stream);
+		void writeExternal(amf::Object* object, ByteStream& stream);
+		
+		void addField(const std::string& name);
+		void setParent(ExternalisedDefinition* parent);
+	
+	private:
+		uint32 readFlags(std::vector<uint8>& flags, ByteStream& stream);
 
 	private:
 		bool mUsesFlags;
@@ -32,30 +35,6 @@ namespace amf {
 		ExternalisedDefinition* mParent;
 		std::vector<std::string> mFields;
 	};
-		/*
-	class ReferenceTable {
-	public:
-		static void startGroup();
-		
-		static void addString(const std::string& value);
-		static std::string getString(size_t index);
-
-		static void addComplexObject(Variant* object);
-		static Variant* getComplexObject(size_t index);
-
-		static ObjectDefinition* getObjectDefinition(size_t index);
-		static ObjectDefinition* getObjectDefinitionByName(const std::string& name);
-		static void addObjectDefinition(ObjectDefinition* definition);
-
-		static ExternalisedObjectDefinition* getExternalisedObjectDefinition(const std::string& key);
-		static void addExternalisedObjectDefinition(const std::string& key, ExternalisedObjectDefinition* definition);
-			
-	private:
-		static std::vector<std::string> mStrings;
-		static std::vector<Variant*> mComplexObjects;
-		static std::vector<ObjectDefinition*> mObjectDefinitions;
-		static std::map<std::string, ExternalisedObjectDefinition*> mExternalisedObjectDefinitions;
-	};*/
 		
 	class amf3 : public EncoderImpl {
 	public:
@@ -80,6 +59,9 @@ namespace amf {
 
 		void start();
 		void end();
+		
+		void defineObject(Object* object);
+		void addExternalizable(flex::utils::IExternalizable* externalizable);
 
 		void serialise(uint8 version, Variant* value, ByteStream& stream);
 		void serialise(uint8 type, Null* value, ByteStream& stream);
@@ -104,24 +86,25 @@ namespace amf {
 		void deserialise(uint8 type, Object* value, ByteStream& stream);
 
 	private:
+		void createDefaultDefinitions();
 		void createDefaultExternalised();
-
+		
+		void addDefinition(ObjectDefinition* def);
 		void addString(const std::string& str);
 		void addObject(Variant* obj);
-		void addDefinition(ObjectDefinition* def);
-		void addExternalisedDefinition(ExternalisedDefinition* def);
-		void addExternalisedDefinition(const std::string& name, ExternalisedDefinition* def);
+		void addExternalizable(const std::string& name, flex::utils::IExternalizable* def);
 
 		std::string getString(uint32 index);
 		Variant* getObject(uint32 index);
 		ObjectDefinition* getDefinition(uint32 index);
 		ObjectDefinition* getDefinition(const std::string& name);
-		ExternalisedDefinition* getExternalisedDefinition(const std::string& name);
+		flex::utils::IExternalizable* getExternalizable(const std::string& name);
 
 	private:
 		std::vector<std::string> mStrings;
 		std::vector<Variant*> mObjects;
 		std::vector<ObjectDefinition*> mDefinitions;
-		std::map<std::string, ExternalisedDefinition*> mExternalisedDefinitions;
+		std::vector<ObjectDefinition*> mPermanentDefinitions;
+		std::map<std::string, flex::utils::IExternalizable*> mExternalizables;
 	};
 };

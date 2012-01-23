@@ -67,7 +67,7 @@ struct Package {
 	std::vector<Service*> mServices;
 };
 
-std::map<std::string, Package*> gPackages;
+std::vector<Package*> gPackages;
 
 void readToken(std::stringstream& fh, const std::string& token){
 	std::string _tmp;
@@ -168,6 +168,8 @@ Class* parseClass(std::stringstream& fh){
 
 		if(var->mType.compare("ArrayCollection") == 0)
 			var->mType = "amf::Array";
+		else if(var->mType.compare("Date") == 0)
+			var->mType = "amf::Date";
 
 		fh >> token;
 		if(token.compare("=") == 0){
@@ -202,15 +204,9 @@ Package* parsePackage(std::stringstream& fh){
 	fh >> token;
 	readToken(fh, "{");
 	
-	Package* pkg;
-	auto itr = gPackages.find(token);
-	if(itr != gPackages.end()){
-		pkg = itr->second;
-	}else{
-		pkg = new Package();
-		pkg->mName = token;
-		gPackages[token] = pkg;
-	}
+	Package* pkg = new Package();
+	pkg->mName = token;
+	gPackages.push_back(pkg);
 
 	while(true){
 		fh >> token;
@@ -237,7 +233,11 @@ Package* parsePackage(std::stringstream& fh){
 	return pkg;
 }
 
-void outputPackage(Package* pkg, std::ostream& strm){
+std::string indent;
+
+void addPackageHeader(Package* pkg, std::ostream& strm){
+	indent = std::string();
+
 	strm << "#pragma once" << std::endl << std::endl;
 
 	if(pkg->mClasses.size())
@@ -260,7 +260,6 @@ void outputPackage(Package* pkg, std::ostream& strm){
 
 	strm << std::endl;
 
-	std::string indent;
 	int pos = 0;
 	while(true){
 		int next = pkg->mName.find('.', pos);
@@ -287,18 +286,34 @@ void outputPackage(Package* pkg, std::ostream& strm){
 			imp = imp.erase(pos, 3);
 		
 		imp = imp.erase(0, 5);
-		strm << indent << "using " << imp << std::endl;
+		strm << indent << "using namespace " << imp << std::endl;
 	}
 
 	if(pkg->mImports.size())
 		strm << std::endl;
+}
+
+void addPackageFooter(Package* pkg, std::ostream& strm){
+	while(indent.length()){
+		indent.erase(0, 1);
+		strm << indent << "};" << std::endl;
+	}
+}
+#include <windows.h>
+void outputPackage(Package* pkg){
+	std::string base_dir = pkg->mName + "/";
 	
+	for(int pos = base_dir.find('.'); pos != std::string::npos; pos = base_dir.find('.'))
+		base_dir.replace(pos, 1, "/");
+
+	system((std::string("mkdir \"") + base_dir + "\"").c_str());
+
 	for(auto itr = pkg->mClasses.begin(); itr != pkg->mClasses.end(); ++itr){
-		if(itr != pkg->mClasses.begin())
-			strm << std::endl;
+		std::stringstream strm;
+		addPackageHeader(pkg, strm);
 
 		Class* cls = *itr;
-		strm << indent << "class " << cls->mName << " : protected amf::Object {" << std::endl;
+		strm << indent << "class " << cls->mName << " : public amf::Object {" << std::endl;
 		strm << indent << "public:" << std::endl;
 		indent.append("\t");
 
@@ -359,6 +374,8 @@ void outputPackage(Package* pkg, std::ostream& strm){
 				strm << indent << "return get(\"" << var->mName << "\")->toBool();" << std::endl;
 			}else if(var->mType.compare("amf::Array") == 0){
 				strm << indent << "return get(\"" << var->mName << "\")->toArray();" << std::endl;
+			}else if(var->mType.compare("amf::Date") == 0){
+				strm << indent << "return get(\"" << var->mName << "\")->toDate();" << std::endl;
 			}else{
 				strm << indent << "return (" << var->mType << "*)get(\"" << var->mName << "\")->toObject();" << std::endl;
 			}
@@ -407,14 +424,20 @@ void outputPackage(Package* pkg, std::ostream& strm){
 
 		indent.erase(0, 1);
 		strm << indent << "};" << std::endl;
+
+		addPackageFooter(pkg, strm);
+
+		std::string filename = cls->mName;
+		std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
+
+		std::ofstream out(base_dir + filename + ".h");
+		out << strm.rdbuf();
+		out.close();
 	}
-	
-	if(pkg->mServices.size() && pkg->mClasses.size())
-		strm << std::endl;
 
 	for(auto itr = pkg->mServices.begin(); itr != pkg->mServices.end(); ++itr){
-		if(itr != pkg->mServices.begin())
-			strm << std::endl;
+		std::stringstream strm;
+		addPackageHeader(pkg, strm);
 
 		Service* svc = *itr;
 		strm << indent << "class " << svc->mName << " : private flex::messaging::services::Service {" << std::endl;
@@ -462,6 +485,8 @@ void outputPackage(Package* pkg, std::ostream& strm){
 					strm << "amf::Array* ";
 				}else if(arg->mType.compare("Object") == 0){
 					strm << "amf::Object* ";
+				}else if(arg->mType.compare("Date") == 0){
+					strm << "amf::Date* ";
 				}else{
 					strm << arg->mType << "* ";
 				}
@@ -504,37 +529,57 @@ void outputPackage(Package* pkg, std::ostream& strm){
 
 		indent.erase(0, 1);
 		strm << indent << "};" << std::endl;
-	}
 
-	while(indent.length()){
-		indent.erase(0, 1);
-		strm << indent << "};" << std::endl;
+		addPackageFooter(pkg, strm);
+
+		std::string filename = svc->mName;
+		std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
+
+		std::ofstream out(base_dir + filename + ".h");
+		out << strm.rdbuf();
+		out.close();
 	}
 }
 
 int main(int argc, char** argv){
 	while(true){
-		std::string filename;
-		std::getline(std::cin, filename);
-		if(filename.length() == 0)
+		std::string source;
+		std::getline(std::cin, source);
+		if(source.length() == 0)
 			break;
 
-		std::ifstream file(filename);
-		if(file.is_open()){
+		std::ifstream in(source);
+		if(in.is_open()){
 			std::stringstream fh;
-			fh << file.rdbuf();
+			fh << in.rdbuf();
 
 			if(fh.peek() == 0xEF)
 				fh.seekg(3);
 
-			file.close();
+			in.close();
 
 			parsePackage(fh);
 		}
+
 	}
 	
-	for(auto itr = gPackages.begin(); itr != gPackages.end(); ++itr)
-		outputPackage(itr->second, std::cout);
+	for(auto itr = gPackages.begin(); itr != gPackages.end(); ++itr){
+		Package* pkg = *itr;
+		outputPackage(pkg);
+		/*
+		std::string dest = "dumped/";
+		dest += pkg->mName.substr(pkg->mName.find_last_of('.') + 1);
+		dest += ".h";
+
+		std::ofstream out(dest);
+		if(out.is_open()){
+			std::stringstream fh;
+			outputPackage(itr->second, fh);
+			out << fh.rdbuf();
+			out.close();
+		}
+		*/
+	}
 
 	return 0;
 }

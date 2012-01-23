@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowClass</class>
+ <widget class="QMainWindow" name="MainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1286</width>
+    <height>804</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">* {
+	color: white;
+	font: 10pt &quot;Arial&quot;;
+}
+
+#windowtitle {
+	font: 8pt;
+}
+
+QLineEdit {
+	color: black;
+}
+
+QPushButton[default=false] {
+	font-weight: bold;
+	height: 25px;
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-color: rgb(67, 122, 189);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(67, 122, 189), stop: 1 rgb(37,63,97));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(67, 122, 189), stop: 1 rgb(37,63,97));
+	border-bottom-color: rgb(37,63,97);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(85, 144, 215), stop: 0.19 rgb(45, 100, 167), stop: 0.9 rgb(14, 40, 72), stop: 1 rgb(20, 47,80));
+}
+
+QPushButton[default=false]:hover {
+	border-top-color: rgb(66, 130, 207);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(66, 130, 207), stop: 1 rgb(33, 86, 158));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(66, 130, 207), stop: 1 rgb(33, 86, 158));
+	border-bottom-color: rgb(33, 86, 158);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(85, 148, 227), stop: 0.19 rgb(47, 110, 189), stop: 0.9 rgb(11, 63, 128), stop: 1 rgb(19, 73,143));
+}
+
+QPushButton[default=false]:disabled {
+	border-top-color: rgb(173, 173, 173);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(173, 173, 173), stop: 1 rgb(121, 121, 121));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(173, 173, 173), stop: 1 rgb(121, 121, 121));
+	border-bottom-color: rgb(121, 121, 121);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(196, 196, 196), stop: 0.19 rgb(154, 154, 154), stop: 1 rgb(126, 126, 126));
+}
+
+QPushButton[flat=true] {
+	border-top-color: rgb(231, 158, 49);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(231, 158, 49), stop: 1  rgb(171, 76, 28));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(231, 158, 49), stop: 1  rgb(171, 76, 28));
+	border-bottom-color: rgb(171, 76, 28);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(251, 181, 106), stop: 0.19 rgb(223, 140, 26), stop: 0.81 rgb(157, 53, 1), stop: 1 rgb(187, 68, 20));
+}
+
+QPushButton[flat=true]:hover {
+	border-top-color: rgb(236, 160, 57);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(236, 160, 57), stop: 1  rgb(224, 126, 28));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(236, 160, 57), stop: 1  rgb(224, 126, 28));
+	border-bottom-color: rgb(224, 126, 28);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(255, 187, 120), stop: 0.19 rgb(236, 150, 38), stop: 0.81 rgb(219, 95, 1), stop: 1 rgb(234, 127, 27));
+}
+
+QToolTip {
+	background-color: rgba(45, 45, 45, 216);
+	border: none;
+	border-radius: 2px;
+	opacity: 216;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QLabel" name="windowframeleft">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>99</y>
+      <width>13</width>
+      <height>647</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_left.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="windowframeright">
+    <property name="geometry">
+     <rect>
+      <x>1273</x>
+      <y>99</y>
+      <width>13</width>
+      <height>647</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_right.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="windowframebottom">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>746</y>
+      <width>1286</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_bottom.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="windowframetop">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1286</width>
+      <height>99</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_top.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="background">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>15</y>
+      <width>1272</width>
+      <height>750</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/images/backgrounds/LOL_qqlogin.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="windowtitle">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>6</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(209, 209, 209);</string>
+    </property>
+    <property name="text">
+     <string>OpenPvP.net</string>
+    </property>
+   </widget>
+   <widget class="QDragBar" name="topdragbar" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>1221</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="close">
+    <property name="geometry">
+     <rect>
+      <x>1250</x>
+      <y>4</y>
+      <width>27</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Click to close.</string>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border: none;
+	background-image: url(assets/extracted/close_normal.png);
+}
+
+QPushButton:hover {
+	border: none;
+	background-image: url(assets/extracted/close_hover.png);
+}
+
+QPushButton:pressed {
+	border: none;
+	background-image: url(assets/extracted/close_pressed.png);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="default">
+     <bool>true</bool>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="minimise">
+    <property name="geometry">
+     <rect>
+      <x>1225</x>
+      <y>4</y>
+      <width>27</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Click to minimise.</string>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border: none;
+	background-image: url(assets/extracted/min_normal.png);
+}
+
+QPushButton:hover {
+border: none;
+	background-image: url(assets/extracted/min_hover.png);
+}
+
+QPushButton:pressed {
+border: none;
+	background-image: url(assets/extracted/min_pressed.png);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="default">
+     <bool>true</bool>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QDragBar" name="botdragbar" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>757</y>
+      <width>1286</width>
+      <height>47</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="LoginWidget" name="loginWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>220</y>
+      <width>379</width>
+      <height>360</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="logo">
+    <property name="geometry">
+     <rect>
+      <x>817</x>
+      <y>70</y>
+      <width>325</width>
+      <height>130</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/images/chrome/logo/logo.png</pixmap>
+    </property>
+   </widget>
+   <zorder>background</zorder>
+   <zorder>windowframeleft</zorder>
+   <zorder>windowframeright</zorder>
+   <zorder>windowframebottom</zorder>
+   <zorder>windowframetop</zorder>
+   <zorder>windowtitle</zorder>
+   <zorder>topdragbar</zorder>
+   <zorder>close</zorder>
+   <zorder>minimise</zorder>
+   <zorder>botdragbar</zorder>
+   <zorder>loginWidget</zorder>
+   <zorder>logo</zorder>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QDragBar</class>
+   <extends>QWidget</extends>
+   <header>qdragbar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>LoginWidget</class>
+   <extends>QWidget</extends>
+   <header>loginwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="mainwindow.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>close</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1263</x>
+     <y>14</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

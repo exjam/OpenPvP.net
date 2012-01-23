@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\gameclient">
+      <UniqueIdentifier>{84c78b66-1546-4b0a-8e7c-ed4987698a95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{ba169d66-14ff-4cba-bd99-092f0020e34d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\services">
+      <UniqueIdentifier>{11da8b93-d579-49ab-90e8-5a8ec82819d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\domain">
+      <UniqueIdentifier>{165ad153-a615-4a9e-b2c4-8235e205a0fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\domain">
+      <UniqueIdentifier>{d823b13e-284e-4c14-9bd4-7b1dd83c0a52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\services">
+      <UniqueIdentifier>{a346079d-6d13-4f6d-a8ed-4bed538f37ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\domain\systemstates">
+      <UniqueIdentifier>{4157e114-dc69-47bc-a836-49a3f6180e82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\domain\broadcast">
+      <UniqueIdentifier>{13083f95-90c7-4d1f-805e-926183e85bad}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="riotgames\platform\common\services\loginservice.h">
+      <Filter>Header Files\common\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\common\services\messagerouterservice.h">
+      <Filter>Header Files\common\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\abstracteventdispatchingdomainobject.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\accountsummary.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\common\domain\authenticationcredentials.h">
+      <Filter>Header Files\common\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\serversessionobject.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\services\clientfacadeservice.h">
+      <Filter>Header Files\gameclient\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\playercomplaint.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\systemstates\clientsystemstatesnotification.h">
+      <Filter>Header Files\gameclient\domain\systemstates</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\services\matchmakerservice.h">
+      <Filter>Header Files\gameclient\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\broadcast\broadcastnotification.h">
+      <Filter>Header Files\gameclient\domain\broadcast</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="riotgames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

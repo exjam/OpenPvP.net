@@ -3,6 +3,12 @@
 #include "types.h"
 #include "bytestream.h"
 
+namespace flex {
+	namespace utils {
+		class IExternalizable;
+	};
+};
+
 namespace amf {
 	typedef enum {
 		AMF_NULL,
@@ -43,6 +49,9 @@ namespace amf {
 		void start(uint8 version);
 		void end();
 
+		void defineObject(Object* object);
+		void addExternalizable(flex::utils::IExternalizable* externalizable);
+
 	private:
 		uint8 mVersion;
 		EncoderImpl* mVersions[mMaxVersion + 1];
@@ -76,6 +85,9 @@ namespace amf {
 	public:
 		virtual void start() = 0;
 		virtual void end() = 0;
+		
+		virtual void defineObject(Object* object) = 0;
+		virtual void addExternalizable(flex::utils::IExternalizable* externalizable) = 0;
 
 		virtual void serialise(uint8 version, Variant* value, ByteStream& stream) = 0;
 		virtual void serialise(uint8 type, Null* value, ByteStream& stream) = 0;

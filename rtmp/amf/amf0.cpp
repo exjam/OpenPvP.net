@@ -13,6 +13,12 @@ namespace amf {
 
 	void amf0::end(){
 	}
+
+	void amf0::defineObject(Object* object){
+	}
+
+	void amf0::addExternalizable(flex::utils::IExternalizable* externalizable){
+	}
 	
 	void amf0::serialise(uint8 type, ByteArray* value, ByteStream& stream){
 	}

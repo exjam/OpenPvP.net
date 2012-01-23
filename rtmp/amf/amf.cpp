@@ -20,6 +20,18 @@ namespace amf {
 		mVersions[3] = new amf3();
 	}
 
+	void Encoder_::defineObject(Object* object){
+		for(int i = 0; i <= mMaxVersion; ++i)
+			if(mVersions[i])
+				mVersions[i]->defineObject(object);
+	}
+
+	void Encoder_::addExternalizable(flex::utils::IExternalizable* object){
+		for(int i = 0; i <= mMaxVersion; ++i)
+			if(mVersions[i])
+				mVersions[i]->addExternalizable(object);
+	}
+
 	void Encoder_::start(uint8 version){
 		setVersion(version);
 

@@ -31,6 +31,9 @@ namespace amf {
 
 		void start();
 		void end();
+
+		void defineObject(Object* object);
+		void addExternalizable(flex::utils::IExternalizable* externalizable);
 		
 		void serialise(uint8 version, Variant* value, ByteStream& stream);
 		void serialise(uint8 type, Null* value, ByteStream& stream);

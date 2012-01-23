@@ -77,6 +77,21 @@
     <ClInclude Include="lock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="flex\channelset.h">
+      <Filter>Header Files\flex</Filter>
+    </ClInclude>
+    <ClInclude Include="stringify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flex\consumer.h">
+      <Filter>Header Files\flex</Filter>
+    </ClInclude>
+    <ClInclude Include="flex\iexternalizable.h">
+      <Filter>Header Files\flex</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="amf\amf.cpp">

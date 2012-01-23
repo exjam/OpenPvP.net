@@ -13,6 +13,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtmp", "rtmp\rtmp.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "classdump", "tools\classdump\classdump.vcxproj", "{E1B4582C-85CC-449F-8ABB-A8EF13FA219A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qtclient", "qtclient\qtclient.vcxproj", "{340838E5-C8C0-4575-BAF6-857B1C97B8C9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "riotgames", "riotgames\riotgames.vcxproj", "{6FBEF47B-62CA-4514-A214-06E02ED55709}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +43,14 @@ Global
 		{E1B4582C-85CC-449F-8ABB-A8EF13FA219A}.Debug|Win32.Build.0 = Debug|Win32
 		{E1B4582C-85CC-449F-8ABB-A8EF13FA219A}.Release|Win32.ActiveCfg = Release|Win32
 		{E1B4582C-85CC-449F-8ABB-A8EF13FA219A}.Release|Win32.Build.0 = Release|Win32
+		{340838E5-C8C0-4575-BAF6-857B1C97B8C9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{340838E5-C8C0-4575-BAF6-857B1C97B8C9}.Debug|Win32.Build.0 = Debug|Win32
+		{340838E5-C8C0-4575-BAF6-857B1C97B8C9}.Release|Win32.ActiveCfg = Release|Win32
+		{340838E5-C8C0-4575-BAF6-857B1C97B8C9}.Release|Win32.Build.0 = Release|Win32
+		{6FBEF47B-62CA-4514-A214-06E02ED55709}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FBEF47B-62CA-4514-A214-06E02ED55709}.Debug|Win32.Build.0 = Debug|Win32
+		{6FBEF47B-62CA-4514-A214-06E02ED55709}.Release|Win32.ActiveCfg = Release|Win32
+		{6FBEF47B-62CA-4514-A214-06E02ED55709}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

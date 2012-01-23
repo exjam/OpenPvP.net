@@ -3,6 +3,8 @@
 #include "amf/amf3.h"
 #include "amf/variant.h"
 
+#include "flex/consumer.h"
+
 #include "client.h"
 #include "packet.h"
 #include "messages.h"
@@ -23,9 +25,6 @@ namespace rtmp {
 
 	Client::~Client(){
 		disconnect();
-
-		if(mSocket)
-			delete mSocket;
 
 		delete mSendLock;
 	}
@@ -65,11 +64,32 @@ namespace rtmp {
 	}
 
 	void Client::disconnect(){
-		mSocket->disconnect();
+		if(mSocket)
+			mSocket->disconnect();
+
+		if(!mEventCallback._Empty())
+			mEventCallback(EVT_DISCONNECT, nullptr);
 	}
 
 	void Client::send(ByteStream* stream){
+		static FILE* lf = nullptr;
+		if(!lf)
+			fopen_s(&lf, "log.txt", "w");
+
 		mSendLock->lock();
+
+		fprintf(lf, " %d bytes", stream->size());
+
+		for(uint32 i = 0; i < stream->size(); ++i){
+			if(i % 16 == 0)
+				fprintf(lf, "\n");
+
+			fprintf(lf, "%02x ", stream->data()[i]);
+		}
+
+		fprintf(lf, "\n");
+		fflush(lf);
+
 		mSendData.push(new ByteStream(stream));
 		mSendLock->unlock();
 	}
@@ -92,9 +112,9 @@ namespace rtmp {
 		send(command->packet());
 	}
 
-	void Client::send(messages::AmfCommand* command, const CommandCallback& onResult){
+	void Client::send(messages::AmfCommand* command, const CommandCallback& callback){
 		command->setID(getNextCommandID());
-		mCallbacks.push_back(CommandIDCallback(command->id(), onResult));
+		mCallbacks.push_back(CommandIDCallback(command->id(), callback));
 		send(command->packet());
 	}
 
@@ -111,8 +131,8 @@ namespace rtmp {
 	}
 
 	uint32 Client::getNextCommandID(){
-		static uint32 id = 1;
-		return id++;
+		static volatile uint32 id = 0;
+		return InterlockedIncrement(&id);//TODO: cross platform-ify
 	}
 	
 	Client& Client::instance(){
@@ -127,14 +147,12 @@ namespace rtmp {
 				{
 					uint32 ack_size;
 					stream >> ack_size;
-					std::cout << "WINDOW_ACK_SIZE: " << ack_size << std::endl;
 				}
 				break;
 			case SET_PEER_BW:
 				{
 					uint32 bw1; uint8 bw2;
 					stream >> bw1 >> bw2;
-					std::cout << "SET_PEER_BW: " << bw1 << " " << (uint32)bw2 << std::endl;
 				}
 				break;
 			case AMF0_COMMAND:
@@ -156,24 +174,33 @@ namespace rtmp {
 				{
 					messages::Amf3Command command(*pak);
 					auto callback = popCallback(command.id());
-					if(callback._Empty()){
-						std::cout << "Unhandled Amf3Command [" << command.id() << "]" << std::endl;
-
-						amf::log::obj obj;
-						obj << command.object() << std::endl;
-						std::cout << obj.str() << std::endl;
-					}else{
+					if(!callback._Empty()){
 						callback(command.object());
+						return;
 					}
+
+					if(amf::Variant* vcid = command.object()->get("clientId")){
+						auto itr = mConsumers.find(vcid->toString());
+						if(itr != mConsumers.end()){
+							itr->second->onMessage(command.object());
+							return;
+						}
+					}
+
+					std::cout << "Unhandled Amf3Command [" << command.id() << "]" << std::endl;
+
+					amf::log::obj obj;
+					obj << command.object() << std::endl;
+					std::cout << obj.str() << std::endl;
 				}
 				break;
 			default:
-				printf("Unhandled RTMP packet type %u:\n", pak->type());
+				std::cout << "Unhandled RTMP packet type " << pak->type() << std::endl;
 			
 				for(uint32 i = 0; i < stream.size(); ++i)
 					printf("%02x ", stream.data()[i]);
 
-				printf("\n");
+				std::cout << std::endl;
 		};
 	}
 
@@ -210,7 +237,21 @@ namespace rtmp {
 
 	void Client::onConnect(amf::Variant* result){
 		amf::Object* object = result->toObject();
-		std::cout << "connect result: "<< object->get("code")->toString() << std::endl;
+
+		if(object->get("code")->toString().compare("NetConnection.Connect.Success") == 0){
+			if(!mEventCallback._Empty())
+				mEventCallback(EVT_CONNECT, object);
+		}else{
+			disconnect();
+		}
+	}
+
+	void Client::registerConsumer(flex::messaging::Consumer* consumer){
+		mConsumers[consumer->clientId()] = consumer;
+	}
+	
+	void Client::registerEventHandler(const EventCallback& callback){
+		mEventCallback = callback;
 	}
 
 	uint32 Client::waitHandshake(int stage){

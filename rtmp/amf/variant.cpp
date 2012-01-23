@@ -1,4 +1,5 @@
 #include "variant.h"
+#include "amf.h"
 
 namespace amf {
 	var_t var(const std::string& name, object_creator_t value){
@@ -69,8 +70,13 @@ namespace amf {
 		return toInt();
 	}
 
-	double Variant::toDate() const {
-		return toDouble();
+	Date* Variant::toDate() const {
+		if(mType == AMF_NULL)
+			return nullptr;
+		else if(mType != AMF_DATE)
+			throw std::bad_cast();
+
+		return (Date*)this;
 	}
 
 	double Variant::toDouble() const {
@@ -138,5 +144,9 @@ namespace amf {
 			default:
 				throw std::bad_cast();
 		};
+	}
+		
+	void Object::defineObject(){
+		Encoder.defineObject(this);
 	}
 };
