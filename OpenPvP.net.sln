@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client\client.vcxproj", "{1CBE8C89-CC6C-4DEE-B6DA-403998D22D2C}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injector", "tools\injector\injector.vcxproj", "{324A84FC-FED7-4DED-83A8-7CCCDD9631A4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "airlog", "tools\airlog\airlog.vcxproj", "{AEBDD5C8-406F-478C-B8BF-FD8D7BF62DDD}"
@@ -14,6 +12,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "classdump", "tools\classdump\classdump.vcxproj", "{E1B4582C-85CC-449F-8ABB-A8EF13FA219A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qtclient", "qtclient\qtclient.vcxproj", "{340838E5-C8C0-4575-BAF6-857B1C97B8C9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BEF24D64-EFA0-48EF-847A-801CDBF2704C} = {BEF24D64-EFA0-48EF-847A-801CDBF2704C}
+		{6FBEF47B-62CA-4514-A214-06E02ED55709} = {6FBEF47B-62CA-4514-A214-06E02ED55709}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "riotgames", "riotgames\riotgames.vcxproj", "{6FBEF47B-62CA-4514-A214-06E02ED55709}"
 EndProject
@@ -23,10 +25,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1CBE8C89-CC6C-4DEE-B6DA-403998D22D2C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1CBE8C89-CC6C-4DEE-B6DA-403998D22D2C}.Debug|Win32.Build.0 = Debug|Win32
-		{1CBE8C89-CC6C-4DEE-B6DA-403998D22D2C}.Release|Win32.ActiveCfg = Release|Win32
-		{1CBE8C89-CC6C-4DEE-B6DA-403998D22D2C}.Release|Win32.Build.0 = Release|Win32
 		{324A84FC-FED7-4DED-83A8-7CCCDD9631A4}.Debug|Win32.ActiveCfg = Debug|Win32
 		{324A84FC-FED7-4DED-83A8-7CCCDD9631A4}.Debug|Win32.Build.0 = Debug|Win32
 		{324A84FC-FED7-4DED-83A8-7CCCDD9631A4}.Release|Win32.ActiveCfg = Release|Win32

@@ -218,7 +218,7 @@ namespace amf {
 				break;
 			case AMF0_AVMPLUS:
 				Encoder.setVersion(3);
-				return Encoder.deserialise(stream);
+				return Encoder.deserialise(stream, false);
 			/*
 			case AMF0_REFERENCE:
 				break;
@@ -290,12 +290,12 @@ namespace amf {
 
 		if(type == AMF0_STRICT_ARRAY){
 			for(uint32 i = 0; i < size; ++i)
-				value->push_back(Encoder.deserialise(stream));
+				value->push_back(Encoder.deserialise(stream, false));
 		}else if(type == AMF0_ECMA_ARRAY){
 			for(uint32 i = 0; i < size; ++i){
 				String key;
 				deserialise(AMF0_STRING, &key, stream);
-				value->insert(key, Encoder.deserialise(stream));
+				value->insert(key, Encoder.deserialise(stream, false));
 			}
 		}
 	}
@@ -313,7 +313,7 @@ namespace amf {
 			String key;
 			deserialise(AMF0_STRING, &key, stream);
 
-			Variant* data = Encoder.deserialise(stream);
+			Variant* data = Encoder.deserialise(stream, false);
 			if(!data)
 				break;
 

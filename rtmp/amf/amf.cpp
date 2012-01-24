@@ -35,6 +35,13 @@ namespace amf {
 	void Encoder_::start(uint8 version){
 		setVersion(version);
 
+		for(auto itr = mCache.begin(); itr != mCache.end(); ++itr){
+			if(*itr)
+				delete *itr;
+		}
+		
+		mCache.clear();
+
 		for(int i = 0; i <= mMaxVersion; ++i)
 			if(mVersions[i])
 				mVersions[i]->start();
@@ -53,9 +60,13 @@ namespace amf {
 		mVersion = version;
 	}
 
-	Variant* Encoder_::deserialise(ByteStream& stream){
+	Variant* Encoder_::deserialise(ByteStream& stream, bool cache){
 		assert(stream.tell() < stream.size());
-		return mVersions[mVersion]->deserialise(mVersion, stream);
+		amf::Variant* result = mVersions[mVersion]->deserialise(mVersion, stream);
+		if(cache && result)
+			mCache.push_back(result);
+		
+		return result;
 	}
 
 	void Encoder_::serialise(Variant* value, ByteStream& stream){

@@ -6,10 +6,10 @@ namespace riotgames {
 	namespace platform {
 		namespace gameclient {
 			namespace domain {
-				class AbstractEventDispatchingDomainObject : public amf::Object {
+				class AbstractDomainObject : public amf::Object {
 				public:
-					AbstractEventDispatchingDomainObject(){
-						setName("com.riotgames.platform.gameclient.domain.AbstractEventDispatchingDomainObject");
+					AbstractDomainObject(){
+						setName("com.riotgames.platform.gameclient.domain.AbstractDomainObject");
 						
 						set("futureData", new amf::Null());
 						set("dataVersion", new amf::Integer(0));

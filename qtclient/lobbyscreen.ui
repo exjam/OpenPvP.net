@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LobbyScreen</class>
+ <widget class="QWidget" name="LobbyScreen">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1286</width>
+    <height>804</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">* {
+	color: white;
+	font: 10pt &quot;Arial&quot;;
+}
+
+#windowtitle {
+	font: 8pt;
+}
+
+QLineEdit {
+	color: black;
+}
+
+QPushButton[default=false] {
+	font-weight: bold;
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-color: rgb(67, 122, 189);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(67, 122, 189), stop: 1 rgb(37,63,97));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(67, 122, 189), stop: 1 rgb(37,63,97));
+	border-bottom-color: rgb(37,63,97);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(85, 144, 215), stop: 0.19 rgb(45, 100, 167), stop: 0.9 rgb(14, 40, 72), stop: 1 rgb(20, 47,80));
+}
+
+QPushButton[default=false]:hover {
+	border-top-color: rgb(66, 130, 207);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(66, 130, 207), stop: 1 rgb(33, 86, 158));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(66, 130, 207), stop: 1 rgb(33, 86, 158));
+	border-bottom-color: rgb(33, 86, 158);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(85, 148, 227), stop: 0.19 rgb(47, 110, 189), stop: 0.9 rgb(11, 63, 128), stop: 1 rgb(19, 73,143));
+}
+
+QPushButton[default=false]:pressed {
+	padding-left: 2px;
+	padding-top: 2px;
+	border-top-color: rgb(15, 45, 80);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(15, 45, 80), stop: 1 rgb(10, 25, 47));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(55, 90, 140), stop: 1 rgb(80, 90, 110));
+	border-bottom-color: rgb(80, 90, 110);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(25, 70, 125), stop: 0.19 rgb(20, 55, 100), stop: 0.9 rgb(11, 31, 55), stop: 1 rgb(50, 70, 85));
+}
+
+QPushButton[default=false]:disabled {
+	border-top-color: rgb(173, 173, 173);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(173, 173, 173), stop: 1 rgb(121, 121, 121));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(173, 173, 173), stop: 1 rgb(121, 121, 121));
+	border-bottom-color: rgb(121, 121, 121);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(196, 196, 196), stop: 0.19 rgb(154, 154, 154), stop: 1 rgb(126, 126, 126));
+}
+
+QPushButton[flat=true] {
+	border-top-color: rgb(231, 158, 49);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(231, 158, 49), stop: 1  rgb(171, 76, 28));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(231, 158, 49), stop: 1  rgb(171, 76, 28));
+	border-bottom-color: rgb(171, 76, 28);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(251, 181, 106), stop: 0.19 rgb(223, 140, 26), stop: 0.81 rgb(157, 53, 1), stop: 1 rgb(187, 68, 20));
+}
+
+QPushButton[flat=true]:hover {
+	border-top-color: rgb(236, 160, 57);
+	border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(236, 160, 57), stop: 1  rgb(224, 126, 28));
+	border-right-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(236, 160, 57), stop: 1  rgb(224, 126, 28));
+	border-bottom-color: rgb(224, 126, 28);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(255, 187, 120), stop: 0.19 rgb(236, 150, 38), stop: 0.81 rgb(219, 95, 1), stop: 1 rgb(234, 127, 27));
+}
+
+QToolTip {
+	background-color: rgba(45, 45, 45, 216);
+	border: none;
+	border-radius: 2px;
+	opacity: 216;
+}
+</string>
+  </property>
+  <widget class="QLabel" name="logo">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>160</width>
+     <height>85</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>assets/extracted/lobby_logo.png</pixmap>
+   </property>
+  </widget>
+  <widget class="SummonerInfoWidget" name="summonerInfo" native="true">
+   <property name="geometry">
+    <rect>
+     <x>758</x>
+     <y>0</y>
+     <width>472</width>
+     <height>85</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="windowframe" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1286</width>
+     <height>804</height>
+    </rect>
+   </property>
+   <widget class="QLabel" name="left">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>98</y>
+      <width>13</width>
+      <height>647</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_left.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="top">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1286</width>
+      <height>99</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_top_lobby.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="bottom">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>745</y>
+      <width>1286</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_bottom.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="right">
+    <property name="geometry">
+     <rect>
+      <x>1273</x>
+      <y>98</y>
+      <width>13</width>
+      <height>647</height>
+     </rect>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/extracted/window_frame_right.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="background">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>1272</width>
+      <height>750</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/images/backgrounds/pvp_landingBackground.jpg</pixmap>
+    </property>
+   </widget>
+   <zorder>background</zorder>
+   <zorder>top</zorder>
+   <zorder>left</zorder>
+   <zorder>bottom</zorder>
+   <zorder>right</zorder>
+  </widget>
+  <zorder>windowframe</zorder>
+  <zorder>logo</zorder>
+  <zorder>summonerInfo</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SummonerInfoWidget</class>
+   <extends>QWidget</extends>
+   <header>summonerinfowidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

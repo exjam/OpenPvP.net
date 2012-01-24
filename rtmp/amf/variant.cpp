@@ -97,9 +97,15 @@ namespace amf {
 	}
 
 	Array* Variant::toArray() const {
-		if(mType == AMF_NULL)
+		if(mType == AMF_NULL){
 			return nullptr;
-		else if(mType != AMF_ARRAY)
+		}else if(mType == AMF_OBJECT){
+			Object* obj = (Object*)this;
+			if(obj->name().compare("flex.messaging.io.ArrayCollection") == 0)
+				return obj->get("source")->toArray();
+		}
+		
+		if(mType != AMF_ARRAY)
 			throw std::bad_cast();
 
 		return (Array*)this;

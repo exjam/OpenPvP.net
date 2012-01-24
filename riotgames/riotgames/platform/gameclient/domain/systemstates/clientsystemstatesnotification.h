@@ -27,9 +27,10 @@ namespace riotgames {
 							uint16 length;
 							stream >> length;
 
-							char* json = new char[length];
+							char* json = new char[length + 1];
 							stream.read(json, length);
-							std::cout << "ClientSystemStatesNotificationExt json:" << std::endl << json << std::endl;
+							json[length] = 0;
+							object->set("json", amf::Variant::fromValue(json));
 							delete [] json;
 						}
 

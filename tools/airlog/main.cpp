@@ -2,6 +2,7 @@
 Logs RTMP packets sent from adobe air before SSL encryption
 */
 
+#include "riotgames.h"
 #include "amf/log.h"
 #include "amf/amf.h"
 #include "amf/amf3.h"
@@ -14,6 +15,7 @@ Logs RTMP packets sent from adobe air before SSL encryption
 #include <tlhelp32.h>
 
 #pragma comment(lib, "../../Debug/rtmp.lib")
+#pragma comment(lib, "../../Debug/riotgames.lib")
 
 FILE* gLogFile = NULL;
 
@@ -356,6 +358,8 @@ namespace code {
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved){
 	if(dwReason == DLL_PROCESS_ATTACH){
+		riotgames::init();
+
 		FILE* console;
 		AllocConsole();
 		SetConsoleTitle("LoL Console");

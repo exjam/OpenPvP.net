@@ -63,6 +63,7 @@ namespace rtmp {
 			
 			Amf0Command(Packet& source);
 			Amf0Command(const std::string& name, amf::Object* object);
+			~Amf0Command();
 
 			Packet* packet();
 			const std::string& name();
@@ -81,6 +82,8 @@ namespace rtmp {
 			
 			Amf3Command(Packet& source);
 			Amf3Command(amf::Object* object);
+
+			~Amf3Command();
 
 			Packet* packet();
 			amf::Object* object();

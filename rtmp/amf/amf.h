@@ -3,6 +3,8 @@
 #include "types.h"
 #include "bytestream.h"
 
+#include <vector>
+
 namespace flex {
 	namespace utils {
 		class IExternalizable;
@@ -43,7 +45,7 @@ namespace amf {
 
 		void setVersion(uint8 version);
 		
-		Variant* deserialise(ByteStream& stream);
+		Variant* deserialise(ByteStream& stream, bool cache = true);
 		void serialise(Variant* value, ByteStream& stream);
 
 		void start(uint8 version);
@@ -55,6 +57,7 @@ namespace amf {
 	private:
 		uint8 mVersion;
 		EncoderImpl* mVersions[mMaxVersion + 1];
+		std::vector<amf::Variant*> mCache;
 	};
 
 	extern Encoder_ Encoder;

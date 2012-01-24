@@ -16,36 +16,36 @@ namespace flex {
 				}
 
 				void invoke(const std::string& operation, const rtmp::CommandCallback& callback){
-						amf::Array args;
-						invokeWithArgs(operation, callback, &args);
+						amf::Array* args = new amf::Array();
+						invokeWithArgs(operation, callback, args);
 				}
 
 				void invoke(const std::string& operation, const rtmp::CommandCallback& callback, amf::Variant* arg1){
-						amf::Array args;
-						args << arg1;
+						amf::Array* args = new amf::Array();
+						(*args) << arg1->copy();
 
-						invokeWithArgs(operation, callback, &args);
+						invokeWithArgs(operation, callback, args);
 				}
 
 				void invoke(const std::string& operation, const rtmp::CommandCallback& callback, amf::Variant* arg1, amf::Variant* arg2){
-						amf::Array args;
-						args << arg1 << arg2;
+						amf::Array* args = new amf::Array();
+						(*args) << arg1->copy() << arg2->copy();
 
-						invokeWithArgs(operation, callback, &args);
+						invokeWithArgs(operation, callback, args);
 				}
 
 				void invoke(const std::string& operation, const rtmp::CommandCallback& callback, amf::Variant* arg1, amf::Variant* arg2, amf::Variant* arg3){
-						amf::Array args;
-						args << arg1 << arg2 << arg3;
+						amf::Array* args = new amf::Array();
+						(*args) << arg1->copy() << arg2->copy() << arg3->copy();
 
-						invokeWithArgs(operation, callback, &args);
+						invokeWithArgs(operation, callback, args);
 				}
 
 				void invoke(const std::string& operation, const rtmp::CommandCallback& callback, amf::Variant* arg1, amf::Variant* arg2, amf::Variant* arg3, amf::Variant* arg4){
-						amf::Array args;
-						args << arg1 << arg2 << arg3 << arg4;
+						amf::Array* args = new amf::Array();
+						(*args) << arg1->copy() << arg2->copy() << arg3->copy() << arg4->copy();
 
-						invokeWithArgs(operation, callback, &args);
+						invokeWithArgs(operation, callback, args);
 				}
 
 			private:

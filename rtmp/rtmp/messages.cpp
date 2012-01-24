@@ -18,12 +18,12 @@ namespace rtmp {
 		}
 
 		Amf0Command::Amf0Command(const std::string& name, amf::Object* object)
-			: Packet(Type), mName(name), mProperties(object)
+			: Packet(Type), mName(name), mProperties(object->copy()->toObject()), mInformation(0)
 		{
 		}
 
 		Amf0Command::Amf0Command(Packet& source)
-			: Packet(Type)
+			: Packet(Type), mInformation(0)
 		{
 			amf::String _string;
 			amf::Number _number;
@@ -31,9 +31,17 @@ namespace rtmp {
 			amf::Encoder.start(0);
 			mName = amf::Encoder.deserialise(source.mData)->toString();
 			mID = amf::Encoder.deserialise(source.mData)->toDouble();
-			mProperties = amf::Encoder.deserialise(source.mData)->toObject();
-			mInformation = amf::Encoder.deserialise(source.mData)->toObject();
+			mProperties = amf::Encoder.deserialise(source.mData)->copy()->toObject();
+			mInformation = amf::Encoder.deserialise(source.mData)->copy()->toObject();
 			amf::Encoder.end();
+		}
+		
+		Amf0Command::~Amf0Command(){
+			if(mProperties)
+				delete mProperties;
+
+			if(mInformation)
+				delete mInformation;
 		}
 
 		Packet* Amf0Command::packet(){
@@ -61,27 +69,30 @@ namespace rtmp {
 		}
 
 		Amf3Command::Amf3Command(amf::Object* object)
-			: Packet(Type), mObject(object)
+			: Packet(Type), mObject(object->copy()->toObject())
 		{
 		}
 
 		Amf3Command::Amf3Command(Packet& source)
-			: Packet(Type)
+			: Packet(Type), mObject(0)
 		{
 			ByteStream& stream = source.mData;
 
-			amf::String _string;
-			amf::Number _number;
-
-			amf::Encoder.start(0);
 
 			uint8 tmp;
 			stream >> tmp;
-
-			delete amf::Encoder.deserialise(stream);
+			
+			amf::Encoder.start(0);
+			amf::Encoder.deserialise(stream);
 			mID = amf::Encoder.deserialise(stream)->toDouble();
-			delete amf::Encoder.deserialise(stream);
-			mObject = amf::Encoder.deserialise(stream)->toObject();
+			amf::Encoder.deserialise(stream);
+			mObject = amf::Encoder.deserialise(stream)->copy()->toObject();
+			amf::Encoder.end();
+		}
+
+		Amf3Command::~Amf3Command(){
+			if(mObject)
+				delete mObject;
 		}
 
 		Packet* Amf3Command::packet(){

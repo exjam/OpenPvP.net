@@ -91,9 +91,9 @@ namespace flex {
 
 					set("operation", new amf::String());
 					set("source", new amf::String());
-					defineObject();
-		
 					headers()->set("DSRequestTimeout", amf::Variant::fromValue(60));
+
+					defineObject();
 				}
 
 				std::string operation(){

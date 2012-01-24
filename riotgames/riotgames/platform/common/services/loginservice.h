@@ -16,8 +16,8 @@ namespace riotgames {
 					{
 					}
 
-					void performLCDSHeartBeat(double param1, const std::string& param2, int param3, const std::string& param4, const rtmp::CommandCallback& callback){
-						invoke("performLCDSHeartBeat", callback, &amf::Number(param1), &amf::String(param2), &amf::Integer(param3), &amf::String(param4));
+					void performLCDSHeartBeat(double accountId, const std::string& serverSessionToken, int heartbeatId, const std::string& datetime, const rtmp::CommandCallback& callback){
+						invoke("performLCDSHeartBeat", callback, &amf::Number(accountId), &amf::String(serverSessionToken), &amf::Integer(heartbeatId), &amf::String(datetime));
 					}
 
 					void getLoggedInAccountView(const rtmp::CommandCallback& callback){

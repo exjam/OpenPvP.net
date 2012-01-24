@@ -37,6 +37,18 @@
     <Filter Include="Header Files\gameclient\domain\broadcast">
       <UniqueIdentifier>{13083f95-90c7-4d1f-805e-926183e85bad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gameclient\domain\rankedTeams">
+      <UniqueIdentifier>{833fea21-cf94-4c4b-8143-14f63e708ba5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\domain\inventory">
+      <UniqueIdentifier>{3687e856-815d-46a0-a51f-ddcebe042406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\domain\game">
+      <UniqueIdentifier>{e8b86fb3-9819-4675-8efa-592c085e3698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gameclient\domain\gameconfig">
+      <UniqueIdentifier>{dfb004d3-df0c-46ce-8d6a-711a84ea6130}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="riotgames\platform\common\services\loginservice.h">
@@ -44,9 +56,6 @@
     </ClInclude>
     <ClInclude Include="riotgames\platform\common\services\messagerouterservice.h">
       <Filter>Header Files\common\services</Filter>
-    </ClInclude>
-    <ClInclude Include="riotgames\platform\gameclient\domain\abstracteventdispatchingdomainobject.h">
-      <Filter>Header Files\gameclient\domain</Filter>
     </ClInclude>
     <ClInclude Include="riotgames\platform\gameclient\domain\accountsummary.h">
       <Filter>Header Files\gameclient\domain</Filter>
@@ -71,6 +80,132 @@
     </ClInclude>
     <ClInclude Include="riotgames\platform\gameclient\domain\broadcast\broadcastnotification.h">
       <Filter>Header Files\gameclient\domain\broadcast</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\common\services\inventoryservice.h">
+      <Filter>Header Files\common\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\services\summonerruneservice.h">
+      <Filter>Header Files\gameclient\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\services\teamservice.h">
+      <Filter>Header Files\gameclient\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\rankedTeams\teamid.h">
+      <Filter>Header Files\gameclient\domain\rankedTeams</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\abstractdomainobject.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\rankedTeams\teaminfo.h">
+      <Filter>Header Files\gameclient\domain\rankedTeams</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\rankedTeams\player.h">
+      <Filter>Header Files\gameclient\domain\rankedTeams</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\inventory\activeboosts.h">
+      <Filter>Header Files\gameclient\domain\inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\champion.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\rentableinventoryitem.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\championskin.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\game\gamequeueconfig.h">
+      <Filter>Header Files\gameclient\domain\game</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\logindatapacket.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\playerstatsummaries.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonercatalog.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\allsummonerdata.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summoner.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\spellbook.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonerdefaultspells.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonerlevel.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonerlevelandpoints.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonertalentsandpoints.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\spell.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\game\gamereconnectioninfo.h">
+      <Filter>Header Files\gameclient\domain\game</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\gamedto.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\playercredentialsdto.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\playerparticipant.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\playerstatsummary.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summaryaggstats.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summaryaggstat.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\gameconfig\gametypeconfig.h">
+      <Filter>Header Files\gameclient\domain\gameconfig</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\runeslot.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\runetype.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\talent.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\talentgroup.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\talentrow.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\spellbookpage.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\slotentry.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonerassociatedtalent.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\rune.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\summonerassociatedtalentpk.h">
+      <Filter>Header Files\gameclient\domain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

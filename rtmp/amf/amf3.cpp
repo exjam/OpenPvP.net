@@ -38,17 +38,17 @@ namespace amf {
 				for(uint32 j = 0; j < 7; ++j){
 					uint32 index = i*7 + j;
 					if((byte >> j) & 1){
-						Variant* entity = Encoder.deserialise(stream);
-						if(index >= mFields.size())
-							delete entity;
-						else
+						Variant* entity = Encoder.deserialise(stream, false);
+						if(index < mFields.size())
 							obj->insert(mFields[i*7 + j], entity);
+						else if(entity)
+							delete entity;
 					}
 				}
 			}
 		}else{
 			for(auto itr = mFields.begin(); itr != mFields.end(); ++itr)
-				obj->insert(*itr, Encoder.deserialise(stream));
+				obj->insert(*itr, Encoder.deserialise(stream, false));
 		}
 	}
 
@@ -156,11 +156,13 @@ namespace amf {
 	}
 
 	void amf3::addString(const std::string& str){
-		mStrings.push_back(str);
+		if(str.length() > 0)
+			mStrings.push_back(str);
 	}
 
 	void amf3::addObject(Variant* obj){
-		mObjects.push_back(obj);
+		if(obj)
+			mObjects.push_back(obj);
 	}
 
 	void amf3::addDefinition(ObjectDefinition* def){
@@ -586,13 +588,12 @@ namespace amf {
 			Array* source = (Array*)getObject(length >> 1);
 			if(source->type() != Array::Type)
 				throw new DecodeException("Referenced object was not of type Array");
-
-			//TODO: maybe duplicate objects?
+			
 			for(auto itr = source->begin(); itr != source->end(); ++itr)
-				value->insert(itr->first, itr->second);
+				value->insert(itr->first, itr->second->copy());
 
 			for(uint32 i = 0; i < source->size(); ++i)
-				value->push_back(source->at(i));
+				value->push_back(source->at(i)->copy());
 		}else{
 			addObject(value);
 
@@ -605,11 +606,11 @@ namespace amf {
 				if(_string.length() == 0)
 					break;
 
-				value->insert(_string, Encoder.deserialise(stream));
+				value->insert(_string, Encoder.deserialise(stream, false));
 			}
 
 			for(uint32 i = 0; i < length; ++i)
-				value->push_back(Encoder.deserialise(stream));
+				value->push_back(Encoder.deserialise(stream, false));
 		}
 	}
 
@@ -628,9 +629,8 @@ namespace amf {
 
 			value->setName(source->name());
 
-			//TODO: maybe duplicate objects?
 			for(auto itr = source->begin(); itr != source->end(); ++itr)
-				value->insert(itr->first, itr->second);
+				value->insert(itr->first, itr->second->copy());
 		}else{
 			addObject(value);
 
@@ -673,7 +673,7 @@ namespace amf {
 				extDef->readExternal(value, stream);
 			}else{
 				for(auto itr = definition->mMembers.begin(); itr != definition->mMembers.end(); ++itr)
-					value->insert(*itr, Encoder.deserialise(stream));
+					value->insert(*itr, Encoder.deserialise(stream, false));
 			}
 
 			if(definition->mDynamic){
@@ -681,7 +681,7 @@ namespace amf {
 					deserialise(AMF3_STRING, &_string, stream);
 					if(_string.length() == 0) break;
 					
-					value->insert(_string, Encoder.deserialise(stream));
+					value->insert(_string, Encoder.deserialise(stream, false));
 				}
 			}
 		}

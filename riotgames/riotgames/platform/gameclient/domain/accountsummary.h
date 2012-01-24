@@ -1,13 +1,13 @@
 #pragma once
 
 #include "amf/variant.h"
-#include "abstracteventdispatchingdomainobject.h"
+#include "abstractdomainobject.h"
 
 namespace riotgames {
 	namespace platform {
 		namespace gameclient {
 			namespace domain {
-				class AccountSummary : public AbstractEventDispatchingDomainObject {
+				class AccountSummary : public AbstractDomainObject {
 				public:
 					AccountSummary(){
 						setName("com.riotgames.platform.account.AccountSummary");

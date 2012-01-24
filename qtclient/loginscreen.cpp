@@ -1,4 +1,4 @@
-#include "loginwidget.h"
+#include "loginscreen.h"
 #include "mainwindow.h"
 #include "connection.h"
 
@@ -7,53 +7,44 @@
 #include "riotgames/platform/common/services/loginservice.h"
 #include "riotgames/platform/common/services/messagerouterservice.h"
 
-LoginWidget::LoginWidget(QWidget *parent, Qt::WFlags flags)
-	: QWidget(parent, flags), mLoginStage(0)
+LoginScreen::LoginScreen(QWidget *parent, Qt::WFlags flags)
+	: QWidget(parent, flags), mLoginStage(0), mNetworkMan(this)
 {
 	ui.setupUi(this);
 
-	mNetworkMan = new QNetworkAccessManager(this);
-	connect(mNetworkMan, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
-	connect(mNetworkMan, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
+	connect(&mNetworkMan, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+	connect(&mNetworkMan, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 
 	connect(gConnection, SIGNAL(connected()), this, SLOT(onClientConnected()));
-	connect(this, SIGNAL(receiveLoginResult(amf::Variant*)), this, SLOT(onLoginResult(amf::Variant*)));
 }
 
-LoginWidget::~LoginWidget(){
+LoginScreen::~LoginScreen(){
 }
 
-void LoginWidget::onLoginResult(amf::Variant* result){
+void LoginScreen::onLoginResult(amf::Variant* result){
 	amf::Object* object = result->toObject();
 	if(object->name().compare("flex.messaging.messages.ErrorMessage") == 0){
 		QString str = QString("Error in %1:\n%2")
 			.arg(QString::fromStdString(object->get("faultCode")->toString()))
 			.arg(QString::fromStdString(object->get("faultString")->toString()));
 
-		gMainWindow->hideStatusDialog();
 		gMainWindow->showAlert("Error", str, AlertDialog::Ok);
 	}else{
-		using namespace riotgames::platform::gameclient::domain;
 		amf::log::obj obj;
 		obj << result;
-		gMainWindow->setStatusDialogMessage("Retrieveing login data...");
 
-		mSession = (ServerSessionObject*)object->get("body")->toObject();
+		ServerSessionObject* session = (ServerSessionObject*)object->get("body")->copy()->toObject();
 
 		flex::messaging::ChannelSet cs;
-		cs.login(mSession->getAccountSummary()->getUsername(), mSession->getToken());
+		cs.login(session->getAccountSummary()->getUsername(), session->getToken());
 
-		riotgames::platform::common::services::messageRouterService.initialize(mSession);
+		riotgames::platform::common::services::messageRouterService.initialize(session);
 
-		emit loginComplete();
+		emit loginComplete(session);
 	}
 }
 
-void LoginWidget::loginResult(amf::Variant* result){
-	emit receiveLoginResult(result);
-}
-
-void LoginWidget::onClientConnected(){
+void LoginScreen::onClientConnected(){
 	riotgames::platform::common::services::loginService.login(
 		ui.username->text().toStdString(),
 		ui.password->text().toStdString(),
@@ -62,15 +53,15 @@ void LoginWidget::onClientConnected(){
 		mIpAddress.toStdString(),
 		"en_US",
 		"1.52.12_01_16_15_31",
-		std::bind(&LoginWidget::loginResult, this, std::placeholders::_1));
+		std::bind(&LoginScreen::onLoginResult, this, std::placeholders::_1));
 }
 
-void LoginWidget::sslErrors(QNetworkReply* reply, const QList<QSslError>& errors){
+void LoginScreen::sslErrors(QNetworkReply* reply, const QList<QSslError>& errors){
 	mLoginStage = 0;
 	updateLoginButton();
 }
 
-void LoginWidget::replyFinished(QNetworkReply* reply){
+void LoginScreen::replyFinished(QNetworkReply* reply){
 	if(mLoginStage == 1){
 		if(reply->error() != QNetworkReply::NoError && reply->error() != QNetworkReply::ContentOperationNotPermittedError)
 			return loginError("Could not connect to login server.");
@@ -84,7 +75,7 @@ void LoginWidget::replyFinished(QNetworkReply* reply){
 		mAuthToken = data.mid(pos, data.indexOf("\"", pos) - pos);
 
 		mLoginStage = 2;
-		mNetworkMan->get(QNetworkRequest(QUrl("http://ll.leagueoflegends.com/services/connection_info")));
+		mNetworkMan.get(QNetworkRequest(QUrl("http://ll.leagueoflegends.com/services/connection_info")));
 	}else if(mLoginStage == 2){
 		if(reply->error() != QNetworkReply::NoError)
 			return loginError("Coult not retrieve connection info.");
@@ -101,7 +92,7 @@ void LoginWidget::replyFinished(QNetworkReply* reply){
 	}
 }
 
-void LoginWidget::login(){
+void LoginScreen::login(){
 	if(!ui.login->isEnabled())
 		return;
 
@@ -115,25 +106,25 @@ void LoginWidget::login(){
 
 	QNetworkRequest req(QUrl("https://lq.na1.lol.riotgames.com/login-queue/rest/queue/authenticate"));
 	req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant::fromValue(QString("application/x-www-form-urlencoded")));
-	mNetworkMan->post(req, data.toUtf8());
+	mNetworkMan.post(req, data.toUtf8());
 }
 
-void LoginWidget::passwordChanged(const QString& str){
+void LoginScreen::passwordChanged(const QString& str){
 	updateLoginButton();
 }
 
-void LoginWidget::usernameChanged(const QString& str){
+void LoginScreen::usernameChanged(const QString& str){
 	updateLoginButton();
 }
 
-void LoginWidget::updateLoginButton(){
+void LoginScreen::updateLoginButton(){
 	if(mLoginStage)
 		ui.login->setEnabled(false);
 	else
 		ui.login->setEnabled(ui.username->text().length() && ui.password->text().length());
 }
 
-void LoginWidget::loginError(const QString& error){
+void LoginScreen::loginError(const QString& error){
 	gMainWindow->hideStatusDialog();
 
 	mLoginStage = 0;

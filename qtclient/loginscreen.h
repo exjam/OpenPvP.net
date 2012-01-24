@@ -1,5 +1,5 @@
-#ifndef LOGINWIDGET_H
-#define LOGINWIDGET_H
+#ifndef LOGIN_SCREEN_H
+#define LOGIN_SCREEN_H
 
 #include <QtGui/QMainWindow>
 
@@ -11,20 +11,22 @@
 
 #include <QMessageBox>
 
-#include "ui_loginwidget.h"
+#include "ui_loginscreen.h"
 #include "riotgames/platform/gameclient/domain/serversessionobject.h"
 
 namespace amf {
 	class Variant;
 };
 
-class LoginWidget : public QWidget
+using riotgames::platform::gameclient::domain::ServerSessionObject;
+
+class LoginScreen : public QWidget
 {
 	Q_OBJECT
 
 public:
-	LoginWidget(QWidget *parent = 0, Qt::WFlags flags = 0);
-	~LoginWidget();
+	LoginScreen(QWidget *parent = 0, Qt::WFlags flags = 0);
+	~LoginScreen();
 
 public slots:
 	void login();
@@ -35,24 +37,22 @@ public slots:
 	void usernameChanged(const QString& str);
 	
 	void onClientConnected();
-	void onLoginResult(amf::Variant* result);
-	
+
 private:
-	void loginResult(amf::Variant* result);
+	void onLoginResult(amf::Variant* result);
 	void updateLoginButton();
 	void loginError(const QString& error);
 
 signals:
-	void loginComplete();
+	void loginComplete(ServerSessionObject* session);
 	void receiveLoginResult(amf::Variant* result);
 
 private:
 	QString mAuthToken;
 	QString mIpAddress;
 	int mLoginStage;
-	QNetworkAccessManager* mNetworkMan;
-	Ui::LoginWidget ui;
-	riotgames::platform::gameclient::domain::ServerSessionObject* mSession;
+	QNetworkAccessManager mNetworkMan;
+	Ui::LoginScreen ui;
 };
 
 #endif
