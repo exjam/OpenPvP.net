@@ -10,6 +10,7 @@
 #include "riotgames/platform/gameclient/services/clientfacadeservice.h"
 #include "riotgames/platform/gameclient/services/summonerruneservice.h"
 #include "riotgames/platform/gameclient/services/teamservice.h"
+#include "riotgames/platform/gameclient/services/summonerservice.h"
 #include "riotgames/platform/gameclient/domain/inventory/activeboosts.h"
 
 using namespace riotgames::platform::common::services;
@@ -17,6 +18,7 @@ using namespace riotgames::platform::gameclient::services;
 using namespace riotgames::platform::gameclient::domain;
 #include "loginscreen.h"
 #include "lobbyscreen.h"
+#include "summonerinfowidget.h"
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags), mStatusDialog(new StatusDialog(this)), mServerSession(0), mHeartbeatCount(0), mSummonerID(0.0)
@@ -28,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	mHeartbeatTimer = new QTimer();
 	connect(mHeartbeatTimer, SIGNAL(timeout()), this, SLOT(performHeartbeat()));
 	connect(this, SIGNAL(_internalAlert(QString,QString,AlertDialog::Buttons)), this, SLOT(doAlert(QString,QString,AlertDialog::Buttons)));
+	connect(this, SIGNAL(_internalHideStatusDialog()), this, SLOT(doHideStatusDialog()));
 
 	changeScreen(new LoginScreen());
 	connect(mCurrentScreen, SIGNAL(loginComplete(ServerSessionObject*)), this, SLOT(onLoginComplete(ServerSessionObject*)));
@@ -73,6 +76,12 @@ void MainWindow::onActiveBoosts(amf::Variant* result){
 	summonerRuneService.getSummonerRuneInventory(mSummonerID, std::bind(&MainWindow::onRuneInventory, this, std::placeholders::_1));
 }
 
+void MainWindow::onGetSummonerByAccountId(amf::Variant* result){
+}
+
+void MainWindow::onGetSummonerByName(amf::Variant* result){
+}
+
 void MainWindow::onRuneInventory(amf::Variant* result){
 }
 
@@ -85,7 +94,23 @@ void MainWindow::onAvailableQueues(amf::Variant* result){
 void MainWindow::onCreatePlayer(amf::Variant* result){
 }
 
+#include "riotgames/platform/gameclient/domain/logindatapacket.h"
 void MainWindow::onLoginDataPacket(amf::Variant* result){
+	using riotgames::platform::gameclient::domain::LoginDataPacket;
+	LoginDataPacket* data = (LoginDataPacket*)result->toObject()->get("body")->toObject();
+	auto summonerData = data->getAllSummonerData();
+	if(summonerData){
+		auto summoner = summonerData->getSummoner();
+	
+		if(summoner){
+			LobbyScreen* screen = (LobbyScreen*)mCurrentScreen;
+			SummonerInfoWidget* widget = screen->getSummonerInfoWidget();
+			widget->setRpCount(data->getRpBalance());
+			widget->setIpCount(data->getIpBalance());
+			widget->setName(QString::fromStdString(summoner->getName()));
+			hideStatusDialog();
+		}
+	}
 }
 
 void MainWindow::onHeartbeatReply(amf::Variant* result){
@@ -141,5 +166,13 @@ void MainWindow::showStatusDialog(const QString& title, const QString& message){
 }
 
 void MainWindow::hideStatusDialog(){
+	emit _internalHideStatusDialog();
+}
+
+void MainWindow::doHideStatusDialog(){
 	mStatusDialog->hide();
+}
+
+void MainWindow::minimise(){
+	setWindowState(windowState() | Qt::WindowMinimized);
 }

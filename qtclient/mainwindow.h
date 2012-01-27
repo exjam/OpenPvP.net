@@ -29,10 +29,14 @@ public:
 	void showAlert(const QString& title, const QString& message, AlertDialog::Buttons buttons);
 
 	void changeScreen(QWidget* screen);
+
 public slots:
+	void minimise();
 	int doAlert(const QString& title, const QString& message, AlertDialog::Buttons buttons);
 
 private slots:
+	void doHideStatusDialog();
+
 	void onLoginComplete(ServerSessionObject* session);
 
 	void performHeartbeat();
@@ -44,8 +48,11 @@ private slots:
 	void onAvailableQueues(amf::Variant* result);
 	void onCreatePlayer(amf::Variant* result);
 	void onRuneInventory(amf::Variant* result);
+	void onGetSummonerByName(amf::Variant* result);
+	void onGetSummonerByAccountId(amf::Variant* result);
 
 signals:
+	void _internalHideStatusDialog();
 	void _internalAlert(const QString& title, const QString& message, AlertDialog::Buttons buttons);
 
 private:

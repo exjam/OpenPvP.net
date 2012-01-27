@@ -5,6 +5,8 @@ ByteStream::endian_t little_endian(ByteStream::LITTLE_ENDIAN);
 ByteStream::endian_t big_endian(ByteStream::BIG_ENDIAN);
 
 namespace rtmp {
+	Packet::Header Packet::mLastHeader;
+
 	Packet::Packet(uint8 type){
 		memset(&mHeader, 0, sizeof(mHeader));
 		mHeader.mContentType = type;
@@ -68,18 +70,28 @@ namespace rtmp {
 		
 		if(mHeader.mFormat <= 2){
 			stream >> uint24(mHeader.mTimeStamp);
+		}else{
+			mHeader.mTimeStamp = mLastHeader.mTimeStamp;
 		}
 
 		if(mHeader.mFormat <= 1){
 			stream >> uint24(mHeader.mBodySize);
 			stream >> mHeader.mContentType;
+		}else{
+			mHeader.mBodySize = mLastHeader.mBodySize;
+			mHeader.mContentType = mLastHeader.mContentType;
 		}
 		
-		if(mHeader.mFormat == 0)
+		if(mHeader.mFormat == 0){
 			stream >> little_endian >> mHeader.mMessageStreamID >> big_endian;
+		}else{
+			mHeader.mMessageStreamID = mLastHeader.mMessageStreamID;
+		}
 
 		if(mHeader.mTimeStamp == 0xFFFFFF)
 			stream >> mHeader.mTimeStamp;
+
+		mLastHeader = mHeader;
 	}
 
 	uint32 Packet::getHeaderSize(ByteStream& data){

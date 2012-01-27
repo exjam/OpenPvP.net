@@ -1,16 +1,18 @@
 #pragma once
 
 #include "amf/variant.h"
+#include "basesummoner.h"
 
 namespace riotgames {
 	namespace platform {
 		namespace gameclient {
 			namespace domain {
-				class Summoner : public amf::Object {
+				class Summoner : public BaseSummoner {
 				public:
 					Summoner(){
-						setName("com.riotgames.platform.gameclient.domain.Summoner");
-
+						setName("com.riotgames.platform.summoner.Summoner");
+						
+						set("name", new amf::Null());
 						set("seasonOneTier", new amf::Null());
 						set("nameChangeFlag", new amf::Null());
 						set("sumId", new amf::Null());

@@ -4,6 +4,7 @@
 #include "riotgames/platform/gameclient/services/matchmakerservice.h"
 #include "riotgames/platform/gameclient/services/clientfacadeservice.h"
 #include "riotgames/platform/gameclient/services/teamservice.h"
+#include "riotgames/platform/gameclient/services/summonerservice.h"
 #include "riotgames/platform/gameclient/services/summonerruneservice.h"
 #include "riotgames/platform/gameclient/domain/systemstates/clientsystemstatesnotification.h"
 #include "riotgames/platform/gameclient/domain/broadcast/broadcastnotification.h"
@@ -24,6 +25,7 @@ namespace riotgames {
 				MatchMakerService matchmakerService;
 				SummonerRuneService summonerRuneService;
 				TeamService summonerTeamService;
+				SummonerService summonerService;
 			};
 		};
 	};

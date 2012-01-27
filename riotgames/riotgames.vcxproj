@@ -19,6 +19,7 @@
     <ClInclude Include="riotgames\platform\gameclient\domain\abstractdomainobject.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\accountsummary.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\allsummonerdata.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\basesummoner.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\broadcast\broadcastnotification.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\champion.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\championskin.h" />
@@ -62,6 +63,7 @@
     <ClInclude Include="riotgames\platform\gameclient\services\clientfacadeservice.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\matchmakerservice.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\summonerruneservice.h" />
+    <ClInclude Include="riotgames\platform\gameclient\services\summonerservice.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\teamservice.h" />
   </ItemGroup>
   <ItemGroup>

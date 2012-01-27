@@ -18,6 +18,10 @@ public:
 	~LobbyScreen(){
 	}
 
+	SummonerInfoWidget* getSummonerInfoWidget(){
+		return ui.summonerInfo;
+	}
+
 private:
 	Ui::LobbyScreen ui;
 };

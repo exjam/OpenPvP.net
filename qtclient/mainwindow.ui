@@ -268,5 +268,24 @@ border: none;
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>minimise</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowClass</receiver>
+   <slot>minimise()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1238</x>
+     <y>14</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>minimise()</slot>
+ </slots>
 </ui>
