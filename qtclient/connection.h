@@ -32,7 +32,7 @@ public:
 	}
 
 protected:
-	void clientEvent(int evt, amf::Variant* data){
+	void clientEvent(int evt, const amf::Variant& data){
 		switch(evt){
 			case rtmp::Client::EVT_CONNECT:
 				emit connected();

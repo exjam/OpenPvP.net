@@ -11,24 +11,24 @@ namespace riotgames {
 					SummaryAggStat(){
 						setName("com.riotgames.platform.statistics.SummaryAggStat");
 
-						set("statType", new amf::Null());
-						set("value", new amf::Null());
+						set("statType", (amf::Null*)nullptr);
+						set("value", (amf::Null*)nullptr);
 					}
 
-					std::string getStatType(){
-						return get("statType")->toString();
+					std::string getStatType() const {
+						return get("statType");
 					}
 
-					double getValue(){
-						return get("value")->toDouble();
+					double getValue() const {
+						return get("value");
 					}
 
 					void setStatType(const std::string& value){
-						set("statType", amf::object_creator_t(value).mValue);
+						get("statType") = value;
 					}
 
 					void setValue(double value){
-						set("value", amf::object_creator_t(value).mValue);
+						get("value") = value;
 					}
 				};
 			};

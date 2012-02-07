@@ -21,11 +21,11 @@ namespace riotgames {
 					}
 
 					void ownerLeaveTeam(double param1, TeamId* param2, const rtmp::CommandCallback& callback){
-						invoke("leaveTeam", callback, &amf::Number(param1), param2);
+						invoke("leaveTeam", callback, param1, param2);
 					}
 
 					void changeOwner(double param1, TeamId* param2, const rtmp::CommandCallback& callback){
-						invoke("changeOwner", callback, &amf::Number(param1), param2);
+						invoke("changeOwner", callback, param1, param2);
 					}
 
 					void joinTeam(TeamId* param1, const rtmp::CommandCallback& callback){
@@ -37,19 +37,19 @@ namespace riotgames {
 					}
 
 					void invitePlayer(double param1, TeamId* param2, const rtmp::CommandCallback& callback){
-						invoke("invitePlayer", callback, &amf::Number(param1), param2);
+						invoke("invitePlayer", callback, param1, param2);
 					}
 
 					void findTeamByTag(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("findTeamByTag", callback, &amf::String(param1));
+						invoke("findTeamByTag", callback, param1);
 					}
 
 					void kickPlayer(double param1, TeamId* param2, const rtmp::CommandCallback& callback){
-						invoke("kickPlayer", callback, &amf::Number(param1), param2);
+						invoke("kickPlayer", callback, param1, param2);
 					}
 
 					void doesNameExist(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("doesNameExist", callback, &amf::String(param1));
+						invoke("doesNameExist", callback, param1);
 					}
 
 					void findOrCreateLocalPlayer(const rtmp::CommandCallback& callback){
@@ -57,19 +57,19 @@ namespace riotgames {
 					}
 
 					void doesTagExist(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("doesTagExist", callback, &amf::String(param1));
+						invoke("doesTagExist", callback, param1);
 					}
 
 					void findTeamByName(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("findTeamByName", callback, &amf::String(param1));
+						invoke("findTeamByName", callback, param1);
 					}
 
 					void createTeam(const std::string& param1, const std::string& param2, const rtmp::CommandCallback& callback){
-						invoke("createTeam", callback, &amf::String(param1), &amf::String(param2));
+						invoke("createTeam", callback, param1, param2);
 					}
 
 					void findPlayer(double param1, const rtmp::CommandCallback& callback){
-						invoke("findPlayer", callback, &amf::Number(param1));
+						invoke("findPlayer", callback, param1);
 					}
 
 					void leaveTeam(TeamId* param1, const rtmp::CommandCallback& callback){

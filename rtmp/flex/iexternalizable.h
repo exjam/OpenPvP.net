@@ -12,8 +12,8 @@ namespace flex {
 			virtual ~IExternalizable(){}
 
 			virtual std::string name() const = 0;
-			virtual void readExternal(amf::Object* object, ByteStream& stream) = 0;
-			virtual void writeExternal(amf::Object* object, ByteStream& stream) = 0;
+			virtual void readExternal(amf::Encoder* encoder, amf::Object* object, ByteStream& stream) = 0;
+			virtual void writeExternal(amf::Encoder* encoder, amf::Object* object, ByteStream& stream) = 0;
 		};
 	};
 };

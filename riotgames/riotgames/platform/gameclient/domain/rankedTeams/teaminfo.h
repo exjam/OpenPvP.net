@@ -14,42 +14,42 @@ namespace riotgames {
 						TeamInfo(){
 							setName("com.riotgames.team.TeamInfo");
 
-							set("name", new amf::Null());
-							set("tag", new amf::Null());
-							set("teamId", new amf::Null());
-							set("memberStatusString", new amf::Null());
+							set("name", (amf::Null*)nullptr);
+							set("tag", (amf::Null*)nullptr);
+							set("teamId", (amf::Null*)nullptr);
+							set("memberStatusString", (amf::Null*)nullptr);
 						}
 
-						std::string getName(){
-							return get("name")->toString();
+						std::string getName() const {
+							return get("name");
 						}
 
-						std::string getTag(){
-							return get("tag")->toString();
+						std::string getTag() const {
+							return get("tag");
 						}
 
-						TeamId* getTeamId(){
-							return (TeamId*)get("teamId")->toObject();
+						const amf::Reference<TeamId> getTeamId() const {
+							return get("teamId").toObject();
 						}
 
-						std::string getMemberStatusString(){
-							return get("memberStatusString")->toString();
+						std::string getMemberStatusString() const {
+							return get("memberStatusString");
 						}
 
 						void setName(const std::string& value){
-							set("name", amf::object_creator_t(value).mValue);
+							get("name") = value;
 						}
 
 						void setTag(const std::string& value){
-							set("tag", amf::object_creator_t(value).mValue);
+							get("tag") = value;
 						}
 
 						void setTeamId(TeamId* value){
-							set("teamId", (Variant*)value);
+							get("teamId") = value;
 						}
 
 						void setMemberStatusString(const std::string& value){
-							set("memberStatusString", amf::object_creator_t(value).mValue);
+							get("memberStatusString") = value;
 						}
 					};
 				};

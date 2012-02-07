@@ -12,60 +12,60 @@ namespace riotgames {
 					SpellBookPage(){
 						setName("com.riotgames.platform.summoner.spellbook.SpellBookPage");
 
-						set("isCurrent", new amf::Null());
-						set("name", new amf::Null());
-						set("createDate", new amf::Null());
-						set("pageId", new amf::Null());
-						set("summonerId", new amf::Null());
+						set("isCurrent", (amf::Null*)nullptr);
+						set("name", (amf::Null*)nullptr);
+						set("createDate", (amf::Null*)nullptr);
+						set("pageId", (amf::Null*)nullptr);
+						set("summonerId", (amf::Null*)nullptr);
 						set("slotEntries", new amf::Array());
 					}
 
-					bool getIsCurrent(){
-						return get("isCurrent")->toBool();
+					bool getIsCurrent() const {
+						return get("isCurrent");
 					}
 
-					std::string getName(){
-						return get("name")->toString();
+					std::string getName() const {
+						return get("name");
 					}
 
-					amf::Date* getCreateDate(){
-						return get("createDate")->toDate();
+					amf::Date* getCreateDate() const {
+						return get("createDate").toDate();
 					}
 
-					double getPageId(){
-						return get("pageId")->toDouble();
+					double getPageId() const {
+						return get("pageId");
 					}
 
-					double getSummonerId(){
-						return get("summonerId")->toDouble();
+					double getSummonerId() const {
+						return get("summonerId");
 					}
 
-					amf::Array_t<SlotEntry*>* getSlotEntries(){
-						return (amf::Array_t<SlotEntry*>*)get("slotEntries")->toArray();
+					amf::TypedArray<SlotEntry*>* getSlotEntries() const {
+						return (amf::TypedArray<SlotEntry*>*)(amf::Array*)get("slotEntries");
 					}
 
 					void setIsCurrent(bool value){
-						set("isCurrent", amf::object_creator_t(value).mValue);
+						get("isCurrent") = value;
 					}
 
 					void setName(const std::string& value){
-						set("name", amf::object_creator_t(value).mValue);
+						get("name") = value;
 					}
 
 					void setCreateDate(amf::Date* value){
-						set("createDate", (Variant*)value);
+						get("createDate") = value;
 					}
 
 					void setPageId(double value){
-						set("pageId", amf::object_creator_t(value).mValue);
+						get("pageId") = value;
 					}
 
 					void setSummonerId(double value){
-						set("summonerId", amf::object_creator_t(value).mValue);
+						get("summonerId") = value;
 					}
 
 					void setSlotEntries(amf::Array* value){
-						set("slotEntries", (Variant*)value);
+						get("slotEntries") = value;
 					}
 				};
 			};

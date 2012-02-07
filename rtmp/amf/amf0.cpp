@@ -5,33 +5,26 @@
 #include <assert.h>
 
 namespace amf {
-	amf0::amf0(){
+	amf0::amf0(Encoder* parent)
+		: mParent(parent)
+	{
 	}
 
-	void amf0::start(){
-	}
-
-	void amf0::end(){
-	}
-
-	void amf0::defineObject(Object* object){
-	}
-
-	void amf0::addExternalizable(flex::utils::IExternalizable* externalizable){
+	amf0::~amf0(){
 	}
 	
-	void amf0::serialise(uint8 type, ByteArray* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const ByteArray* value, ByteStream& stream){
 	}
 	
 	void amf0::deserialise(uint8 type, ByteArray* value, ByteStream& stream){
 	}
 
-	void amf0::serialise(uint8 version, Variant* value, ByteStream& stream){
+	void amf0::serialise(uint8 version, const Variant& value, ByteStream& stream){
 		assert(version == 0);
 			
-		uint8 type = value ? value->type() : AMF_NULL;
-		switch(type){
+		switch(value.type()){
 			case AMF_NULL:
+			case AMF_UNKNOWN_TYPE:
 				serialise(AMF0_INVALID, (Null*)value, stream);
 				break;
 			case AMF_NUMBER:
@@ -56,18 +49,18 @@ namespace amf {
 				serialise(AMF0_INVALID, (Object*)value, stream);
 				break;
 			default:
-				throw new EncodeException("Invalid AMF0 data type %u", type);
+				throw new EncodeException("Invalid AMF0 data type %u", value.type());
 				break;
 		}
 	}
 		
-	void amf0::serialise(uint8 type, Null* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Null* value, ByteStream& stream){
 		assert(type == AMF0_INVALID);
 
 		stream << uint8(AMF0_NULL);
 	}
 
-	void amf0::serialise(uint8 type, Number* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Number* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_NUMBER);
 
 		if(type == AMF0_INVALID)
@@ -76,7 +69,7 @@ namespace amf {
 		stream << double(value->value());
 	}
 
-	void amf0::serialise(uint8 type, Integer* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Integer* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_NUMBER);
 			
 		if(type == AMF0_INVALID)
@@ -85,7 +78,7 @@ namespace amf {
 		stream << double(value->value());
 	}
 
-	void amf0::serialise(uint8 type, Boolean* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Boolean* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_BOOLEAN);
 			
 		if(type == AMF0_INVALID)
@@ -94,7 +87,7 @@ namespace amf {
 		stream << uint8(value->value() ? 1 : 0);
 	}
 
-	void amf0::serialise(uint8 type, String* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const String* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_STRING);
 			
 		if(type == AMF0_INVALID)
@@ -105,7 +98,7 @@ namespace amf {
 		stream.write(str.c_str(), str.length());
 	}
 
-	void amf0::serialise(uint8 type, Date* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Date* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_DATE);
 			
 		if(type == AMF0_DATE)
@@ -115,7 +108,7 @@ namespace amf {
 		stream << uint16(0);
 	}
 
-	void amf0::serialise(uint8 type, Array* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Array* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_ECMA_ARRAY || type == AMF0_STRICT_ARRAY);
 
 		if(value->hasAssociative() && value->hasDense())
@@ -131,7 +124,7 @@ namespace amf {
 
 			for(auto itr = value->begin(); itr != value->end(); ++itr){
 				serialise(AMF0_STRING, &String(itr->first), stream);
-				Encoder.serialise(itr->second, stream);
+				mParent->serialise(itr->second, stream);
 			}
 		}else if(value->hasDense()){
 			assert(type == AMF0_INVALID || type == AMF0_STRICT_ARRAY);
@@ -142,11 +135,11 @@ namespace amf {
 			stream << uint32(value->size());
 
 			for(size_t i = 0; i < value->size(); ++i)
-				Encoder.serialise(value->at(i), stream);
+				mParent->serialise(value->at(i), stream);
 		}
 	}
 
-	void amf0::serialise(uint8 type, Object* value, ByteStream& stream){
+	void amf0::serialise(uint8 type, const Object* value, ByteStream& stream){
 		assert(type == AMF0_INVALID || type == AMF0_OBJECT || type == AMF0_TYPED_OBJECT);
 
 		if(value->name().length()){
@@ -165,20 +158,20 @@ namespace amf {
 
 		for(auto itr = value->begin(); itr != value->end(); ++itr){
 			serialise(AMF0_STRING, &String(itr->first), stream);
-			Encoder.serialise(itr->second, stream);
+			mParent->serialise(itr->second, stream);
 		}
 
 		stream << uint16(0);
 		stream << uint8(AMF0_OBJECT_END);
 	}
 
-	Variant* amf0::deserialise(uint8 version, ByteStream& stream){
+	Variant amf0::deserialise(uint8 version, ByteStream& stream){
 		assert(version == 0);
 
 		uint8 type;
 		stream >> type;
 
-		Variant* value = nullptr;
+		Variant value;
 
 		switch(type){
 			case AMF0_NUMBER:
@@ -217,8 +210,8 @@ namespace amf {
 				deserialise(type, (Null*)value, stream);
 				break;
 			case AMF0_AVMPLUS:
-				Encoder.setVersion(3);
-				return Encoder.deserialise(stream, false);
+				mParent->setVersion(3);
+				return mParent->deserialise(stream, false);
 			/*
 			case AMF0_REFERENCE:
 				break;
@@ -244,7 +237,9 @@ namespace amf {
 	void amf0::deserialise(uint8 type, Number* value, ByteStream& stream){			
 		assert(type == AMF0_NUMBER);
 
-		stream >> value->value();
+		double val;
+		stream >> val;
+		value->setValue(val);
 	}
 
 	void amf0::deserialise(uint8 type, Integer* number, ByteStream& stream){
@@ -256,7 +251,7 @@ namespace amf {
 
 		uint8 charValue;
 		stream >> charValue;
-		value->value() = charValue > 0;
+		value->setValue(charValue > 0);
 	}
 
 	void amf0::deserialise(uint8 type, String* value, ByteStream& stream){
@@ -271,15 +266,20 @@ namespace amf {
 			stream >> size;
 		}
 
-		value->value().assign((char*)stream.data() + stream.tell(), size);
+		value->setValue(std::string((char*)stream.data() + stream.tell(), size));
 		stream.skip(size);
 	}
 
 	void amf0::deserialise(uint8 type, Date* value, ByteStream& stream){
 		assert(type == AMF0_DATE);
 
-		stream >> value->value();
-		stream >> value->timezone();
+		double val;
+		uint16 timezone;
+		stream >> val;
+		stream >> timezone;
+
+		value->setTimezone(timezone);
+		value->setValue(val);
 	}
 
 	void amf0::deserialise(uint8 type, Array* value, ByteStream& stream){
@@ -290,12 +290,12 @@ namespace amf {
 
 		if(type == AMF0_STRICT_ARRAY){
 			for(uint32 i = 0; i < size; ++i)
-				value->push_back(Encoder.deserialise(stream, false));
+				value->push_back(mParent->deserialise(stream, false));
 		}else if(type == AMF0_ECMA_ARRAY){
 			for(uint32 i = 0; i < size; ++i){
 				String key;
 				deserialise(AMF0_STRING, &key, stream);
-				value->insert(key, Encoder.deserialise(stream, false));
+				value->insert(key, mParent->deserialise(stream, false));
 			}
 		}
 	}
@@ -313,7 +313,7 @@ namespace amf {
 			String key;
 			deserialise(AMF0_STRING, &key, stream);
 
-			Variant* data = Encoder.deserialise(stream, false);
+			Variant data = mParent->deserialise(stream, false);
 			if(!data)
 				break;
 

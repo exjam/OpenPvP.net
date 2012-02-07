@@ -17,8 +17,8 @@ namespace rtmp {
 			mID = id;
 		}
 
-		Amf0Command::Amf0Command(const std::string& name, amf::Object* object)
-			: Packet(Type), mName(name), mProperties(object->copy()->toObject()), mInformation(0)
+		Amf0Command::Amf0Command(const std::string& name, amf::Variant& object)
+			: Packet(Type), mName(name), mProperties(object), mInformation(0)
 		{
 		}
 
@@ -28,30 +28,23 @@ namespace rtmp {
 			amf::String _string;
 			amf::Number _number;
 
-			amf::Encoder.start(0);
-			mName = amf::Encoder.deserialise(source.mData)->toString();
-			mID = amf::Encoder.deserialise(source.mData)->toDouble();
-			mProperties = amf::Encoder.deserialise(source.mData)->copy()->toObject();
-			mInformation = amf::Encoder.deserialise(source.mData)->copy()->toObject();
-			amf::Encoder.end();
+			amf::Encoder encoder(0);
+			mName = encoder.deserialise(source.mData);
+			mID = encoder.deserialise(source.mData);
+			mProperties = encoder.deserialise(source.mData);
+			mInformation = encoder.deserialise(source.mData);
 		}
 		
 		Amf0Command::~Amf0Command(){
-			if(mProperties)
-				delete mProperties;
-
-			if(mInformation)
-				delete mInformation;
 		}
 
 		Packet* Amf0Command::packet(){
 			mData.clear();
 			
-			amf::Encoder.start(0);
-			amf::Encoder.serialise(&amf::String(mName), mData);
-			amf::Encoder.serialise(&amf::Number(mID), mData);
-			amf::Encoder.serialise(mProperties, mData);
-			amf::Encoder.end();
+			amf::Encoder encoder(0);
+			encoder.serialise(mName, mData);
+			encoder.serialise(mID, mData);
+			encoder.serialise(mProperties, mData);
 
 			return (Packet*)this;
 		}
@@ -60,16 +53,16 @@ namespace rtmp {
 			return mName;
 		}
 
-		amf::Object* Amf0Command::properties(){
+		const amf::Variant& Amf0Command::properties(){
 			return mProperties;
 		}
 
-		amf::Object* Amf0Command::information(){
+		const amf::Variant& Amf0Command::information(){
 			return mInformation;
 		}
 
-		Amf3Command::Amf3Command(amf::Object* object)
-			: Packet(Type), mObject(object->copy()->toObject())
+		Amf3Command::Amf3Command(amf::Variant& object)
+			: Packet(Type), mObject(object)
 		{
 		}
 
@@ -82,37 +75,34 @@ namespace rtmp {
 			uint8 tmp;
 			stream >> tmp;
 			
-			amf::Encoder.start(0);
-			amf::Encoder.deserialise(stream);
-			mID = amf::Encoder.deserialise(stream)->toDouble();
-			amf::Encoder.deserialise(stream);
-			mObject = amf::Encoder.deserialise(stream)->copy()->toObject();
-			amf::Encoder.end();
+			amf::Encoder encoder(0);
+			encoder.deserialise(stream);
+			mID = encoder.deserialise(stream);
+			encoder.deserialise(stream);
+			mObject = encoder.deserialise(stream);
 		}
 
 		Amf3Command::~Amf3Command(){
-			if(mObject)
-				delete mObject;
 		}
 
 		Packet* Amf3Command::packet(){
 			mData.clear();
 
-			amf::Encoder.start(0);
+			amf::Encoder encoder(0);
 
 			mData << uint8(0);
-			amf::Encoder.serialise(&amf::Null(), mData);
-			amf::Encoder.serialise(&amf::Number(mID), mData);
-			amf::Encoder.serialise(&amf::Null(), mData);
+			encoder.serialise(amf::Variant((amf::BaseAmf*)nullptr), mData);
+			encoder.serialise(mID, mData);
+			encoder.serialise(amf::Variant((amf::BaseAmf*)nullptr), mData);
 			mData << uint8(amf::amf0::AMF0_AVMPLUS);
-
-			amf::Encoder.setVersion(3);
-			amf::Encoder.serialise(mObject, mData);
+			
+			encoder.setVersion(3);
+			encoder.serialise(mObject, mData);
 
 			return (Packet*)this;
 		}
 
-		amf::Object* Amf3Command::object(){
+		const amf::Variant& Amf3Command::object(){
 			return mObject;
 		}
 	};

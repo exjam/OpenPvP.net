@@ -11,98 +11,98 @@ namespace riotgames {
 					AuthenticationCredentials(){
 						setName("com.riotgames.platform.login.AuthenticationCredentials");
 
-						set("partnerCredentials", new amf::Null());
-						set("oldPassword", new amf::Null());
-						set("domain", new amf::Null());
-						set("ipAddress", new amf::Null());
-						set("authToken", new amf::Null());
-						set("locale", new amf::Null());
-						set("clientVersion", new amf::Null());
-						set("password", new amf::Null());
-						set("username", new amf::Null());
-						set("securityAnswer", new amf::Null());
+						set("partnerCredentials", (amf::Null*)nullptr);
+						set("oldPassword", (amf::Null*)nullptr);
+						set("domain", (amf::Null*)nullptr);
+						set("ipAddress", (amf::Null*)nullptr);
+						set("authToken", (amf::Null*)nullptr);
+						set("locale", (amf::Null*)nullptr);
+						set("clientVersion", (amf::Null*)nullptr);
+						set("password", (amf::Null*)nullptr);
+						set("username", (amf::Null*)nullptr);
+						set("securityAnswer", (amf::Null*)nullptr);
 
 						defineObject();
 					}
 
-					std::string getPartnerCredentials(){
-						return get("partnerCredentials")->toString();
+					std::string getPartnerCredentials() const {
+						return get("partnerCredentials");
 					}
 
-					std::string getOldPassword(){
-						return get("oldPassword")->toString();
+					std::string getOldPassword() const {
+						return get("oldPassword");
 					}
 
-					std::string getDomain(){
-						return get("domain")->toString();
+					std::string getDomain() const {
+						return get("domain");
 					}
 
-					std::string getIpAddress(){
-						return get("ipAddress")->toString();
+					std::string getIpAddress() const {
+						return get("ipAddress");
 					}
 
-					std::string getAuthToken(){
-						return get("authToken")->toString();
+					std::string getAuthToken() const {
+						return get("authToken");
 					}
 
-					std::string getLocale(){
-						return get("locale")->toString();
+					std::string getLocale() const {
+						return get("locale");
 					}
 
-					std::string getClientVersion(){
-						return get("clientVersion")->toString();
+					std::string getClientVersion() const {
+						return get("clientVersion");
 					}
 
-					std::string getPassword(){
-						return get("password")->toString();
+					std::string getPassword() const {
+						return get("password");
 					}
 
-					std::string getUsername(){
-						return get("username")->toString();
+					std::string getUsername() const {
+						return get("username");
 					}
 
-					std::string getSecurityAnswer(){
-						return get("securityAnswer")->toString();
+					std::string getSecurityAnswer() const {
+						return get("securityAnswer");
 					}
 
 					void setPartnerCredentials(const std::string& value){
-						set("partnerCredentials", amf::object_creator_t(value).mValue);
+						get("partnerCredentials") = value;
 					}
 
 					void setOldPassword(const std::string& value){
-						set("oldPassword", amf::object_creator_t(value).mValue);
+						get("oldPassword") = value;
 					}
 
 					void setDomain(const std::string& value){
-						set("domain", amf::object_creator_t(value).mValue);
+						get("domain") = value;
 					}
 
 					void setIpAddress(const std::string& value){
-						set("ipAddress", amf::object_creator_t(value).mValue);
+						get("ipAddress") = value;
 					}
 
 					void setAuthToken(const std::string& value){
-						set("authToken", amf::object_creator_t(value).mValue);
+						get("authToken") = value;
 					}
 
 					void setLocale(const std::string& value){
-						set("locale", amf::object_creator_t(value).mValue);
+						get("locale") = value;
 					}
 
 					void setClientVersion(const std::string& value){
-						set("clientVersion", amf::object_creator_t(value).mValue);
+						get("clientVersion") = value;
 					}
 
 					void setPassword(const std::string& value){
-						set("password", amf::object_creator_t(value).mValue);
+						get("password") = value;
 					}
 
 					void setUsername(const std::string& value){
-						set("username", amf::object_creator_t(value).mValue);
+						get("username") = value;
 					}
 
 					void setSecurityAnswer(const std::string& value){
-						set("securityAnswer", amf::object_creator_t(value).mValue);
+						get("securityAnswer") = value;
 					}
 				};
 			};

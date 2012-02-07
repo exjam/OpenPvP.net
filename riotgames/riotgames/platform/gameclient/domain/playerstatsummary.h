@@ -12,87 +12,87 @@ namespace riotgames {
 					PlayerStatSummary(){
 						setName("com.riotgames.platform.statistics.PlayerStatSummary");
 
-						set("userId", new amf::Null());
-						set("maxRating", amf::object_creator_t(0).mValue);
-						set("leaves", amf::object_creator_t(0).mValue);
-						set("modifyDate", new amf::Null());
-						set("losses", amf::object_creator_t(0).mValue);
-						set("rating", amf::object_creator_t(0).mValue);
-						set("wins", amf::object_creator_t(0).mValue);
-						set("playerStatSummaryType", new amf::Null());
-						set("aggregatedStats", new amf::Null());
+						set("userId", (amf::Null*)nullptr);
+						set("maxRating", 0);
+						set("leaves", 0);
+						set("modifyDate", (amf::Null*)nullptr);
+						set("losses", 0);
+						set("rating", 0);
+						set("wins", 0);
+						set("playerStatSummaryType", (amf::Null*)nullptr);
+						set("aggregatedStats", (amf::Null*)nullptr);
 					}
 
-					double getUserId(){
-						return get("userId")->toDouble();
+					double getUserId() const {
+						return get("userId");
 					}
 
-					int getMaxRating(){
-						return get("maxRating")->toInt();
+					int getMaxRating() const {
+						return get("maxRating");
 					}
 
-					int getLeaves(){
-						return get("leaves")->toInt();
+					int getLeaves() const {
+						return get("leaves");
 					}
 
-					amf::Date* getModifyDate(){
-						return get("modifyDate")->toDate();
+					amf::Date* getModifyDate() const {
+						return get("modifyDate").toDate();
 					}
 
-					int getLosses(){
-						return get("losses")->toInt();
+					int getLosses() const {
+						return get("losses");
 					}
 
-					int getRating(){
-						return get("rating")->toInt();
+					int getRating() const {
+						return get("rating");
 					}
 
-					int getWins(){
-						return get("wins")->toInt();
+					int getWins() const {
+						return get("wins");
 					}
 
-					std::string getPlayerStatSummaryType(){
-						return get("playerStatSummaryType")->toString();
+					std::string getPlayerStatSummaryType() const {
+						return get("playerStatSummaryType");
 					}
 
-					SummaryAggStats* getAggregatedStats(){
-						return (SummaryAggStats*)get("aggregatedStats")->toObject();
+					const amf::Reference<SummaryAggStats> getAggregatedStats() const {
+						return get("aggregatedStats").toObject();
 					}
 
 					void setUserId(double value){
-						set("userId", amf::object_creator_t(value).mValue);
+						get("userId") = value;
 					}
 
 					void setMaxRating(int value){
-						set("maxRating", amf::object_creator_t(value).mValue);
+						get("maxRating") = value;
 					}
 
 					void setLeaves(int value){
-						set("leaves", amf::object_creator_t(value).mValue);
+						get("leaves") = value;
 					}
 
 					void setModifyDate(amf::Date* value){
-						set("modifyDate", (Variant*)value);
+						get("modifyDate") = value;
 					}
 
 					void setLosses(int value){
-						set("losses", amf::object_creator_t(value).mValue);
+						get("losses") = value;
 					}
 
 					void setRating(int value){
-						set("rating", amf::object_creator_t(value).mValue);
+						get("rating") = value;
 					}
 
 					void setWins(int value){
-						set("wins", amf::object_creator_t(value).mValue);
+						get("wins") = value;
 					}
 
 					void setPlayerStatSummaryType(const std::string& value){
-						set("playerStatSummaryType", amf::object_creator_t(value).mValue);
+						get("playerStatSummaryType") = value;
 					}
 
 					void setAggregatedStats(SummaryAggStats* value){
-						set("aggregatedStats", (Variant*)value);
+						get("aggregatedStats") = value;
 					}
 				};
 			};

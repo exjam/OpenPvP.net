@@ -20,8 +20,8 @@ namespace amf {
 		ExternalisedDefinition(const std::string& name, bool useFlags = true);
 
 		std::string name() const;
-		void readExternal(amf::Object* object, ByteStream& stream);
-		void writeExternal(amf::Object* object, ByteStream& stream);
+		void readExternal(Encoder* encoder, amf::Object* object, ByteStream& stream);
+		void writeExternal(Encoder* encoder, amf::Object* object, ByteStream& stream);
 		
 		void addField(const std::string& name);
 		void setParent(ExternalisedDefinition* parent);
@@ -36,7 +36,7 @@ namespace amf {
 		std::vector<std::string> mFields;
 	};
 		
-	class amf3 : public EncoderImpl {
+	class amf3 {
 	public:
 		typedef enum {
 			AMF3_UNDEFINED = 0,
@@ -55,26 +55,26 @@ namespace amf {
 			AMF3_INVALID = 0xFF,
 		} DataTypes;
 
-		amf3();
-
-		void start();
-		void end();
+		amf3(Encoder* parent);
+		~amf3();
 		
-		void defineObject(Object* object);
-		void addExternalizable(flex::utils::IExternalizable* externalizable);
+		static void defineObject(Object* object);
+		static void addExternalizable(flex::utils::IExternalizable* externalizable);
 
-		void serialise(uint8 version, Variant* value, ByteStream& stream);
-		void serialise(uint8 type, Null* value, ByteStream& stream);
-		void serialise(uint8 type, Number* value, ByteStream& stream);
-		void serialise(uint8 type, Integer* number, ByteStream& stream);
-		void serialise(uint8 type, Boolean* value, ByteStream& stream);
-		void serialise(uint8 type, String* value, ByteStream& stream);
-		void serialise(uint8 type, Date* value, ByteStream& stream);
-		void serialise(uint8 type, Array* value, ByteStream& stream);
-		void serialise(uint8 type, ByteArray* value, ByteStream& stream);
-		void serialise(uint8 type, Object* value, ByteStream& stream);
-		
-		Variant* deserialise(uint8 version, ByteStream& stream);
+		void serialise(uint8 version, const Variant& value, ByteStream& stream);
+		Variant deserialise(uint8 version, ByteStream& stream);
+
+	private:
+		void serialise(uint8 type, const Null* value, ByteStream& stream);
+		void serialise(uint8 type, const Number* value, ByteStream& stream);
+		void serialise(uint8 type, const Integer* number, ByteStream& stream);
+		void serialise(uint8 type, const Boolean* value, ByteStream& stream);
+		void serialise(uint8 type, const String* value, ByteStream& stream);
+		void serialise(uint8 type, const Date* value, ByteStream& stream);
+		void serialise(uint8 type, const Array* value, ByteStream& stream);
+		void serialise(uint8 type, const ByteArray* value, ByteStream& stream);
+		void serialise(uint8 type, const Object* value, ByteStream& stream);
+
 		void deserialise(uint8 type, Null* value, ByteStream& stream);
 		void deserialise(uint8 type, Number* value, ByteStream& stream);
 		void deserialise(uint8 type, Integer* number, ByteStream& stream);
@@ -86,25 +86,29 @@ namespace amf {
 		void deserialise(uint8 type, Object* value, ByteStream& stream);
 
 	private:
-		void createDefaultDefinitions();
-		void createDefaultExternalised();
+		static void createDefaultExternalised();
+		static void addExternalizable(const std::string& name, flex::utils::IExternalizable* def);
+		static flex::utils::IExternalizable* getExternalizable(const std::string& name);
+		
+		static void addPermanentDefinition(ObjectDefinition* def);
+		static ObjectDefinition* getPermanentDefinition(const std::string& name);
 		
 		void addDefinition(ObjectDefinition* def);
 		void addString(const std::string& str);
-		void addObject(Variant* obj);
-		void addExternalizable(const std::string& name, flex::utils::IExternalizable* def);
+		void addObject(const Variant& obj);
 
 		std::string getString(uint32 index);
-		Variant* getObject(uint32 index);
+		const Variant& getObject(uint32 index);
 		ObjectDefinition* getDefinition(uint32 index);
 		ObjectDefinition* getDefinition(const std::string& name);
-		flex::utils::IExternalizable* getExternalizable(const std::string& name);
 
 	private:
+		Encoder* mParent;
 		std::vector<std::string> mStrings;
-		std::vector<Variant*> mObjects;
+		std::vector<Variant> mObjects;
 		std::vector<ObjectDefinition*> mDefinitions;
-		std::vector<ObjectDefinition*> mPermanentDefinitions;
-		std::map<std::string, flex::utils::IExternalizable*> mExternalizables;
+		
+		static std::vector<ObjectDefinition*> mPermanentDefinitions;
+		static std::map<std::string, flex::utils::IExternalizable*> mExternalizables;
 	};
 };

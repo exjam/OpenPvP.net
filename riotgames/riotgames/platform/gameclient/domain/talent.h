@@ -11,141 +11,141 @@ namespace riotgames {
 					Talent(){
 						setName("com.riotgames.platform.summoner.Talent");
 
-						set("gameCode", new amf::Null());
-						set("prereqTalentGameCode", new amf::Null());
-						set("talentGroupId", new amf::Null());
-						set("name", new amf::Null());
-						set("level4Desc", new amf::Null());
-						set("minLevel", new amf::Null());
-						set("maxRank", new amf::Null());
-						set("tltId", new amf::Null());
-						set("index", new amf::Null());
-						set("talentRowId", new amf::Null());
-						set("level2Desc", new amf::Null());
-						set("minTier", new amf::Null());
-						set("level3Desc", new amf::Null());
-						set("level5Desc", new amf::Null());
-						set("level1Desc", new amf::Null());
+						set("gameCode", (amf::Null*)nullptr);
+						set("prereqTalentGameCode", (amf::Null*)nullptr);
+						set("talentGroupId", (amf::Null*)nullptr);
+						set("name", (amf::Null*)nullptr);
+						set("level4Desc", (amf::Null*)nullptr);
+						set("minLevel", (amf::Null*)nullptr);
+						set("maxRank", (amf::Null*)nullptr);
+						set("tltId", (amf::Null*)nullptr);
+						set("index", (amf::Null*)nullptr);
+						set("talentRowId", (amf::Null*)nullptr);
+						set("level2Desc", (amf::Null*)nullptr);
+						set("minTier", (amf::Null*)nullptr);
+						set("level3Desc", (amf::Null*)nullptr);
+						set("level5Desc", (amf::Null*)nullptr);
+						set("level1Desc", (amf::Null*)nullptr);
 					}
 
-					int getGameCode(){
-						return get("gameCode")->toInt();
+					int getGameCode() const {
+						return get("gameCode");
 					}
 
-					int getPrereqTalentGameCode(){
-						return get("prereqTalentGameCode")->toInt();
+					int getPrereqTalentGameCode() const {
+						return get("prereqTalentGameCode");
 					}
 
-					int getTalentGroupId(){
-						return get("talentGroupId")->toInt();
+					int getTalentGroupId() const {
+						return get("talentGroupId");
 					}
 
-					std::string getName(){
-						return get("name")->toString();
+					std::string getName() const {
+						return get("name");
 					}
 
-					int getLevel4Desc(){
-						return get("level4Desc")->toInt();
+					int getLevel4Desc() const {
+						return get("level4Desc");
 					}
 
-					int getMinLevel(){
-						return get("minLevel")->toInt();
+					int getMinLevel() const {
+						return get("minLevel");
 					}
 
-					int getMaxRank(){
-						return get("maxRank")->toInt();
+					int getMaxRank() const {
+						return get("maxRank");
 					}
 
-					int getTltId(){
-						return get("tltId")->toInt();
+					int getTltId() const {
+						return get("tltId");
 					}
 
-					int getIndex(){
-						return get("index")->toInt();
+					int getIndex() const {
+						return get("index");
 					}
 
-					int getTalentRowId(){
-						return get("talentRowId")->toInt();
+					int getTalentRowId() const {
+						return get("talentRowId");
 					}
 
-					int getLevel2Desc(){
-						return get("level2Desc")->toInt();
+					int getLevel2Desc() const {
+						return get("level2Desc");
 					}
 
-					int getMinTier(){
-						return get("minTier")->toInt();
+					int getMinTier() const {
+						return get("minTier");
 					}
 
-					int getLevel3Desc(){
-						return get("level3Desc")->toInt();
+					int getLevel3Desc() const {
+						return get("level3Desc");
 					}
 
-					int getLevel5Desc(){
-						return get("level5Desc")->toInt();
+					int getLevel5Desc() const {
+						return get("level5Desc");
 					}
 
-					int getLevel1Desc(){
-						return get("level1Desc")->toInt();
+					int getLevel1Desc() const {
+						return get("level1Desc");
 					}
 
 					void setGameCode(int value){
-						set("gameCode", amf::object_creator_t(value).mValue);
+						get("gameCode") = value;
 					}
 
 					void setPrereqTalentGameCode(int value){
-						set("prereqTalentGameCode", amf::object_creator_t(value).mValue);
+						get("prereqTalentGameCode") = value;
 					}
 
 					void setTalentGroupId(int value){
-						set("talentGroupId", amf::object_creator_t(value).mValue);
+						get("talentGroupId") = value;
 					}
 
 					void setName(const std::string& value){
-						set("name", amf::object_creator_t(value).mValue);
+						get("name") = value;
 					}
 
 					void setLevel4Desc(int value){
-						set("level4Desc", amf::object_creator_t(value).mValue);
+						get("level4Desc") = value;
 					}
 
 					void setMinLevel(int value){
-						set("minLevel", amf::object_creator_t(value).mValue);
+						get("minLevel") = value;
 					}
 
 					void setMaxRank(int value){
-						set("maxRank", amf::object_creator_t(value).mValue);
+						get("maxRank") = value;
 					}
 
 					void setTltId(int value){
-						set("tltId", amf::object_creator_t(value).mValue);
+						get("tltId") = value;
 					}
 
 					void setIndex(int value){
-						set("index", amf::object_creator_t(value).mValue);
+						get("index") = value;
 					}
 
 					void setTalentRowId(int value){
-						set("talentRowId", amf::object_creator_t(value).mValue);
+						get("talentRowId") = value;
 					}
 
 					void setLevel2Desc(int value){
-						set("level2Desc", amf::object_creator_t(value).mValue);
+						get("level2Desc") = value;
 					}
 
 					void setMinTier(int value){
-						set("minTier", amf::object_creator_t(value).mValue);
+						get("minTier") = value;
 					}
 
 					void setLevel3Desc(int value){
-						set("level3Desc", amf::object_creator_t(value).mValue);
+						get("level3Desc") = value;
 					}
 
 					void setLevel5Desc(int value){
-						set("level5Desc", amf::object_creator_t(value).mValue);
+						get("level5Desc") = value;
 					}
 
 					void setLevel1Desc(int value){
-						set("level1Desc", amf::object_creator_t(value).mValue);
+						get("level1Desc") = value;
 					}
 				};
 			};

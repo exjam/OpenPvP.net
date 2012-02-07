@@ -11,69 +11,69 @@ namespace riotgames {
 					Spell(){
 						setName("com.riotgames.platform.summoner.Spell");
 
-						set("displayName", new amf::Null());
-						set("active", new amf::Null());
-						set("name", new amf::Null());
+						set("displayName", (amf::Null*)nullptr);
+						set("active", (amf::Null*)nullptr);
+						set("name", (amf::Null*)nullptr);
 						set("gameModes", new amf::Array());
-						set("description", new amf::Null());
-						set("spellId", new amf::Null());
-						set("minLevel", new amf::Null());
+						set("description", (amf::Null*)nullptr);
+						set("spellId", (amf::Null*)nullptr);
+						set("minLevel", (amf::Null*)nullptr);
 					}
 
-					std::string getDisplayName(){
-						return get("displayName")->toString();
+					std::string getDisplayName() const {
+						return get("displayName");
 					}
 
-					bool getActive(){
-						return get("active")->toBool();
+					bool getActive() const {
+						return get("active");
 					}
 
-					std::string getName(){
-						return get("name")->toString();
+					std::string getName() const {
+						return get("name");
 					}
 
-					amf::Array* getGameModes(){
-						return get("gameModes")->toArray();
+					const amf::Reference<amf::Array> getGameModes() const {
+						return get("gameModes");
 					}
 
-					std::string getDescription(){
-						return get("description")->toString();
+					std::string getDescription() const {
+						return get("description");
 					}
 
-					int getSpellId(){
-						return get("spellId")->toInt();
+					int getSpellId() const {
+						return get("spellId");
 					}
 
-					int getMinLevel(){
-						return get("minLevel")->toInt();
+					int getMinLevel() const {
+						return get("minLevel");
 					}
 
 					void setDisplayName(const std::string& value){
-						set("displayName", amf::object_creator_t(value).mValue);
+						get("displayName") = value;
 					}
 
 					void setActive(bool value){
-						set("active", amf::object_creator_t(value).mValue);
+						get("active") = value;
 					}
 
 					void setName(const std::string& value){
-						set("name", amf::object_creator_t(value).mValue);
+						get("name") = value;
 					}
 
 					void setGameModes(amf::Array* value){
-						set("gameModes", (Variant*)value);
+						get("gameModes") = value;
 					}
 
 					void setDescription(const std::string& value){
-						set("description", amf::object_creator_t(value).mValue);
+						get("description") = value;
 					}
 
 					void setSpellId(int value){
-						set("spellId", amf::object_creator_t(value).mValue);
+						get("spellId") = value;
 					}
 
 					void setMinLevel(int value){
-						set("minLevel", amf::object_creator_t(value).mValue);
+						get("minLevel") = value;
 					}
 				};
 			};

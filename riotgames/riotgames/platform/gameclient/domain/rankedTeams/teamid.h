@@ -12,15 +12,15 @@ namespace riotgames {
 						TeamId(){
 							setName("com.riotgames.team.TeamId");
 
-							set("fullId", new amf::Null());
+							set("fullId", (amf::Null*)nullptr);
 						}
 
-						std::string getFullId(){
-							return get("fullId")->toString();
+						std::string getFullId() const {
+							return get("fullId");
 						}
 
 						void setFullId(const std::string& value){
-							set("fullId", amf::object_creator_t(value).mValue);
+							get("fullId") = value;
 						}
 					};
 				};

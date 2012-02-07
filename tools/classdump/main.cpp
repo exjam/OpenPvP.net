@@ -241,7 +241,7 @@ void addPackageHeader(Package* pkg, std::ostream& strm){
 	strm << "#pragma once" << std::endl << std::endl;
 
 	if(pkg->mClasses.size())
-		strm << "#include \"amf/amf.h\"" << std::endl;
+		strm << "#include \"amf/variant.h\"" << std::endl;
 
 	if(pkg->mServices.size())
 		strm << "#include \"flex/services.h\"" << std::endl;
@@ -329,9 +329,9 @@ void outputPackage(Package* pkg){
 			if(var->mType.compare("amf::Array") == 0){
 				strm << "new amf::Array()";
 			}else if(var->mValue.length() == 0 || var->mValue.compare("null") == 0){
-				strm << "new amf::Null()";
+				strm << "(amf::Null*)nullptr";
 			}else{
-				strm << "amf::object_creator_t(" << var->mValue << ").mValue";
+				strm << var->mValue;
 			}
 
 			strm << ");" << std::endl;
@@ -354,30 +354,25 @@ void outputPackage(Package* pkg){
 			}else if(var->mType.compare("Boolean") == 0){
 				strm << "bool";
 			}else{
-				strm << var->mType << "*";
+				strm << "const amf::Reference<" << var->mType << ">";
 			}
 
 			std::string name = var->mName;
 			if(name[0] >= 'a' && name[0] <= 'z')
 				name[0] = (name[0] - 'a') + 'A';
 
-			strm << " get" << name << "(){" << std::endl;
+			strm << " get" << name << "() const {" << std::endl;
 			indent.append("\t");
 			
-			if(var->mType.compare("String") == 0){
-				strm << indent << "return get(\"" << var->mName << "\")->toString();" << std::endl;
-			}else if(var->mType.compare("Number") == 0){
-				strm << indent << "return get(\"" << var->mName << "\")->toDouble();" << std::endl;
-			}else if(var->mType.compare("int") == 0){
-				strm << indent << "return get(\"" << var->mName << "\")->toInt();" << std::endl;
-			}else if(var->mType.compare("Boolean") == 0){
-				strm << indent << "return get(\"" << var->mName << "\")->toBool();" << std::endl;
-			}else if(var->mType.compare("amf::Array") == 0){
-				strm << indent << "return get(\"" << var->mName << "\")->toArray();" << std::endl;
-			}else if(var->mType.compare("amf::Date") == 0){
-				strm << indent << "return get(\"" << var->mName << "\")->toDate();" << std::endl;
+			if(var->mType.compare("String") == 0
+			 || var->mType.compare("Number") == 0
+			 || var->mType.compare("int") == 0
+			 || var->mType.compare("Boolean") == 0
+			 || var->mType.compare("amf::Array") == 0
+			 || var->mType.compare("amf::Date") == 0){
+				strm << indent << "return get(\"" << var->mName << "\");" << std::endl;
 			}else{
-				strm << indent << "return (" << var->mType << "*)get(\"" << var->mName << "\")->toObject();" << std::endl;
+				strm << indent << "return get(\"" << var->mName << "\").toObject();" << std::endl;
 			}
 			
 			indent.erase(0, 1);
@@ -408,16 +403,7 @@ void outputPackage(Package* pkg){
 				
 			strm << "){" << std::endl;
 			indent.append("\t");
-			
-			if(var->mType.compare("String") == 0
-				|| var->mType.compare("Number") == 0
-				|| var->mType.compare("int") == 0
-				|| var->mType.compare("Boolean") == 0){
-				strm << indent << "set(\"" << var->mName << "\", amf::object_creator_t(value).mValue);" << std::endl;
-			}else{
-				strm << indent << "set(\"" << var->mName << "\", (Variant*)value);" << std::endl;
-			}
-			
+			strm << indent << "get(\"" << var->mName << "\") = value;" << std::endl;
 			indent.erase(0, 1);
 			strm << indent << "}" << std::endl;
 		}
@@ -508,19 +494,7 @@ void outputPackage(Package* pkg){
 				if(arg->mType.compare("Function") == 0)
 					continue;
 
-				strm << ", ";
-
-				if(arg->mType.compare("String") == 0){
-					strm << "&amf::String(" << arg->mName << ")";
-				}else if(arg->mType.compare("Number") == 0){
-					strm << "&amf::Number(" << arg->mName << ")";
-				}else if(arg->mType.compare("int") == 0){
-					strm << "&amf::Integer(" << arg->mName << ")";
-				}else if(arg->mType.compare("Boolean") == 0){
-					strm << "&amf::Boolean(" << arg->mName << ")";
-				}else{
-					strm << arg->mName;
-				}
+				strm << ", " << arg->mName;
 			}
 
 			strm << ");" << std::endl;
@@ -560,25 +534,11 @@ int main(int argc, char** argv){
 
 			parsePackage(fh);
 		}
-
 	}
 	
 	for(auto itr = gPackages.begin(); itr != gPackages.end(); ++itr){
 		Package* pkg = *itr;
 		outputPackage(pkg);
-		/*
-		std::string dest = "dumped/";
-		dest += pkg->mName.substr(pkg->mName.find_last_of('.') + 1);
-		dest += ".h";
-
-		std::ofstream out(dest);
-		if(out.is_open()){
-			std::stringstream fh;
-			outputPackage(itr->second, fh);
-			out << fh.rdbuf();
-			out.close();
-		}
-		*/
 	}
 
 	return 0;

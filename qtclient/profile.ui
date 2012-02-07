@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Profile</class>
+ <widget class="QWidget" name="Profile">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1159</width>
+    <height>684</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QTabBar::tab {
+	font: 10pt &quot;Fritz Quadrata&quot;;
+	position: absolute;
+	top: 1px;
+	width: 100px;
+	height: 25px;
+	margin-left: -1px;
+	border-style: solid;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	border-width: 1px;
+	border-color: rgb(201, 162, 60);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(218, 206, 170), stop: 0.19 rgb(206, 190, 143), stop: 0.8 rgb(211, 197, 155), stop: 1 rgb(185, 171, 131));
+}
+
+#profileTabs &gt; QTabBar::tab {
+	height: 40px;
+	width: 250px;
+	font: 14pt &quot;Fritz Quadrata&quot;;
+}
+
+QTabBar::tab:first {
+	margin-left: 0px;
+}
+
+QTabBar::tab:hover {
+	border-color: rgb(201, 162, 60);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(237, 231, 213), stop: 0.5 rgb(212, 197, 156), stop: 0.8 rgb(211, 197, 155), stop: 1 rgb(185, 171, 131));
+}
+
+QTabBar::tab:pressed {
+	border-color: rgb(201, 162, 60);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(218, 206, 170), stop: 0.19 rgb(206, 190, 143), stop: 0.8 rgb(211, 197, 155), stop: 1 rgb(185, 171, 131));
+}
+
+QTabBar::tab:selected {
+	color: rgb(107, 7, 7);
+	border-bottom-color: rgb(225, 210, 170);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(236, 228, 205), stop: 0.19 rgb(228, 214, 177), stop: 0.89 rgb(228, 214, 177), stop: 1 rgb(232, 222, 191));
+}
+
+QTabWidget::pane {
+	position: absolute;
+	top: -1px;
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+}
+
+#gameStats &gt; QWidget &gt; QWidget  {
+	background-image: url(assets/images/playerProfile/statstabs_bg.png);
+}</string>
+  </property>
+  <widget class="QLabel" name="background">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1159</width>
+     <height>684</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>assets/images/backgrounds/parchment.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="profileTabs">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>40</y>
+     <width>1072</width>
+     <height>599</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>ExJam</string>
+    </attribute>
+    <widget class="QWidget" name="tabs" native="true">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>1072</width>
+       <height>573</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#tabs {
+	background-image: url(assets/images/playerProfile/tabs_bg2.png);
+}
+</string>
+     </property>
+     <widget class="QWidget" name="tabProfile" native="true">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>40</y>
+        <width>1071</width>
+        <height>531</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="mostPlayed" native="true">
+       <property name="geometry">
+        <rect>
+         <x>780</x>
+         <y>230</y>
+         <width>261</width>
+         <height>247</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#mostPlayed {
+	background-image: url(assets/images/playerProfile/mostplayedchamps.jpg);
+}
+</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="summonerHead" native="true">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>1026</width>
+         <height>149</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#summonerHead {
+	background-image: url(assets/images/playerProfile/summoner_header.png);
+}
+</string>
+       </property>
+       <widget class="QLabel" name="xpbar">
+        <property name="geometry">
+         <rect>
+          <x>815</x>
+          <y>93</y>
+          <width>178</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>assets/images/playerProfile/expbar.jpg</pixmap>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QTabWidget" name="gameStats">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>210</y>
+         <width>726</width>
+         <height>275</height>
+        </rect>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <property name="documentMode">
+        <bool>false</bool>
+       </property>
+       <property name="tabsClosable">
+        <bool>false</bool>
+       </property>
+       <property name="movable">
+        <bool>false</bool>
+       </property>
+       <widget class="QWidget" name="rankedStats">
+        <attribute name="title">
+         <string>Ranked</string>
+        </attribute>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>3</x>
+           <y>7</y>
+           <width>721</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 14pt &quot;Arial&quot;;
+font-weight: bold;</string>
+         </property>
+         <property name="text">
+          <string>Wins: 39 Losses: 19</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>40</y>
+           <width>391</width>
+           <height>201</height>
+          </rect>
+         </property>
+         <widget class="QLabel" name="label_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>177</width>
+            <height>193</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap>assets/images/playerProfile/profile_medalGoldRanked.png</pixmap>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_3">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>181</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 10pt &quot;Fritz Quadrata&quot;;</string>
+          </property>
+          <property name="text">
+           <string>Arranged Team
+3v3</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Normal</string>
+        </attribute>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>Tab 2</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -17,60 +17,60 @@ namespace riotgames {
 					AllSummonerData(){
 						setName("com.riotgames.platform.summoner.AllSummonerData");
 
-						set("summoner", new amf::Null());
-						set("spellBook", new amf::Null());
-						set("summonerDefaultSpells", new amf::Null());
-						set("summonerTalentsAndPoints", new amf::Null());
-						set("summonerLevelAndPoints", new amf::Null());
-						set("summonerLevel", new amf::Null());
+						set("summoner", (amf::Null*)nullptr);
+						set("spellBook", (amf::Null*)nullptr);
+						set("summonerDefaultSpells", (amf::Null*)nullptr);
+						set("summonerTalentsAndPoints", (amf::Null*)nullptr);
+						set("summonerLevelAndPoints", (amf::Null*)nullptr);
+						set("summonerLevel", (amf::Null*)nullptr);
 					}
 
-					Summoner* getSummoner(){
-						return (Summoner*)get("summoner")->toObject();
+					const amf::Reference<Summoner> getSummoner() const {
+						return get("summoner").toObject();
 					}
 
-					SpellBook* getSpellBook(){
-						return (SpellBook*)get("spellBook")->toObject();
+					const amf::Reference<SpellBook> getSpellBook() const {
+						return get("spellBook").toObject();
 					}
 
-					SummonerDefaultSpells* getSummonerDefaultSpells(){
-						return (SummonerDefaultSpells*)get("summonerDefaultSpells")->toObject();
+					const amf::Reference<SummonerDefaultSpells> getSummonerDefaultSpells() const {
+						return get("summonerDefaultSpells").toObject();
 					}
 
-					SummonerTalentsAndPoints* getSummonerTalentsAndPoints(){
-						return (SummonerTalentsAndPoints*)get("summonerTalentsAndPoints")->toObject();
+					const amf::Reference<SummonerTalentsAndPoints> getSummonerTalentsAndPoints() const {
+						return get("summonerTalentsAndPoints").toObject();
 					}
 
-					SummonerLevelAndPoints* getSummonerLevelAndPoints(){
-						return (SummonerLevelAndPoints*)get("summonerLevelAndPoints")->toObject();
+					const amf::Reference<SummonerLevelAndPoints> getSummonerLevelAndPoints() const {
+						return get("summonerLevelAndPoints").toObject();
 					}
 
-					SummonerLevel* getSummonerLevel(){
-						return (SummonerLevel*)get("summonerLevel")->toObject();
+					const amf::Reference<SummonerLevel> getSummonerLevel() const {
+						return get("summonerLevel").toObject();
 					}
 
 					void setSummoner(Summoner* value){
-						set("summoner", (Variant*)value);
+						get("summoner") = value;
 					}
 
 					void setSpellBook(SpellBook* value){
-						set("spellBook", (Variant*)value);
+						get("spellBook") = value;
 					}
 
 					void setSummonerDefaultSpells(SummonerDefaultSpells* value){
-						set("summonerDefaultSpells", (Variant*)value);
+						get("summonerDefaultSpells") = value;
 					}
 
 					void setSummonerTalentsAndPoints(SummonerTalentsAndPoints* value){
-						set("summonerTalentsAndPoints", (Variant*)value);
+						get("summonerTalentsAndPoints") = value;
 					}
 
 					void setSummonerLevelAndPoints(SummonerLevelAndPoints* value){
-						set("summonerLevelAndPoints", (Variant*)value);
+						get("summonerLevelAndPoints") = value;
 					}
 
 					void setSummonerLevel(SummonerLevel* value){
-						set("summonerLevel", (Variant*)value);
+						get("summonerLevel") = value;
 					}
 				};
 			};

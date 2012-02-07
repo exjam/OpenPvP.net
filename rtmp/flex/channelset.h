@@ -12,28 +12,25 @@ namespace flex {
 
 		class ChannelSet {
 		public:
-			void login(const std::string& username, const std::string& password){
-				CommandMessage msg;
-				msg.setBody(amf::Variant::fromValue(Base64::encode(username + ":" + password)));
-				msg.setOperation(CommandMessage::LOGIN);
-				msg.setDestination("auth");
+			void login(const std::string& username, const std::string& password, const rtmp::CommandCallback& cb){
+				CommandMessage* msg = new CommandMessage();
+				msg->setBody(Base64::encode(username + ":" + password));
+				msg->setOperation(CommandMessage::LOGIN);
+				msg->setDestination("auth");
 
-				rtmp::Client::instance().send(&rtmp::messages::Amf3Command((amf::Object*)&msg), std::bind(&ChannelSet::onLogin, this, std::placeholders::_1));
+				rtmp::Client::instance().send(&rtmp::messages::Amf3Command(amf::Variant(msg)), cb);
 			}
 
 			void logout(){
-				CommandMessage msg;
-				msg.setOperation(CommandMessage::LOGOUT);
-				msg.setDestination("auth");
+				CommandMessage* msg = new CommandMessage();
+				msg->setOperation(CommandMessage::LOGOUT);
+				msg->setDestination("auth");
 
-				rtmp::Client::instance().send(&rtmp::messages::Amf3Command((amf::Object*)&msg), std::bind(&ChannelSet::onLogout, this, std::placeholders::_1));
+				rtmp::Client::instance().send(&rtmp::messages::Amf3Command(amf::Variant(msg)), std::bind(&ChannelSet::onLogout, this, std::placeholders::_1));
 			}
 
 		private:
-			void onLogin(amf::Variant* result){
-			}
-
-			void onLogout(amf::Variant* result){
+			void onLogout(const amf::Variant& result){
 			}
 
 		private:

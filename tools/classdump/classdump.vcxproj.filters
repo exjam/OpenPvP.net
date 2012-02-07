@@ -11,7 +11,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\documents\pvp.net\com\riotgames\platform\common\services\LoginService.as" />
-  </ItemGroup>
 </Project>

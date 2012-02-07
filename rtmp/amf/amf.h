@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "variant.h"
 #include "bytestream.h"
 
 #include <vector>
@@ -11,56 +12,29 @@ namespace flex {
 	};
 };
 
-namespace amf {
-	typedef enum {
-		AMF_NULL,
-		AMF_NUMBER,
-		AMF_INTEGER,
-		AMF_BOOLEAN,
-		AMF_STRING,
-		AMF_DATE,
-		AMF_ARRAY,
-		AMF_BYTE_ARRAY,
-		AMF_OBJECT,
-		AMF_UNKNOWN_TYPE,
-	} AmfTypes;
+namespace amf {	
+	class amf0;
+	class amf3;
 	
-	class Variant;
-	class Null;
-	class Date;
-	class Array;
-	class Object;
-	class Number;
-	class String;
-	class Integer;
-	class Boolean;
-	class ByteArray;
-	class EncoderImpl;
-	
-	class Encoder_ {
+	class Encoder {
 		static const int mMaxVersion = 3;
 
 	public:
-		Encoder_();
+		Encoder(uint8 version);
+		~Encoder();
 
 		void setVersion(uint8 version);
-		
-		Variant* deserialise(ByteStream& stream, bool cache = true);
-		void serialise(Variant* value, ByteStream& stream);
+		Variant deserialise(ByteStream& stream, bool cache = true);
+		void serialise(const Variant& value, ByteStream& stream);
 
-		void start(uint8 version);
-		void end();
-
-		void defineObject(Object* object);
-		void addExternalizable(flex::utils::IExternalizable* externalizable);
+		static void defineObject(Object* object);
+		static void addExternalizable(flex::utils::IExternalizable* externalizable);
 
 	private:
 		uint8 mVersion;
-		EncoderImpl* mVersions[mMaxVersion + 1];
-		std::vector<amf::Variant*> mCache;
+		amf0* mAmf0;
+		amf3* mAmf3;
 	};
-
-	extern Encoder_ Encoder;
 
 	class DecodeException : public std::exception {
 	public:
@@ -82,36 +56,5 @@ namespace amf {
 		
 	private:
 		std::string mWhat;
-	};
-
-	class EncoderImpl {
-	public:
-		virtual void start() = 0;
-		virtual void end() = 0;
-		
-		virtual void defineObject(Object* object) = 0;
-		virtual void addExternalizable(flex::utils::IExternalizable* externalizable) = 0;
-
-		virtual void serialise(uint8 version, Variant* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Null* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Number* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Integer* number, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Boolean* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, String* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Date* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Array* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, ByteArray* value, ByteStream& stream) = 0;
-		virtual void serialise(uint8 type, Object* value, ByteStream& stream) = 0;
-		
-		virtual Variant* deserialise(uint8 version, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Null* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Number* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Integer* number, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Boolean* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, String* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Date* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Array* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, ByteArray* value, ByteStream& stream) = 0;
-		virtual void deserialise(uint8 type, Object* value, ByteStream& stream) = 0;
 	};
 };

@@ -12,60 +12,60 @@ namespace riotgames {
 					PlayerParticipant(){
 						setName("com.riotgames.platform.game.PlayerParticipant");
 
-						set("profileIconId", amf::object_creator_t(-1).mValue);
-						set("summonerLevel", new amf::Null());
-						set("accountId", new amf::Null());
-						set("clientInSynch", new amf::Null());
-						set("summonerId", new amf::Null());
+						set("profileIconId", -1);
+						set("summonerLevel", (amf::Null*)nullptr);
+						set("accountId", (amf::Null*)nullptr);
+						set("clientInSynch", (amf::Null*)nullptr);
+						set("summonerId", (amf::Null*)nullptr);
 						set("lifetimeStatistics", new amf::Array());
 					}
 
-					int getProfileIconId(){
-						return get("profileIconId")->toInt();
+					int getProfileIconId() const {
+						return get("profileIconId");
 					}
 
-					double getSummonerLevel(){
-						return get("summonerLevel")->toDouble();
+					double getSummonerLevel() const {
+						return get("summonerLevel");
 					}
 
-					double getAccountId(){
-						return get("accountId")->toDouble();
+					double getAccountId() const {
+						return get("accountId");
 					}
 
-					bool getClientInSynch(){
-						return get("clientInSynch")->toBool();
+					bool getClientInSynch() const {
+						return get("clientInSynch");
 					}
 
-					double getSummonerId(){
-						return get("summonerId")->toDouble();
+					double getSummonerId() const {
+						return get("summonerId");
 					}
 
-					amf::Array* getLifetimeStatistics(){
-						return get("lifetimeStatistics")->toArray();
+					const amf::Reference<amf::Array> getLifetimeStatistics() const {
+						return get("lifetimeStatistics");
 					}
 
 					void setProfileIconId(int value){
-						set("profileIconId", amf::object_creator_t(value).mValue);
+						get("profileIconId") = value;
 					}
 
 					void setSummonerLevel(double value){
-						set("summonerLevel", amf::object_creator_t(value).mValue);
+						get("summonerLevel") = value;
 					}
 
 					void setAccountId(double value){
-						set("accountId", amf::object_creator_t(value).mValue);
+						get("accountId") = value;
 					}
 
 					void setClientInSynch(bool value){
-						set("clientInSynch", amf::object_creator_t(value).mValue);
+						get("clientInSynch") = value;
 					}
 
 					void setSummonerId(double value){
-						set("summonerId", amf::object_creator_t(value).mValue);
+						get("summonerId") = value;
 					}
 
 					void setLifetimeStatistics(amf::Array* value){
-						set("lifetimeStatistics", (Variant*)value);
+						get("lifetimeStatistics") = value;
 					}
 				};
 			};

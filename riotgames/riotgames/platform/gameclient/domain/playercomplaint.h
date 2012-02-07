@@ -11,69 +11,69 @@ namespace riotgames {
 					PlayerComplaint(){
 						setName("com.riotgames.platform.gameclient.domain.PlayerComplaint");
 
-						set("ipAddress", new amf::Null());
-						set("offense", new amf::Null());
-						set("gameId", new amf::Null());
-						set("reportSource", new amf::Null());
-						set("reportingSummonerId", new amf::Null());
-						set("reportedSummonerId", new amf::Null());
-						set("comment", new amf::Null());
+						set("ipAddress", (amf::Null*)nullptr);
+						set("offense", (amf::Null*)nullptr);
+						set("gameId", (amf::Null*)nullptr);
+						set("reportSource", (amf::Null*)nullptr);
+						set("reportingSummonerId", (amf::Null*)nullptr);
+						set("reportedSummonerId", (amf::Null*)nullptr);
+						set("comment", (amf::Null*)nullptr);
 					}
 
-					std::string getIpAddress(){
-						return get("ipAddress")->toString();
+					std::string getIpAddress() const {
+						return get("ipAddress");
 					}
 
-					std::string getOffense(){
-						return get("offense")->toString();
+					std::string getOffense() const {
+						return get("offense");
 					}
 
-					double getGameId(){
-						return get("gameId")->toDouble();
+					double getGameId() const {
+						return get("gameId");
 					}
 
-					std::string getReportSource(){
-						return get("reportSource")->toString();
+					std::string getReportSource() const {
+						return get("reportSource");
 					}
 
-					double getReportingSummonerId(){
-						return get("reportingSummonerId")->toDouble();
+					double getReportingSummonerId() const {
+						return get("reportingSummonerId");
 					}
 
-					double getReportedSummonerId(){
-						return get("reportedSummonerId")->toDouble();
+					double getReportedSummonerId() const {
+						return get("reportedSummonerId");
 					}
 
-					std::string getComment(){
-						return get("comment")->toString();
+					std::string getComment() const {
+						return get("comment");
 					}
 
 					void setIpAddress(const std::string& value){
-						set("ipAddress", amf::object_creator_t(value).mValue);
+						get("ipAddress") = value;
 					}
 
 					void setOffense(const std::string& value){
-						set("offense", amf::object_creator_t(value).mValue);
+						get("offense") = value;
 					}
 
 					void setGameId(double value){
-						set("gameId", amf::object_creator_t(value).mValue);
+						get("gameId") = value;
 					}
 
 					void setReportSource(const std::string& value){
-						set("reportSource", amf::object_creator_t(value).mValue);
+						get("reportSource") = value;
 					}
 
 					void setReportingSummonerId(double value){
-						set("reportingSummonerId", amf::object_creator_t(value).mValue);
+						get("reportingSummonerId") = value;
 					}
 
 					void setReportedSummonerId(double value){
-						set("reportedSummonerId", amf::object_creator_t(value).mValue);
+						get("reportedSummonerId") = value;
 					}
 
 					void setComment(const std::string& value){
-						set("comment", amf::object_creator_t(value).mValue);
+						get("comment") = value;
 					}
 				};
 			};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "amf/variant.h"
 
 #include <map>
 #include <queue>
@@ -8,10 +9,6 @@
 #include <functional>
 
 class ByteStream;
-
-namespace amf {
-	class Variant;
-};
 
 namespace flex {
 	namespace messaging {
@@ -29,8 +26,8 @@ namespace rtmp {
 		class AmfCommand;
 	};
 	
-	typedef std::function<void(int, amf::Variant*)> EventCallback;
-	typedef std::function<void(amf::Variant*)> CommandCallback;
+	typedef std::function<void(int, const amf::Variant&)> EventCallback;
+	typedef std::function<void(const amf::Variant&)> CommandCallback;
 
 	class Client {
 	private:
@@ -77,7 +74,7 @@ namespace rtmp {
 	private:
 		void send(Packet* pak);
 		void send(ByteStream* pak);
-		void onConnect(amf::Variant* result);
+		void onConnect(const amf::Variant& result);
 
 	private:
 		uint32 getNextCommandID();

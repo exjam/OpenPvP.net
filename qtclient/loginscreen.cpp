@@ -3,9 +3,7 @@
 #include "connection.h"
 
 #include "amf/log.h"
-#include "flex/channelset.h"
 #include "riotgames/platform/common/services/loginservice.h"
-#include "riotgames/platform/common/services/messagerouterservice.h"
 
 LoginScreen::LoginScreen(QWidget *parent, Qt::WFlags flags)
 	: QWidget(parent, flags), mLoginStage(0), mNetworkMan(this)
@@ -21,25 +19,19 @@ LoginScreen::LoginScreen(QWidget *parent, Qt::WFlags flags)
 LoginScreen::~LoginScreen(){
 }
 
-void LoginScreen::onLoginResult(amf::Variant* result){
-	amf::Object* object = result->toObject();
+void LoginScreen::onLoginResult(const amf::Variant& result){
+	amf::Object* object = result.toObject();
 	if(object->name().compare("flex.messaging.messages.ErrorMessage") == 0){
 		QString str = QString("Error in %1:\n%2")
-			.arg(QString::fromStdString(object->get("faultCode")->toString()))
-			.arg(QString::fromStdString(object->get("faultString")->toString()));
+			.arg(QString::fromStdString(object->get("faultCode")))
+			.arg(QString::fromStdString(object->get("faultString")));
 
 		gMainWindow->showAlert("Error", str, AlertDialog::Ok);
 	}else{
 		amf::log::obj obj;
 		obj << result;
 
-		ServerSessionObject* session = (ServerSessionObject*)object->get("body")->copy()->toObject();
-
-		flex::messaging::ChannelSet cs;
-		cs.login(session->getAccountSummary()->getUsername(), session->getToken());
-
-		riotgames::platform::common::services::messageRouterService.initialize(session);
-
+		amf::Reference<ServerSessionObject> session = object->get("body").toObject();
 		emit loginComplete(session);
 	}
 }

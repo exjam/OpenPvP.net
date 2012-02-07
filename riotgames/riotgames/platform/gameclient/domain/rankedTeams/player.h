@@ -12,33 +12,33 @@ namespace riotgames {
 						Player(){
 							setName("com.riotgames.team.Player");
 
-							set("playerId", new amf::Null());
+							set("playerId", (amf::Null*)nullptr);
 							set("createdTeams", new amf::Array());
 							set("playerTeams", new amf::Array());
 						}
 
-						double getPlayerId(){
-							return get("playerId")->toDouble();
+						double getPlayerId() const {
+							return get("playerId");
 						}
 
-						amf::Array* getCreatedTeams(){
-							return get("createdTeams")->toArray();
+						const amf::Reference<amf::Array> getCreatedTeams() const {
+							return get("createdTeams");
 						}
 
-						amf::Array* getPlayerTeams(){
-							return get("playerTeams")->toArray();
+						const amf::Reference<amf::Array> getPlayerTeams() const {
+							return get("playerTeams");
 						}
 
 						void setPlayerId(double value){
-							set("playerId", amf::object_creator_t(value).mValue);
+							get("playerId") = value;
 						}
 
 						void setCreatedTeams(amf::Array* value){
-							set("createdTeams", (Variant*)value);
+							get("createdTeams") = value;
 						}
 
 						void setPlayerTeams(amf::Array* value){
-							set("playerTeams", (Variant*)value);
+							get("playerTeams") = value;
 						}
 					};
 				};

@@ -12,59 +12,58 @@ namespace flex {
 
 					set("body", new amf::Array());
 					set("clientId", new amf::Null());
-					set("destination", new amf::String());
-					set("messageId", new amf::String("1337"));
-					set("timeToLive", new amf::Integer());
-					set("timestamp", new amf::Integer());
+					set("destination", "");
+					set("messageId", "1337");
+					set("timeToLive", 0);
+					set("timestamp", 0);
 
 					amf::Object* headers = new amf::Object();
 					(*headers)
 						<< amf::var("DSEndpoint", "my-rtmps")
 						<< amf::var("DSId", "1337");
-
+						
 					set("headers", headers);
-					
 					defineObject();
 				}
 
-				amf::Variant* body(){
+				const amf::Variant& body(){
 					return get("body");
 				}
 
 				amf::Object* clientId(){
-					return get("clientId")->toObject();
+					return get("clientId");
 				}
 
 				std::string destination(){
-					return get("destination")->toString();
+					return get("destination");
 				}
 
 				amf::Object* headers(){
-					return get("headers")->toObject();
+					return get("headers");
 				}
 
 				std::string messageId(){
-					return get("messageId")->toString();
+					return get("messageId");
 				}
 
 				int timeToLive(){
-					return get("timeToLive")->toInt();
+					return get("timeToLive");
 				}
 
 				int timestamp(){
-					return get("timestamp")->toInt();
+					return get("timestamp");
 				}
 
-				void setBody(amf::Variant* value){
+				void setBody(const amf::Variant& value){
 					set("body", value);
 				}
 
 				void setClientId(const std::string& value){
-					set("clientId", amf::Variant::fromValue(value));
+					get("clientId") = value;
 				}
 
 				void setDestination(const std::string& value){
-					((amf::String*)get("destination"))->setValue(value);
+					get("destination") = value;
 				}
 
 				void setHeaders(amf::Object* value){
@@ -72,15 +71,15 @@ namespace flex {
 				}
 
 				void setMessageId(const std::string& value){
-					((amf::String*)get("messageId"))->setValue(value);
+					get("messageId") = value;
 				}
 				
 				void setTimeToLive(int value){
-					((amf::Integer*)get("timeToLive"))->setValue(value);
+					get("timeToLive") = value;
 				}
 
 				void setTimestamp(int value){
-					((amf::Integer*)get("timestamp"))->setValue(value);
+					get("timestamp") = value;
 				}
 			};
 
@@ -89,27 +88,27 @@ namespace flex {
 				RemotingMessage(){
 					setName("flex.messaging.messages.RemotingMessage");
 
-					set("operation", new amf::String());
-					set("source", new amf::String());
-					headers()->set("DSRequestTimeout", amf::Variant::fromValue(60));
+					set("operation", "");
+					set("source", "");
+					headers()->set("DSRequestTimeout", 60);
 
 					defineObject();
 				}
 
 				std::string operation(){
-					return get("operation")->toString();
+					return get("operation");
 				}
 
 				std::string source(){
-					return get("source")->toString();
+					return get("source");
 				}
 
 				void setOperation(const std::string& value){
-					((amf::String*)get("operation"))->setValue(value);
+					get("operation") = value;
 				}
 
 				void setSource(const std::string& value){
-					((amf::String*)get("source"))->setValue(value);
+					get("source") = value;
 				}
 			};
 
@@ -134,24 +133,24 @@ namespace flex {
 					setName("flex.messaging.messages.CommandMessage");
 
 					set("operation", new amf::Integer());
-					set("correlationId", new amf::Integer());
+					set("correlationId", new amf::String());
 					defineObject();
 				}
 
 				int operation(){
-					return get("operation")->toInt();
+					return get("operation");
 				}
 
 				std::string correlationId(){
-					return get("correlationId")->toString();
+					return get("correlationId");
 				}
 
 				void setOperation(int value){
-					((amf::Integer*)get("operation"))->setValue(value);
+					get("operation") = value;
 				}
 
-				void setSource(const std::string& value){
-					((amf::String*)get("correlationId"))->setValue(value);
+				void setCorrelationId(const std::string& value){
+					get("correlationId") = value;
 				}
 			};
 		};

@@ -4,8 +4,14 @@
 #include <QTimer>
 #include <QDateTime>
 
+#include "loginscreen.h"
+#include "lobbyscreen.h"
+#include "summonerinfowidget.h"
+
+#include "flex/channelset.h"
 #include "riotgames/platform/common/services/loginservice.h"
 #include "riotgames/platform/common/services/inventoryservice.h"
+#include "riotgames/platform/common/services/messagerouterservice.h"
 #include "riotgames/platform/gameclient/services/matchmakerservice.h"
 #include "riotgames/platform/gameclient/services/clientfacadeservice.h"
 #include "riotgames/platform/gameclient/services/summonerruneservice.h"
@@ -16,12 +22,9 @@
 using namespace riotgames::platform::common::services;
 using namespace riotgames::platform::gameclient::services;
 using namespace riotgames::platform::gameclient::domain;
-#include "loginscreen.h"
-#include "lobbyscreen.h"
-#include "summonerinfowidget.h"
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
-	: QMainWindow(parent, flags), mStatusDialog(new StatusDialog(this)), mServerSession(0), mHeartbeatCount(0), mSummonerID(0.0)
+	: QMainWindow(parent, flags), mStatusDialog(new StatusDialog(this)), mHeartbeatCount(0), mSummonerID(0.0)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_TranslucentBackground, true);
@@ -32,8 +35,9 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	connect(this, SIGNAL(_internalAlert(QString,QString,AlertDialog::Buttons)), this, SLOT(doAlert(QString,QString,AlertDialog::Buttons)));
 	connect(this, SIGNAL(_internalHideStatusDialog()), this, SLOT(doHideStatusDialog()));
 
+	qRegisterMetaType< amf::Reference<ServerSessionObject> >("amf::Reference<ServerSessionObject>");
 	changeScreen(new LoginScreen());
-	connect(mCurrentScreen, SIGNAL(loginComplete(ServerSessionObject*)), this, SLOT(onLoginComplete(ServerSessionObject*)));
+	connect(mCurrentScreen, SIGNAL(loginComplete(const amf::Reference<ServerSessionObject>&)), this, SLOT(onLoginComplete(const amf::Reference<ServerSessionObject>&)));
 }
 
 MainWindow::~MainWindow()
@@ -54,11 +58,14 @@ void MainWindow::changeScreen(QWidget* screen){
 	layout->addWidget(mCurrentScreen);
 }
 
-void MainWindow::onLoginComplete(ServerSessionObject* session){	
+void MainWindow::onLoginComplete(const amf::Reference<ServerSessionObject>& session){	
 	gMainWindow->setStatusDialogMessage("Receiving summoner data...");
 	changeScreen(new LobbyScreen());
 
 	mServerSession = session;
+
+	flex::messaging::ChannelSet cs;
+	cs.login(mServerSession->getAccountSummary()->getUsername(), mServerSession->getToken(), std::bind(&MainWindow::onChannelSetLogin, this, std::placeholders::_1));
 
 	clientFacadeService.getLoginDataPacketForUser(std::bind(&MainWindow::onLoginDataPacket, this, std::placeholders::_1));
 	matchmakerService.getAvailableQueues(std::bind(&MainWindow::onAvailableQueues, this, std::placeholders::_1));
@@ -70,34 +77,51 @@ void MainWindow::onLoginComplete(ServerSessionObject* session){
 	mHeartbeatTimer->start(60000);
 }
 
-void MainWindow::onActiveBoosts(amf::Variant* result){
-	inventory::ActiveBoosts* boosts = (inventory::ActiveBoosts*)result->toObject()->get("body")->toObject();
+void MainWindow::onChannelSetLogin(const amf::Variant& message){
+	messageRouterService.initialize(mServerSession);
+	messageRouterService.addGameListener(std::bind(&MainWindow::onGameMessage, this, std::placeholders::_1));
+	messageRouterService.addClientListener(std::bind(&MainWindow::onClientMessage, this, std::placeholders::_1));
+	messageRouterService.addBroadcastListener(std::bind(&MainWindow::onBroadcastMessage, this, std::placeholders::_1));
+}
+
+void MainWindow::onGameMessage(const amf::Variant& message){
+}
+
+void MainWindow::onClientMessage(const amf::Variant& message){
+}
+
+void MainWindow::onBroadcastMessage(const amf::Variant& message){
+}
+
+void MainWindow::onActiveBoosts(const amf::Variant& result){
+	using inventory::ActiveBoosts;
+	amf::Reference<ActiveBoosts> boosts = result.toObject()->get("body").toObject();
 	mSummonerID = boosts->getSummonerId();
 	summonerRuneService.getSummonerRuneInventory(mSummonerID, std::bind(&MainWindow::onRuneInventory, this, std::placeholders::_1));
 }
 
-void MainWindow::onGetSummonerByAccountId(amf::Variant* result){
+void MainWindow::onGetSummonerByAccountId(const amf::Variant& result){
 }
 
-void MainWindow::onGetSummonerByName(amf::Variant* result){
+void MainWindow::onGetSummonerByName(const amf::Variant& result){
 }
 
-void MainWindow::onRuneInventory(amf::Variant* result){
+void MainWindow::onRuneInventory(const amf::Variant& result){
 }
 
-void MainWindow::onAvailableChampions(amf::Variant* result){
+void MainWindow::onAvailableChampions(const amf::Variant& result){
 }
 
-void MainWindow::onAvailableQueues(amf::Variant* result){
+void MainWindow::onAvailableQueues(const amf::Variant& result){
 }
 
-void MainWindow::onCreatePlayer(amf::Variant* result){
+void MainWindow::onCreatePlayer(const amf::Variant& result){
 }
 
 #include "riotgames/platform/gameclient/domain/logindatapacket.h"
-void MainWindow::onLoginDataPacket(amf::Variant* result){
+void MainWindow::onLoginDataPacket(const amf::Variant& result){
 	using riotgames::platform::gameclient::domain::LoginDataPacket;
-	LoginDataPacket* data = (LoginDataPacket*)result->toObject()->get("body")->toObject();
+	amf::Reference<LoginDataPacket> data = result.toObject()->get("body").toObject();
 	auto summonerData = data->getAllSummonerData();
 	if(summonerData){
 		auto summoner = summonerData->getSummoner();
@@ -113,7 +137,7 @@ void MainWindow::onLoginDataPacket(amf::Variant* result){
 	}
 }
 
-void MainWindow::onHeartbeatReply(amf::Variant* result){
+void MainWindow::onHeartbeatReply(const amf::Variant& result){
 }
 
 void MainWindow::performHeartbeat(){

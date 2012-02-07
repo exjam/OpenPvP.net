@@ -50,26 +50,6 @@ namespace amf {
 			operator std::string() const {
 				return mOut.str();
 			}
-			
-			obj& operator<< (const Variant& var){
-				(*this) << &var;
-				return *this;
-			}
-
-			obj& operator<< (Variant* const& var){
-				(*this) << (const Variant*)var;
-				return *this;
-			}
-			
-			obj& operator<< (const Object& var){
-				(*this) << &var;
-				return *this;
-			}
-
-			obj& operator<< (Object* const& var){
-				(*this) << (const Variant*)var;
-				return *this;
-			}
 
 			obj& operator<< (const indent_t& i){
 				mIndent += i.i;
@@ -93,8 +73,8 @@ namespace amf {
 				return *this;
 			}
 			
-			obj& operator<< (const Variant* const& var){
-				switch(var->type()){
+			obj& operator<< (const Variant& var){
+				switch(var.type()){
 					case AMF_NULL:
 						(*this) << "(null)";
 						break;

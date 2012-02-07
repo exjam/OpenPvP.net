@@ -106,22 +106,6 @@
      <pixmap>assets/extracted/window_frame_right.png</pixmap>
     </property>
    </widget>
-   <widget class="QLabel" name="background">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>1272</width>
-      <height>750</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>assets/images/backgrounds/pvp_landingBackground.jpg</pixmap>
-    </property>
-   </widget>
    <widget class="QWidget" name="play_button_outline" native="true">
     <property name="geometry">
      <rect>
@@ -171,8 +155,6 @@ QPushButton:pressed {
       <bool>true</bool>
      </property>
     </widget>
-    <zorder>play</zorder>
-    <zorder>notice_outline</zorder>
    </widget>
    <widget class="QWidget" name="notice_outline" native="true">
     <property name="geometry">
@@ -204,7 +186,39 @@ QPushButton:pressed {
      </property>
     </widget>
    </widget>
+   <widget class="QWebView" name="webView">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>88</y>
+      <width>1264</width>
+      <height>669</height>
+     </rect>
+    </property>
+    <property name="url">
+     <url>
+      <string>about:blank</string>
+     </url>
+    </property>
+   </widget>
+   <widget class="QLabel" name="background">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>1272</width>
+      <height>750</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>assets/images/backgrounds/pvp_landingBackground.jpg</pixmap>
+    </property>
+   </widget>
    <zorder>background</zorder>
+   <zorder>webView</zorder>
    <zorder>top</zorder>
    <zorder>left</zorder>
    <zorder>bottom</zorder>
@@ -218,12 +232,112 @@ QPushButton:pressed {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKit/QWebView</header>
+  </customwidget>
+  <customwidget>
    <class>SummonerInfoWidget</class>
    <extends>QWidget</extends>
    <header>summonerinfowidget.h</header>
    <container>1</container>
+   <slots>
+    <signal>store()</signal>
+    <signal>profile()</signal>
+    <signal>lore()</signal>
+    <signal>help()</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>summonerInfo</sender>
+   <signal>store()</signal>
+   <receiver>LobbyScreen</receiver>
+   <slot>store()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>993</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>summonerInfo</sender>
+   <signal>profile()</signal>
+   <receiver>LobbyScreen</receiver>
+   <slot>profile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>993</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>summonerInfo</sender>
+   <signal>lore()</signal>
+   <receiver>LobbyScreen</receiver>
+   <slot>lore()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>993</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>summonerInfo</sender>
+   <signal>help()</signal>
+   <receiver>LobbyScreen</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>993</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>play</sender>
+   <signal>clicked()</signal>
+   <receiver>LobbyScreen</receiver>
+   <slot>play()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>641</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>642</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>store()</slot>
+  <slot>profile()</slot>
+  <slot>lore()</slot>
+  <slot>help()</slot>
+  <slot>play()</slot>
+  <slot>home()</slot>
+ </slots>
 </ui>

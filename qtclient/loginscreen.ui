@@ -41,6 +41,10 @@ QFrame#line_bot {
 	border-bottom-width:1px;
 	border-bottom-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgba(90, 90, 100, 0), stop: 0.2 rgba(90, 90, 100, 255), stop: 0.8 rgba(90, 90, 100, 255), stop: 1 rgba(90, 90, 100, 0));
 }
+
+QPushButton {
+	font-weight: normal;
+}
 </string>
   </property>
   <widget class="QWidget" name="windowframe" native="true">
@@ -237,6 +241,9 @@ QFrame#line_bot {
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QCheckBox" name="remember">
+         <property name="styleSheet">
+          <string notr="true">font-size: 8pt;</string>
+         </property>
          <property name="text">
           <string>Remember Username</string>
          </property>
@@ -265,6 +272,12 @@ QFrame#line_bot {
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="toolTip">
           <string>Click to login to League of Legends</string>

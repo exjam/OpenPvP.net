@@ -13,42 +13,42 @@ namespace riotgames {
 					SummonerTalentsAndPoints(){
 						setName("com.riotgames.platform.summoner.SummonerTalentsAndPoints");
 
-						set("talentPoints", new amf::Null());
-						set("unusedTalentPoints", new amf::Null());
+						set("talentPoints", (amf::Null*)nullptr);
+						set("unusedTalentPoints", (amf::Null*)nullptr);
 						set("summonerAssociatedTalents", new amf::Array());
-						set("summonerId", new amf::Null());
+						set("summonerId", (amf::Null*)nullptr);
 					}
 
-					double getTalentPoints(){
-						return get("talentPoints")->toDouble();
+					double getTalentPoints() const {
+						return get("talentPoints");
 					}
 
-					double getUnusedTalentPoints(){
-						return get("unusedTalentPoints")->toDouble();
+					double getUnusedTalentPoints() const {
+						return get("unusedTalentPoints");
 					}
 
-					amf::Array_t<SummonerAssociatedTalent*>* getSummonerAssociatedTalents(){
-						return (amf::Array_t<SummonerAssociatedTalent*>*)get("summonerAssociatedTalents")->toArray();
+					amf::TypedArray<SummonerAssociatedTalent*>* getSummonerAssociatedTalents() const {
+						return (amf::TypedArray<SummonerAssociatedTalent*>*)(amf::Array*)get("summonerAssociatedTalents");
 					}
 
-					double getSummonerId(){
-						return get("summonerId")->toDouble();
+					double getSummonerId() const {
+						return get("summonerId");
 					}
 
 					void setTalentPoints(double value){
-						set("talentPoints", amf::object_creator_t(value).mValue);
+						get("talentPoints") = value;
 					}
 
 					void setUnusedTalentPoints(double value){
-						set("unusedTalentPoints", amf::object_creator_t(value).mValue);
+						get("unusedTalentPoints") = value;
 					}
 
 					void setSummonerAssociatedTalents(amf::Array* value){
-						set("summonerAssociatedTalents", (Variant*)value);
+						get("summonerAssociatedTalents") = value;
 					}
 
 					void setSummonerId(double value){
-						set("summonerId", amf::object_creator_t(value).mValue);
+						get("summonerId") = value;
 					}
 				};
 			};

@@ -11,69 +11,69 @@ namespace riotgames {
 					ChampionSkin(){
 						setName("com.riotgames.platform.catalog.champion.ChampionSkinDTO");
 
-						set("championId", new amf::Null());
-						set("lastSelected", new amf::Null());
-						set("freeToPlayReward", new amf::Null());
-						set("owned", new amf::Null());
-						set("skinId", new amf::Null());
-						set("stillObtainable", amf::object_creator_t(true).mValue);
-						set("isDefault", new amf::Null());
+						set("championId", (amf::Null*)nullptr);
+						set("lastSelected", (amf::Null*)nullptr);
+						set("freeToPlayReward", (amf::Null*)nullptr);
+						set("owned", (amf::Null*)nullptr);
+						set("skinId", (amf::Null*)nullptr);
+						set("stillObtainable", true);
+						set("isDefault", (amf::Null*)nullptr);
 					}
 
-					double getChampionId(){
-						return get("championId")->toDouble();
+					double getChampionId() const {
+						return get("championId");
 					}
 
-					bool getLastSelected(){
-						return get("lastSelected")->toBool();
+					bool getLastSelected() const {
+						return get("lastSelected");
 					}
 
-					bool getFreeToPlayReward(){
-						return get("freeToPlayReward")->toBool();
+					bool getFreeToPlayReward() const {
+						return get("freeToPlayReward");
 					}
 
-					bool getOwned(){
-						return get("owned")->toBool();
+					bool getOwned() const {
+						return get("owned");
 					}
 
-					double getSkinId(){
-						return get("skinId")->toDouble();
+					double getSkinId() const {
+						return get("skinId");
 					}
 
-					bool getStillObtainable(){
-						return get("stillObtainable")->toBool();
+					bool getStillObtainable() const {
+						return get("stillObtainable");
 					}
 
-					bool getIsDefault(){
-						return get("isDefault")->toBool();
+					bool getIsDefault() const {
+						return get("isDefault");
 					}
 
 					void setChampionId(double value){
-						set("championId", amf::object_creator_t(value).mValue);
+						get("championId") = value;
 					}
 
 					void setLastSelected(bool value){
-						set("lastSelected", amf::object_creator_t(value).mValue);
+						get("lastSelected") = value;
 					}
 
 					void setFreeToPlayReward(bool value){
-						set("freeToPlayReward", amf::object_creator_t(value).mValue);
+						get("freeToPlayReward") = value;
 					}
 
 					void setOwned(bool value){
-						set("owned", amf::object_creator_t(value).mValue);
+						get("owned") = value;
 					}
 
 					void setSkinId(double value){
-						set("skinId", amf::object_creator_t(value).mValue);
+						get("skinId") = value;
 					}
 
 					void setStillObtainable(bool value){
-						set("stillObtainable", amf::object_creator_t(value).mValue);
+						get("stillObtainable") = value;
 					}
 
 					void setIsDefault(bool value){
-						set("isDefault", amf::object_creator_t(value).mValue);
+						get("isDefault") = value;
 					}
 				};
 			};

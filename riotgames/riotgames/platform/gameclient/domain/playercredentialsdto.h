@@ -12,96 +12,96 @@ namespace riotgames {
 					PlayerCredentialsDTO(){
 						setName("com.riotgames.platform.game.PlayerCredentialsDTO");
 
-						set("serverPort", new amf::Null());
-						set("handshakeToken", new amf::Null());
-						set("observerEncryptionKey", new amf::Null());
-						set("observer", new amf::Null());
-						set("serverIp", new amf::Null());
-						set("gameId", new amf::Null());
-						set("playerId", new amf::Null());
-						set("observerServerPort", new amf::Null());
-						set("encryptionKey", new amf::Null());
-						set("observerServerIp", new amf::Null());
+						set("serverPort", (amf::Null*)nullptr);
+						set("handshakeToken", (amf::Null*)nullptr);
+						set("observerEncryptionKey", (amf::Null*)nullptr);
+						set("observer", (amf::Null*)nullptr);
+						set("serverIp", (amf::Null*)nullptr);
+						set("gameId", (amf::Null*)nullptr);
+						set("playerId", (amf::Null*)nullptr);
+						set("observerServerPort", (amf::Null*)nullptr);
+						set("encryptionKey", (amf::Null*)nullptr);
+						set("observerServerIp", (amf::Null*)nullptr);
 					}
 
-					int getServerPort(){
-						return get("serverPort")->toInt();
+					int getServerPort() const {
+						return get("serverPort");
 					}
 
-					std::string getHandshakeToken(){
-						return get("handshakeToken")->toString();
+					std::string getHandshakeToken() const {
+						return get("handshakeToken");
 					}
 
-					std::string getObserverEncryptionKey(){
-						return get("observerEncryptionKey")->toString();
+					std::string getObserverEncryptionKey() const {
+						return get("observerEncryptionKey");
 					}
 
-					bool getObserver(){
-						return get("observer")->toBool();
+					bool getObserver() const {
+						return get("observer");
 					}
 
-					std::string getServerIp(){
-						return get("serverIp")->toString();
+					std::string getServerIp() const {
+						return get("serverIp");
 					}
 
-					double getGameId(){
-						return get("gameId")->toDouble();
+					double getGameId() const {
+						return get("gameId");
 					}
 
-					double getPlayerId(){
-						return get("playerId")->toDouble();
+					double getPlayerId() const {
+						return get("playerId");
 					}
 
-					int getObserverServerPort(){
-						return get("observerServerPort")->toInt();
+					int getObserverServerPort() const {
+						return get("observerServerPort");
 					}
 
-					std::string getEncryptionKey(){
-						return get("encryptionKey")->toString();
+					std::string getEncryptionKey() const {
+						return get("encryptionKey");
 					}
 
-					std::string getObserverServerIp(){
-						return get("observerServerIp")->toString();
+					std::string getObserverServerIp() const {
+						return get("observerServerIp");
 					}
 
 					void setServerPort(int value){
-						set("serverPort", amf::object_creator_t(value).mValue);
+						get("serverPort") = value;
 					}
 
 					void setHandshakeToken(const std::string& value){
-						set("handshakeToken", amf::object_creator_t(value).mValue);
+						get("handshakeToken") = value;
 					}
 
 					void setObserverEncryptionKey(const std::string& value){
-						set("observerEncryptionKey", amf::object_creator_t(value).mValue);
+						get("observerEncryptionKey") = value;
 					}
 
 					void setObserver(bool value){
-						set("observer", amf::object_creator_t(value).mValue);
+						get("observer") = value;
 					}
 
 					void setServerIp(const std::string& value){
-						set("serverIp", amf::object_creator_t(value).mValue);
+						get("serverIp") = value;
 					}
 
 					void setGameId(double value){
-						set("gameId", amf::object_creator_t(value).mValue);
+						get("gameId") = value;
 					}
 
 					void setPlayerId(double value){
-						set("playerId", amf::object_creator_t(value).mValue);
+						get("playerId") = value;
 					}
 
 					void setObserverServerPort(int value){
-						set("observerServerPort", amf::object_creator_t(value).mValue);
+						get("observerServerPort") = value;
 					}
 
 					void setEncryptionKey(const std::string& value){
-						set("encryptionKey", amf::object_creator_t(value).mValue);
+						get("encryptionKey") = value;
 					}
 
 					void setObserverServerIp(const std::string& value){
-						set("observerServerIp", amf::object_creator_t(value).mValue);
+						get("observerServerIp") = value;
 					}
 				};
 			};

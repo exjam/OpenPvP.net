@@ -11,33 +11,33 @@ namespace riotgames {
 					RentableInventoryItem(){
 						setName("com.riotgames.platform.gameclient.domain.RentableInventoryItem");
 
-						set("winCountRemaining", new amf::Null());
-						set("endDate", new amf::Null());
-						set("purchaseDate", new amf::Null());
+						set("winCountRemaining", (amf::Null*)nullptr);
+						set("endDate", (amf::Null*)nullptr);
+						set("purchaseDate", (amf::Null*)nullptr);
 					}
 
-					int getWinCountRemaining(){
-						return get("winCountRemaining")->toInt();
+					int getWinCountRemaining() const {
+						return get("winCountRemaining");
 					}
 
-					double getEndDate(){
-						return get("endDate")->toDouble();
+					double getEndDate() const {
+						return get("endDate");
 					}
 
-					double getPurchaseDate(){
-						return get("purchaseDate")->toDouble();
+					double getPurchaseDate() const {
+						return get("purchaseDate");
 					}
 
 					void setWinCountRemaining(int value){
-						set("winCountRemaining", amf::object_creator_t(value).mValue);
+						get("winCountRemaining") = value;
 					}
 
 					void setEndDate(double value){
-						set("endDate", amf::object_creator_t(value).mValue);
+						get("endDate") = value;
 					}
 
 					void setPurchaseDate(double value){
-						set("purchaseDate", amf::object_creator_t(value).mValue);
+						get("purchaseDate") = value;
 					}
 				};
 			};

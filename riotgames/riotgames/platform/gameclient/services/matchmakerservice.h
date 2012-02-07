@@ -36,7 +36,7 @@ namespace riotgames {
 					}
 
 					void getQueueInfo(double param1, const rtmp::CommandCallback& callback){
-						invoke("getQueueInfo", callback, &amf::Number(param1));
+						invoke("getQueueInfo", callback, param1);
 					}
 
 					void isMatchmakingEnabled(const rtmp::CommandCallback& callback){
@@ -44,11 +44,11 @@ namespace riotgames {
 					}
 
 					void cancelFromQueueIfPossible(double param1, const rtmp::CommandCallback& callback){
-						invoke("cancelFromQueueIfPossible", callback, &amf::Number(param1));
+						invoke("cancelFromQueueIfPossible", callback, param1);
 					}
 
 					void acceptInviteForMatchmakingGame(const std::string& param1, amf::Object* param5, const rtmp::CommandCallback& callback){
-						invoke("acceptInviteForMatchmakingGame", callback, &amf::String(param1), param5);
+						invoke("acceptInviteForMatchmakingGame", callback, param1, param5);
 					}
 
 					void attachTeamToQueues(MatchMakerParams* param1, const rtmp::CommandCallback& callback){

@@ -12,7 +12,7 @@
 namespace flex {
 	namespace messaging {
 		class Consumer {
-			typedef std::function<void(amf::Variant*)> MessageListener;
+			typedef std::function<void(const amf::Variant&)> MessageListener;
 
 		public:
 			Consumer(){
@@ -35,24 +35,25 @@ namespace flex {
 
 				rtmp::Client::instance().registerConsumer(this);
 				
-				flex::messaging::messages::CommandMessage msg;
-				msg.setClientId(mClientId);
-				msg.setDestination(mDestination);
-				msg.setOperation(flex::messaging::messages::CommandMessage::SUBSCRIBE);
-				rtmp::Client::instance().send(&rtmp::messages::Amf3Command((amf::Object*)&msg), std::bind(&Consumer::onSubscribe, this, std::placeholders::_1));
+				flex::messaging::messages::CommandMessage* msg = new flex::messaging::messages::CommandMessage();
+				msg->setClientId(mClientId);
+				msg->setDestination(mDestination);
+				msg->setOperation(flex::messaging::messages::CommandMessage::SUBSCRIBE);
+				msg->headers()->set("DSSubtopic", mClientId);
+				rtmp::Client::instance().send(&rtmp::messages::Amf3Command(amf::Variant((amf::Object*)msg)), std::bind(&Consumer::onSubscribe, this, std::placeholders::_1));
 			}
 
 			void addListener(const MessageListener& listener){
 				mListeners.push_back(listener);
 			}
 
-			void onMessage(amf::Variant* message){
+			void onMessage(const amf::Variant& message){
 				for(auto itr = mListeners.begin(); itr != mListeners.end(); ++itr)
 					(*itr)(message);
 			}
 
 		private:
-			void onSubscribe(amf::Variant* result){
+			void onSubscribe(const amf::Variant& result){
 				std::cout << "Consumer " << mClientId << " acknowledged" << std::endl;
 			}
 

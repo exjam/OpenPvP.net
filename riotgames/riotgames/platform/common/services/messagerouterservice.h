@@ -15,7 +15,7 @@ namespace riotgames {
 				using namespace riotgames::platform::gameclient::domain;
 
 				class MessageRouterService {
-					typedef std::function<void(amf::Variant*)> MessageListener;
+					typedef std::function<void(const amf::Variant&)> MessageListener;
 				public:
 					MessageRouterService(){
 						mGame = new Consumer();
@@ -35,7 +35,7 @@ namespace riotgames {
 					}
 
 					void initialize(ServerSessionObject* object){
-						std::string accountId = stringify(object->getAccountSummary()->getAccountId());
+						std::string accountId = stringify((unsigned int)object->getAccountSummary()->getAccountId());
 
 						mGame->setDestination("messagingDestination");
 						mGame->subscribe("gn-" + accountId);
@@ -70,3 +70,43 @@ namespace riotgames {
 		};
 	};
 };
+
+/*
+Example Notifications:
+
+Recv>AMF3_COMMAND
+{ object DSA
+	body = { object com.riotgames.platform.messaging.StoreFulfillmentNotification
+		data = { object com.riotgames.platform.catalog.runes.RuneQuantity
+			dataVersion = 0
+			futureData = (null)
+			quantity = 1
+			runeId = 5058
+		}
+		inventoryType = "RUNE"
+		ip = 4770
+		rp = 474
+	}
+	clientId = "cn-*"
+	destination = "messagingDestination"
+	headers = { object 
+		DSSubtopic = "cn-*"
+	}
+	messageId = "*"
+	timestamp = *
+}
+Recv>AMF3_COMMAND
+{ object DSA
+	body = { object com.riotgames.platform.messaging.StoreAccountBalanceNotification
+		ip = 4755
+		rp = 474
+	}
+	clientId = "cn-*"
+	destination = "messagingDestination"
+	headers = { object 
+		DSSubtopic = "cn-*"
+	}
+	messageId = "*"
+	timestamp = *
+}
+*/

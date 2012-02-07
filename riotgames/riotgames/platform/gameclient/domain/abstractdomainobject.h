@@ -11,24 +11,24 @@ namespace riotgames {
 					AbstractDomainObject(){
 						setName("com.riotgames.platform.gameclient.domain.AbstractDomainObject");
 						
-						set("futureData", new amf::Null());
+						set("futureData", (amf::Null*)nullptr);
 						set("dataVersion", new amf::Integer(0));
 					}
 
-					amf::Variant* futureData(){
+					amf::Variant& futureData(){
 						return get("futureData");
 					}
 
 					int32 dataVersion(){
-						return get("dataVersion")->toInt();
+						return get("dataVersion");
 					}
 
-					void setFutureData(amf::Variant* value){
-						set("futureData", value);
+					void setFutureData(amf::Variant& value){
+						get("futureData") = value;
 					}
 
 					void setDataVersion(int value){
-						set("dataVersion", amf::object_creator_t(value).mValue);
+						get("dataVersion") = value;
 					}
 				};
 			};

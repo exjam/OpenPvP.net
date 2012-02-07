@@ -14,11 +14,11 @@ namespace riotgames {
 					}
 
 					void useRuneCombiner(double param1, amf::Array* param2, const rtmp::CommandCallback& callback){
-						invoke("useRuneCombiner", callback, &amf::Number(param1), param2);
+						invoke("useRuneCombiner", callback, param1, param2);
 					}
 
 					void useGrabBag(double param1, const rtmp::CommandCallback& callback){
-						invoke("useGrabBag", callback, &amf::Number(param1));
+						invoke("useGrabBag", callback, param1);
 					}
 
 					void getAvailableChampions(const rtmp::CommandCallback& callback){

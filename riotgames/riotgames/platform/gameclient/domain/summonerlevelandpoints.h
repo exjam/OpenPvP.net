@@ -12,42 +12,42 @@ namespace riotgames {
 					SummonerLevelAndPoints(){
 						setName("com.riotgames.platform.summoner.SummonerLevelAndPoints");
 
-						set("expPoints", new amf::Null());
-						set("summonerLevel", new amf::Null());
-						set("infPoints", new amf::Null());
-						set("sumId", new amf::Null());
+						set("expPoints", (amf::Null*)nullptr);
+						set("summonerLevel", (amf::Null*)nullptr);
+						set("infPoints", (amf::Null*)nullptr);
+						set("sumId", (amf::Null*)nullptr);
 					}
 
-					double getExpPoints(){
-						return get("expPoints")->toDouble();
+					double getExpPoints() const {
+						return get("expPoints");
 					}
 
-					double getSummonerLevel(){
-						return get("summonerLevel")->toDouble();
+					double getSummonerLevel() const {
+						return get("summonerLevel");
 					}
 
-					double getInfPoints(){
-						return get("infPoints")->toDouble();
+					double getInfPoints() const {
+						return get("infPoints");
 					}
 
-					double getSumId(){
-						return get("sumId")->toDouble();
+					double getSumId() const {
+						return get("sumId");
 					}
 
 					void setExpPoints(double value){
-						set("expPoints", amf::object_creator_t(value).mValue);
+						get("expPoints") = value;
 					}
 
 					void setSummonerLevel(double value){
-						set("summonerLevel", amf::object_creator_t(value).mValue);
+						get("summonerLevel") = value;
 					}
 
 					void setInfPoints(double value){
-						set("infPoints", amf::object_creator_t(value).mValue);
+						get("infPoints") = value;
 					}
 
 					void setSumId(double value){
-						set("sumId", amf::object_creator_t(value).mValue);
+						get("sumId") = value;
 					}
 				};
 			};

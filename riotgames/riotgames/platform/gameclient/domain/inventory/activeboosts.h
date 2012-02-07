@@ -21,60 +21,60 @@ namespace riotgames {
 							set("xpLoyaltyBoost", new amf::Number());
 						}
 
-						double getIpLoyaltyBoost(){
-							return get("ipLoyaltyBoost")->toDouble();
+						double getIpLoyaltyBoost() const {
+							return get("ipLoyaltyBoost");
 						}
 
-						double getIpBoostPerWinCount(){
-							return get("ipBoostPerWinCount")->toDouble();
+						double getIpBoostPerWinCount() const {
+							return get("ipBoostPerWinCount");
 						}
 
-						double getIpBoostEndDate(){
-							return get("ipBoostEndDate")->toDouble();
+						double getIpBoostEndDate() const {
+							return get("ipBoostEndDate");
 						}
 
-						double getSummonerId(){
-							return get("summonerId")->toDouble();
+						double getSummonerId() const {
+							return get("summonerId");
 						}
 
-						double getXpBoostEndDate(){
-							return get("xpBoostEndDate")->toDouble();
+						double getXpBoostEndDate() const {
+							return get("xpBoostEndDate");
 						}
 
-						double getXpBoostPerWinCount(){
-							return get("xpBoostPerWinCount")->toDouble();
+						double getXpBoostPerWinCount() const {
+							return get("xpBoostPerWinCount");
 						}
 
-						double getXpLoyaltyBoost(){
-							return get("xpLoyaltyBoost")->toDouble();
+						double getXpLoyaltyBoost() const {
+							return get("xpLoyaltyBoost");
 						}
 
 						void setIpLoyaltyBoost(double value){
-							((amf::Number*)get("ipLoyaltyBoost"))->setValue(value);
+							get("ipLoyaltyBoost") = value;
 						}
 
 						void setIpBoostPerWinCount(double value){
-							((amf::Number*)get("ipBoostPerWinCount"))->setValue(value);
+							get("ipBoostPerWinCount") = value;
 						}
 
 						void setIpBoostEndDate(double value){
-							((amf::Number*)get("ipBoostEndDate"))->setValue(value);
+							get("ipBoostEndDate") = value;
 						}
 
 						void setSummonerId(double value){
-							((amf::Number*)get("summonerId"))->setValue(value);
+							get("summonerId") = value;
 						}
 
 						void setXpBoostEndDate(double value){
-							((amf::Number*)get("xpBoostEndDate"))->setValue(value);
+							get("xpBoostEndDate") = value;
 						}
 
 						void setXpBoostPerWinCount(double value){
-							((amf::Number*)get("xpBoostPerWinCount"))->setValue(value);
+							get("xpBoostPerWinCount") = value;
 						}
 
 						void setXpLoyaltyBoost(double value){
-							((amf::Number*)get("xpLoyaltyBoost"))->setValue(value);
+							get("xpLoyaltyBoost") = value;
 						}
 					};
 				};

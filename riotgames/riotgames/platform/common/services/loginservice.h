@@ -17,7 +17,7 @@ namespace riotgames {
 					}
 
 					void performLCDSHeartBeat(double accountId, const std::string& serverSessionToken, int heartbeatId, const std::string& datetime, const rtmp::CommandCallback& callback){
-						invoke("performLCDSHeartBeat", callback, &amf::Number(accountId), &amf::String(serverSessionToken), &amf::Integer(heartbeatId), &amf::String(datetime));
+						invoke("performLCDSHeartBeat", callback, accountId, serverSessionToken, heartbeatId, datetime);
 					}
 
 					void getLoggedInAccountView(const rtmp::CommandCallback& callback){
@@ -25,19 +25,19 @@ namespace riotgames {
 					}
 
 					void login(const std::string& username, const std::string& password, const std::string& authToken, const std::string& domain, const std::string& ipAddress, const std::string& locale, const std::string& clientVersion, const rtmp::CommandCallback& callback){
-						AuthenticationCredentials auth;
-						auth.setUsername(username);
-						auth.setPassword(password);
-						auth.setAuthToken(authToken);
-						auth.setDomain(domain);
-						auth.setIpAddress(ipAddress);
-						auth.setLocale(locale);
-						auth.setClientVersion(clientVersion);
-						invoke("login", callback, &auth);
+						AuthenticationCredentials* auth = new AuthenticationCredentials();
+						auth->setUsername(username);
+						auth->setPassword(password);
+						auth->setAuthToken(authToken);
+						auth->setDomain(domain);
+						auth->setIpAddress(ipAddress);
+						auth->setLocale(locale);
+						auth->setClientVersion(clientVersion);
+						invoke("login", callback, auth);
 					}
 
 					void logout(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("logout", callback, &amf::String(param1));
+						invoke("logout", callback, param1);
 					}
 
 					void getStoreUrl(const rtmp::CommandCallback& callback){
@@ -45,12 +45,12 @@ namespace riotgames {
 					}
 
 					void authenticateChannel(const std::string& param1, const std::string& param2, const rtmp::CommandCallback& callback){
-						invoke("authenticateChannel", callback, &amf::String(param1), &amf::String(param2));
+						invoke("authenticateChannel", callback, param1, param2);
 					}
 
 					/*
 					void loginWithSuppliedCredentials(const std::string& param1, const std::string& param2, const std::string& param3, const std::string& param4, const std::string& param5, const std::string& param6, const std::string& param7, const rtmp::CommandCallback& callback){
-						invoke("loginWithSuppliedCredentials", callback, &amf::String(param1), &amf::String(param2), &amf::String(param3), &amf::String(param4), &amf::String(param5), &amf::String(param6), &amf::String(param7));
+						invoke("loginWithSuppliedCredentials", callback, param1, param2, param3, param4, param5, param6, param7);
 					}
 					*/
 				};

@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">* {
 	color: white;
-	font: 10pt &quot;Arial&quot;;
+	font: 10pt &quot;Friz Quadrata TT&quot;;
 }
 
 #windowtitle {
@@ -25,6 +25,7 @@
 
 QLineEdit {
 	color: black;
+	font: 10pt &quot;Arial&quot;;
 }
 
 QPushButton[default=false] {

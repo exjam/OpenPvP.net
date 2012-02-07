@@ -13,114 +13,114 @@ namespace riotgames {
 						GameQueueConfig(){
 							setName("com.riotgames.platform.matchmaking.GameQueueConfig");
 
-							set("gameMode", new amf::Null());
+							set("gameMode", (amf::Null*)nullptr);
 							set("supportedMapIds", new amf::Array());
-							set("maximumParticipantListSize", new amf::Null());
-							set("type", new amf::Null());
-							set("minimumParticipantListSize", new amf::Null());
-							set("gameTypeConfigId", new amf::Null());
-							set("numPlayersPerTeam", new amf::Null());
-							set("id", new amf::Null());
-							set("maxLevel", new amf::Null());
-							set("minLevel", new amf::Null());
-							set("teamOnly", new amf::Null());
-							set("ranked", new amf::Null());
+							set("maximumParticipantListSize", (amf::Null*)nullptr);
+							set("type", (amf::Null*)nullptr);
+							set("minimumParticipantListSize", (amf::Null*)nullptr);
+							set("gameTypeConfigId", (amf::Null*)nullptr);
+							set("numPlayersPerTeam", (amf::Null*)nullptr);
+							set("id", (amf::Null*)nullptr);
+							set("maxLevel", (amf::Null*)nullptr);
+							set("minLevel", (amf::Null*)nullptr);
+							set("teamOnly", (amf::Null*)nullptr);
+							set("ranked", (amf::Null*)nullptr);
 						}
 
-						std::string getGameMode(){
-							return get("gameMode")->toString();
+						std::string getGameMode() const {
+							return get("gameMode");
 						}
 
-						amf::Array* getSupportedMapIds(){
-							return get("supportedMapIds")->toArray();
+						const amf::Reference<amf::Array> getSupportedMapIds() const {
+							return get("supportedMapIds");
 						}
 
-						int getMaximumParticipantListSize(){
-							return get("maximumParticipantListSize")->toInt();
+						int getMaximumParticipantListSize() const {
+							return get("maximumParticipantListSize");
 						}
 
-						std::string getType(){
-							return get("type")->toString();
+						std::string getType() const {
+							return get("type");
 						}
 
-						int getMinimumParticipantListSize(){
-							return get("minimumParticipantListSize")->toInt();
+						int getMinimumParticipantListSize() const {
+							return get("minimumParticipantListSize");
 						}
 
-						int getGameTypeConfigId(){
-							return get("gameTypeConfigId")->toInt();
+						int getGameTypeConfigId() const {
+							return get("gameTypeConfigId");
 						}
 
-						double getNumPlayersPerTeam(){
-							return get("numPlayersPerTeam")->toDouble();
+						double getNumPlayersPerTeam() const {
+							return get("numPlayersPerTeam");
 						}
 
-						double getId(){
-							return get("id")->toDouble();
+						double getId() const {
+							return get("id");
 						}
 
-						int getMaxLevel(){
-							return get("maxLevel")->toInt();
+						int getMaxLevel() const {
+							return get("maxLevel");
 						}
 
-						int getMinLevel(){
-							return get("minLevel")->toInt();
+						int getMinLevel() const {
+							return get("minLevel");
 						}
 
-						bool getTeamOnly(){
-							return get("teamOnly")->toBool();
+						bool getTeamOnly() const {
+							return get("teamOnly");
 						}
 
-						bool getRanked(){
-							return get("ranked")->toBool();
+						bool getRanked() const {
+							return get("ranked");
 						}
 
 						void setGameMode(const std::string& value){
-							set("gameMode", amf::object_creator_t(value).mValue);
+							get("gameMode") = value;
 						}
 
 						void setSupportedMapIds(amf::Array* value){
-							set("supportedMapIds", (Variant*)value);
+							get("supportedMapIds") = value;
 						}
 
 						void setMaximumParticipantListSize(int value){
-							set("maximumParticipantListSize", amf::object_creator_t(value).mValue);
+							get("maximumParticipantListSize") = value;
 						}
 
 						void setType(const std::string& value){
-							set("type", amf::object_creator_t(value).mValue);
+							get("type") = value;
 						}
 
 						void setMinimumParticipantListSize(int value){
-							set("minimumParticipantListSize", amf::object_creator_t(value).mValue);
+							get("minimumParticipantListSize") = value;
 						}
 
 						void setGameTypeConfigId(int value){
-							set("gameTypeConfigId", amf::object_creator_t(value).mValue);
+							get("gameTypeConfigId") = value;
 						}
 
 						void setNumPlayersPerTeam(double value){
-							set("numPlayersPerTeam", amf::object_creator_t(value).mValue);
+							get("numPlayersPerTeam") = value;
 						}
 
 						void setId(double value){
-							set("id", amf::object_creator_t(value).mValue);
+							get("id") = value;
 						}
 
 						void setMaxLevel(int value){
-							set("maxLevel", amf::object_creator_t(value).mValue);
+							get("maxLevel") = value;
 						}
 
 						void setMinLevel(int value){
-							set("minLevel", amf::object_creator_t(value).mValue);
+							get("minLevel") = value;
 						}
 
 						void setTeamOnly(bool value){
-							set("teamOnly", amf::object_creator_t(value).mValue);
+							get("teamOnly") = value;
 						}
 
 						void setRanked(bool value){
-							set("ranked", amf::object_creator_t(value).mValue);
+							get("ranked") = value;
 						}
 					};
 				};

@@ -24,9 +24,9 @@ namespace amf {
 		return count;
 	}
 	
-	void ExternalisedDefinition::readExternal(Object* obj, ByteStream& stream){
+	void ExternalisedDefinition::readExternal(Encoder* encoder, Object* obj, ByteStream& stream){
 		if(mParent)
-			mParent->readExternal(obj, stream);
+			mParent->readExternal(encoder, obj, stream);
 
 		if(mUsesFlags){
 			std::vector<uint8> flags;
@@ -38,21 +38,19 @@ namespace amf {
 				for(uint32 j = 0; j < 7; ++j){
 					uint32 index = i*7 + j;
 					if((byte >> j) & 1){
-						Variant* entity = Encoder.deserialise(stream, false);
+						Variant entity = encoder->deserialise(stream, false);
 						if(index < mFields.size())
 							obj->insert(mFields[i*7 + j], entity);
-						else if(entity)
-							delete entity;
 					}
 				}
 			}
 		}else{
 			for(auto itr = mFields.begin(); itr != mFields.end(); ++itr)
-				obj->insert(*itr, Encoder.deserialise(stream, false));
+				obj->insert(*itr, encoder->deserialise(stream, false));
 		}
 	}
 
-	void ExternalisedDefinition::writeExternal(amf::Object* object, ByteStream& stream){
+	void ExternalisedDefinition::writeExternal(Encoder* encoder, amf::Object* object, ByteStream& stream){
 	}
 
 	std::string ExternalisedDefinition::name() const {
@@ -68,6 +66,12 @@ namespace amf {
 	}
 
 	void amf3::createDefaultExternalised(){
+		static bool added = false;
+		if(added)
+			return;
+
+		added = true;
+
 		const char* abstrf[] = {
 			"body", "clientId", "destination", "headers", "messageId", "timestamp",
 			"timeToLive", "clientIdBytes", "messageIdBytes", NULL
@@ -117,30 +121,29 @@ namespace amf {
 		addExternalizable("DSC", cmd);
 	}
 
-	amf3::amf3(){
+	std::vector<ObjectDefinition*> amf3::mPermanentDefinitions;
+	std::map<std::string, flex::utils::IExternalizable*> amf3::mExternalizables;
+
+	amf3::amf3(Encoder* parent)
+		: mParent(parent)
+	{
 		createDefaultExternalised();
 	}
 
-	void amf3::start(){
+	amf3::~amf3(){
 		mStrings.clear();
 		mObjects.clear();
 
-		for(auto itr = mDefinitions.begin(); itr != mDefinitions.end(); ){
+		for(auto itr = mDefinitions.begin(); itr != mDefinitions.end(); ++itr){
 			amf::ObjectDefinition* def = *itr;
-			if(def->mTemporary){
-				delete def;
-				itr = mDefinitions.erase(itr);
-			}else{
-				++itr;
-			}
+			delete def;
 		}
-	}
 
-	void amf3::end(){
+		mDefinitions.clear();
 	}
 
 	void amf3::defineObject(Object* object){
-		if(getDefinition(object->name()))
+		if(getPermanentDefinition(object->name()))
 			return;
 
 		ObjectDefinition* def = new ObjectDefinition();
@@ -152,7 +155,7 @@ namespace amf {
 		for(auto itr = object->begin(); itr != object->end(); ++itr)
 			def->mMembers.push_back(itr->first);
 
-		addDefinition(def);
+		addPermanentDefinition(def);
 	}
 
 	void amf3::addString(const std::string& str){
@@ -160,9 +163,11 @@ namespace amf {
 			mStrings.push_back(str);
 	}
 
-	void amf3::addObject(Variant* obj){
-		if(obj)
-			mObjects.push_back(obj);
+	void amf3::addObject(const Variant& obj){
+		if(!obj)
+			return;
+
+		mObjects.push_back(obj);
 	}
 
 	void amf3::addDefinition(ObjectDefinition* def){
@@ -184,7 +189,7 @@ namespace amf {
 		return mStrings.at(index);
 	}
 
-	Variant* amf3::getObject(uint32 index){
+	const Variant& amf3::getObject(uint32 index){
 		return mObjects.at(index);
 	}
 
@@ -205,6 +210,20 @@ namespace amf {
 
 		return nullptr;
 	}
+	
+	void amf3::addPermanentDefinition(ObjectDefinition* def){
+		def->mTemporary = false;
+		mPermanentDefinitions.push_back(def);
+	}
+
+	ObjectDefinition* amf3::getPermanentDefinition(const std::string& name){
+		for(auto itr = mPermanentDefinitions.begin(); itr != mPermanentDefinitions.end(); ++itr){
+			if((*itr)->mName.compare(name) == 0)
+				return *itr;
+		}
+
+		return nullptr;
+	}
 
 	flex::utils::IExternalizable* amf3::getExternalizable(const std::string& name){
 		auto itr = mExternalizables.find(name);
@@ -214,12 +233,12 @@ namespace amf {
 		return itr->second;
 	}
 
-	void amf3::serialise(uint8 version, Variant* value, ByteStream& stream){
+	void amf3::serialise(uint8 version, const Variant& value, ByteStream& stream){
 		assert(version == 3);
 
-		uint8 type = value ? value->type() : AMF_NULL;
-		switch(type){
+		switch(value.type()){
 			case AMF_NULL:
+			case AMF_UNKNOWN_TYPE:
 				serialise(AMF3_INVALID, (Null*)value, stream);
 				break;
 			case AMF_NUMBER:
@@ -247,18 +266,18 @@ namespace amf {
 				serialise(AMF3_INVALID, (Object*)value, stream);
 				break;
 			default:
-				throw new EncodeException("Invalid AMF data type %u", type);
+				throw new EncodeException("Invalid AMF data type %u", value.type());
 				break;
 		}
 	}
 		
-	void amf3::serialise(uint8 type, Null* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Null* value, ByteStream& stream){
 		assert(type == AMF3_INVALID);
 
 		stream << uint8(AMF3_NULL);
 	}
 
-	void amf3::serialise(uint8 type, Number* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Number* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_DOUBLE);
 
 		if(type == AMF3_INVALID)
@@ -267,7 +286,7 @@ namespace amf {
 		stream << double(value->value());
 	}
 
-	void amf3::serialise(uint8 type, Integer* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Integer* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_INTEGER);
 			
 		if(type == AMF3_INVALID)
@@ -295,12 +314,12 @@ namespace amf {
 		}
 	}
 
-	void amf3::serialise(uint8 type, Boolean* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Boolean* value, ByteStream& stream){
 		assert(type == AMF3_INVALID);
 		stream << uint8(value->value() ? AMF3_TRUE : AMF3_FALSE);
 	}
 
-	void amf3::serialise(uint8 type, String* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const String* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_STRING);
 
 		if(type == AMF3_INVALID)
@@ -312,7 +331,7 @@ namespace amf {
 		stream.write(str.c_str(), str.length());
 	}
 
-	void amf3::serialise(uint8 type, Date* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Date* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_DATE);
 			
 		if(type == AMF3_INVALID)
@@ -324,7 +343,7 @@ namespace amf {
 		stream << double(value->value());
 	}
 
-	void amf3::serialise(uint8 type, Array* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Array* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_ARRAY);
 
 		if(type == AMF3_INVALID)
@@ -334,16 +353,16 @@ namespace amf {
 
 		for(auto itr = value->begin(); itr != value->end(); ++itr){
 			serialise(AMF3_STRING, &String(itr->first), stream);
-			Encoder.serialise(itr->second, stream);
+			mParent->serialise(itr->second, stream);
 		}
 
 		serialise(AMF3_STRING, &String(""), stream);
 
 		for(size_t i = 0; i < value->size(); ++i)
-			Encoder.serialise(value->at(i), stream);
+			mParent->serialise(value->at(i), stream);
 	}
 
-	void amf3::serialise(uint8 type, ByteArray* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const ByteArray* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_BYTE_ARRAY);
 			
 		if(type == AMF3_INVALID)
@@ -353,7 +372,7 @@ namespace amf {
 		stream.write((const char*)value->value(), value->size());
 	}
 
-	void amf3::serialise(uint8 type, Object* value, ByteStream& stream){
+	void amf3::serialise(uint8 type, const Object* value, ByteStream& stream){
 		assert(type == AMF3_INVALID || type == AMF3_OBJECT);
 			
 		if(type == AMF3_INVALID)
@@ -397,7 +416,7 @@ namespace amf {
 				serialise(AMF3_STRING, &String(*itr), stream);
 			
 			for(auto itr = definition->mMembers.begin(); itr != definition->mMembers.end(); ++itr)
-				Encoder.serialise(value->get(*itr), stream);
+				mParent->serialise(value->get(*itr), stream);
 		}
 
 		for(auto itr = value->begin(); itr != value->end(); ++itr){
@@ -408,20 +427,20 @@ namespace amf {
 			}
 				
 			serialise(AMF3_STRING, &String(itr->first), stream);
-			Encoder.serialise(itr->second, stream);
+			mParent->serialise(itr->second, stream);
 		}
 
 		if(dynamics > 0)
 			serialise(AMF3_STRING, &String(""), stream);
 	}
 		
-	Variant* amf3::deserialise(uint8 version, ByteStream& stream){
+	Variant amf3::deserialise(uint8 version, ByteStream& stream){
 		assert(version == 3);
 
 		uint8 type;
 		stream >> type;
 
-		Variant* value = nullptr;
+		Variant value;
 
 		switch(type){
 		case AMF3_NULL:
@@ -476,7 +495,9 @@ namespace amf {
 	void amf3::deserialise(uint8 type, Number* value, ByteStream& stream){
 		assert(type == AMF3_DOUBLE);
 
-		stream >> value->value();
+		double val;
+		stream >> val;
+		value->setValue(val);
 	}
 
 	void amf3::deserialise(uint8 type, Integer* value, ByteStream& stream){
@@ -524,7 +545,7 @@ namespace amf {
 			}
 		}else{
 			length >>= 1;
-			value->value().assign((char*)stream.data() + stream.tell(), length);
+			value->setValue(std::string((char*)stream.data() + stream.tell(), length));
 			stream.skip(length);
 
 			if(type == AMF3_STRING)
@@ -548,7 +569,9 @@ namespace amf {
 
 			value->setValue(source->value());
 		}else{
-			stream >> value->value();
+			double val;
+			stream >> val;
+			value->setValue(val);
 
 			addObject(value);
 		}
@@ -590,10 +613,10 @@ namespace amf {
 				throw new DecodeException("Referenced object was not of type Array");
 			
 			for(auto itr = source->begin(); itr != source->end(); ++itr)
-				value->insert(itr->first, itr->second->copy());
+				value->insert(itr->first, itr->second);
 
 			for(uint32 i = 0; i < source->size(); ++i)
-				value->push_back(source->at(i)->copy());
+				value->push_back(source->at(i));
 		}else{
 			addObject(value);
 
@@ -606,11 +629,11 @@ namespace amf {
 				if(_string.length() == 0)
 					break;
 
-				value->insert(_string, Encoder.deserialise(stream, false));
+				value->insert(_string, mParent->deserialise(stream, false));
 			}
 
 			for(uint32 i = 0; i < length; ++i)
-				value->push_back(Encoder.deserialise(stream, false));
+				value->push_back(mParent->deserialise(stream, false));
 		}
 	}
 
@@ -630,7 +653,7 @@ namespace amf {
 			value->setName(source->name());
 
 			for(auto itr = source->begin(); itr != source->end(); ++itr)
-				value->insert(itr->first, itr->second->copy());
+				value->insert(itr->first, itr->second);
 		}else{
 			addObject(value);
 
@@ -670,10 +693,10 @@ namespace amf {
 				if(!extDef)
 					throw new DecodeException("Externalised Definition for object %s not found", value->name().c_str());
 
-				extDef->readExternal(value, stream);
+				extDef->readExternal(mParent, value, stream);
 			}else{
 				for(auto itr = definition->mMembers.begin(); itr != definition->mMembers.end(); ++itr)
-					value->insert(*itr, Encoder.deserialise(stream, false));
+					value->insert(*itr, mParent->deserialise(stream, false));
 			}
 
 			if(definition->mDynamic){
@@ -681,7 +704,7 @@ namespace amf {
 					deserialise(AMF3_STRING, &_string, stream);
 					if(_string.length() == 0) break;
 					
-					value->insert(_string, Encoder.deserialise(stream, false));
+					value->insert(_string, mParent->deserialise(stream, false));
 				}
 			}
 		}

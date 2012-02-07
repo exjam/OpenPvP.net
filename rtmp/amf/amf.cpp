@@ -8,69 +8,51 @@
 #include <assert.h>
 
 namespace amf {
-	Encoder_ Encoder;
 	log::indent_t amf::log::indent(1);
 	log::indent_t amf::log::outdent(-1);
 	int log::obj::mIndent = 0;
 	bool log::obj::mLineStart = true;
 
-	Encoder_::Encoder_(){
-		memset(mVersions, 0, sizeof(EncoderImpl*) * (mMaxVersion + 1));
-		mVersions[0] = new amf0();
-		mVersions[3] = new amf3();
+	Encoder::Encoder(uint8 version)
+		: mVersion(version)
+	{
+		mAmf0 = new amf0(this);
+		mAmf3 = new amf3(this);
 	}
 
-	void Encoder_::defineObject(Object* object){
-		for(int i = 0; i <= mMaxVersion; ++i)
-			if(mVersions[i])
-				mVersions[i]->defineObject(object);
+	Encoder::~Encoder(){
+		delete mAmf0;
+		delete mAmf3;
 	}
 
-	void Encoder_::addExternalizable(flex::utils::IExternalizable* object){
-		for(int i = 0; i <= mMaxVersion; ++i)
-			if(mVersions[i])
-				mVersions[i]->addExternalizable(object);
+	void Encoder::defineObject(Object* object){
+		amf3::defineObject(object);
 	}
 
-	void Encoder_::start(uint8 version){
-		setVersion(version);
-
-		for(auto itr = mCache.begin(); itr != mCache.end(); ++itr){
-			if(*itr)
-				delete *itr;
-		}
-		
-		mCache.clear();
-
-		for(int i = 0; i <= mMaxVersion; ++i)
-			if(mVersions[i])
-				mVersions[i]->start();
+	void Encoder::addExternalizable(flex::utils::IExternalizable* object){
+		amf3::addExternalizable(object);
 	}
 
-	void Encoder_::end(){
-		for(int i = 0; i <= mMaxVersion; ++i)
-			if(mVersions[i])
-				mVersions[i]->end();
-	}
-
-	void Encoder_::setVersion(uint8 version){
-		assert(mVersion <= mMaxVersion);
-		assert(mVersions[mVersion]);
-
+	void Encoder::setVersion(uint8 version){
 		mVersion = version;
 	}
 
-	Variant* Encoder_::deserialise(ByteStream& stream, bool cache){
+	Variant Encoder::deserialise(ByteStream& stream, bool cache){
 		assert(stream.tell() < stream.size());
-		amf::Variant* result = mVersions[mVersion]->deserialise(mVersion, stream);
-		if(cache && result)
-			mCache.push_back(result);
 		
-		return result;
+		if(mVersion == 0)
+			return mAmf0->deserialise(mVersion, stream);
+		else if(mVersion == 3)
+			return mAmf3->deserialise(mVersion, stream);
+		
+		return Variant();
 	}
 
-	void Encoder_::serialise(Variant* value, ByteStream& stream){
-		mVersions[mVersion]->serialise(mVersion, value, stream);
+	void Encoder::serialise(const Variant& value, ByteStream& stream){
+		if(mVersion == 0)
+			mAmf0->serialise(mVersion, value, stream);
+		else if(mVersion == 3)
+			mAmf3->serialise(mVersion, value, stream);
 	}
 
 	DecodeException::DecodeException(const std::string& what)

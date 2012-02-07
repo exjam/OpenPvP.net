@@ -14,11 +14,11 @@ namespace riotgames {
 					}
 
 					void getSummonerRunes(double param1, const rtmp::CommandCallback& callback){
-						invoke("getSummonerRunes", callback, &amf::Number(param1));
+						invoke("getSummonerRunes", callback, param1);
 					}
 
 					void getSummonerRuneInventory(double param1, const rtmp::CommandCallback& callback){
-						invoke("getSummonerRuneInventory", callback, &amf::Number(param1));
+						invoke("getSummonerRuneInventory", callback, param1);
 					}
 				};
 

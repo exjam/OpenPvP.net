@@ -11,51 +11,51 @@ namespace riotgames {
 					SummonerLevel(){
 						setName("com.riotgames.platform.summoner.SummonerLevel");
 
-						set("infTierMod", new amf::Null());
-						set("expToNextLevel", new amf::Null());
-						set("expTierMod", new amf::Null());
-						set("summonerLevel", new amf::Null());
-						set("summonerTier", new amf::Null());
+						set("infTierMod", (amf::Null*)nullptr);
+						set("expToNextLevel", (amf::Null*)nullptr);
+						set("expTierMod", (amf::Null*)nullptr);
+						set("summonerLevel", (amf::Null*)nullptr);
+						set("summonerTier", (amf::Null*)nullptr);
 					}
 
-					double getInfTierMod(){
-						return get("infTierMod")->toDouble();
+					double getInfTierMod() const {
+						return get("infTierMod");
 					}
 
-					double getExpToNextLevel(){
-						return get("expToNextLevel")->toDouble();
+					double getExpToNextLevel() const {
+						return get("expToNextLevel");
 					}
 
-					double getExpTierMod(){
-						return get("expTierMod")->toDouble();
+					double getExpTierMod() const {
+						return get("expTierMod");
 					}
 
-					double getSummonerLevel(){
-						return get("summonerLevel")->toDouble();
+					double getSummonerLevel() const {
+						return get("summonerLevel");
 					}
 
-					double getSummonerTier(){
-						return get("summonerTier")->toDouble();
+					double getSummonerTier() const {
+						return get("summonerTier");
 					}
 
 					void setInfTierMod(double value){
-						set("infTierMod", amf::object_creator_t(value).mValue);
+						get("infTierMod") = value;
 					}
 
 					void setExpToNextLevel(double value){
-						set("expToNextLevel", amf::object_creator_t(value).mValue);
+						get("expToNextLevel") = value;
 					}
 
 					void setExpTierMod(double value){
-						set("expTierMod", amf::object_creator_t(value).mValue);
+						get("expTierMod") = value;
 					}
 
 					void setSummonerLevel(double value){
-						set("summonerLevel", amf::object_creator_t(value).mValue);
+						get("summonerLevel") = value;
 					}
 
 					void setSummonerTier(double value){
-						set("summonerTier", amf::object_creator_t(value).mValue);
+						get("summonerTier") = value;
 					}
 				};
 			};

@@ -17,20 +17,20 @@ namespace riotgames {
 						set("spellBookConfig", new amf::Array());
 					}
 
-					amf::Array_t<TalentGroup*>* getTalentTree(){
-						return (amf::Array_t<TalentGroup*>*)get("talentTree")->toArray();
+					amf::TypedArray<TalentGroup*>* getTalentTree() const {
+						return (amf::TypedArray<TalentGroup*>*)(amf::Array*)get("talentTree");
 					}
 
-					amf::Array_t<RuneSlot*>* getSpellBookConfig(){
-						return (amf::Array_t<RuneSlot*>*)get("spellBookConfig")->toArray();
+					amf::TypedArray<RuneSlot*>* getSpellBookConfig() const {
+						return (amf::TypedArray<RuneSlot*>*)(amf::Array*)get("spellBookConfig");
 					}
 
 					void setTalentTree(amf::Array* value){
-						set("talentTree", (Variant*)value);
+						get("talentTree") = value;
 					}
 
 					void setSpellBookConfig(amf::Array* value){
-						set("spellBookConfig", (Variant*)value);
+						get("spellBookConfig") = value;
 					}
 				};
 			};

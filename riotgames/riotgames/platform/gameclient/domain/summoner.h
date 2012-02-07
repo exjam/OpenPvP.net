@@ -12,115 +12,115 @@ namespace riotgames {
 					Summoner(){
 						setName("com.riotgames.platform.summoner.Summoner");
 						
-						set("name", new amf::Null());
-						set("seasonOneTier", new amf::Null());
-						set("nameChangeFlag", new amf::Null());
-						set("sumId", new amf::Null());
-						set("advancedTutorialFlag", new amf::Null());
-						set("revisionId", new amf::Null());
-						set("revisionDate", new amf::Null());
-						set("helpFlag", new amf::Null());
-						set("isMe", new amf::Null());
+						set("name", (amf::Null*)nullptr);
+						set("seasonOneTier", (amf::Null*)nullptr);
+						set("nameChangeFlag", (amf::Null*)nullptr);
+						set("sumId", (amf::Null*)nullptr);
+						set("advancedTutorialFlag", (amf::Null*)nullptr);
+						set("revisionId", (amf::Null*)nullptr);
+						set("revisionDate", (amf::Null*)nullptr);
+						set("helpFlag", (amf::Null*)nullptr);
+						set("isMe", (amf::Null*)nullptr);
 						set("socialNetworkUserIds", new amf::Array());
-						set("tutorialFlag", new amf::Null());
-						set("lastGameDate", new amf::Null());
-						set("displayEloQuestionaire", new amf::Null());
+						set("tutorialFlag", (amf::Null*)nullptr);
+						set("lastGameDate", (amf::Null*)nullptr);
+						set("displayEloQuestionaire", (amf::Null*)nullptr);
 					}
 
-					std::string getSeasonOneTier(){
-						return get("seasonOneTier")->toString();
+					std::string getSeasonOneTier() const {
+						return get("seasonOneTier");
 					}
 
-					bool getNameChangeFlag(){
-						return get("nameChangeFlag")->toBool();
+					bool getNameChangeFlag() const {
+						return get("nameChangeFlag");
 					}
 
-					double getSumId(){
-						return get("sumId")->toDouble();
+					double getSumId() const {
+						return get("sumId");
 					}
 
-					bool getAdvancedTutorialFlag(){
-						return get("advancedTutorialFlag")->toBool();
+					bool getAdvancedTutorialFlag() const {
+						return get("advancedTutorialFlag");
 					}
 
-					double getRevisionId(){
-						return get("revisionId")->toDouble();
+					double getRevisionId() const {
+						return get("revisionId");
 					}
 
-					amf::Date* getRevisionDate(){
-						return get("revisionDate")->toDate();
+					amf::Date* getRevisionDate() const {
+						return get("revisionDate").toDate();
 					}
 
-					bool getHelpFlag(){
-						return get("helpFlag")->toBool();
+					bool getHelpFlag() const {
+						return get("helpFlag");
 					}
 
-					bool getIsMe(){
-						return get("isMe")->toBool();
+					bool getIsMe() const {
+						return get("isMe");
 					}
 
-					amf::Array* getSocialNetworkUserIds(){
-						return get("socialNetworkUserIds")->toArray();
+					const amf::Reference<amf::Array> getSocialNetworkUserIds() const {
+						return get("socialNetworkUserIds");
 					}
 
-					bool getTutorialFlag(){
-						return get("tutorialFlag")->toBool();
+					bool getTutorialFlag() const {
+						return get("tutorialFlag");
 					}
 
-					amf::Date* getLastGameDate(){
-						return get("lastGameDate")->toDate();
+					amf::Date* getLastGameDate() const {
+						return get("lastGameDate").toDate();
 					}
 
-					bool getDisplayEloQuestionaire(){
-						return get("displayEloQuestionaire")->toBool();
+					bool getDisplayEloQuestionaire() const {
+						return get("displayEloQuestionaire");
 					}
 
 					void setSeasonOneTier(const std::string& value){
-						set("seasonOneTier", amf::object_creator_t(value).mValue);
+						get("seasonOneTier") = value;
 					}
 
 					void setNameChangeFlag(bool value){
-						set("nameChangeFlag", amf::object_creator_t(value).mValue);
+						get("nameChangeFlag") = value;
 					}
 
 					void setSumId(double value){
-						set("sumId", amf::object_creator_t(value).mValue);
+						get("sumId") = value;
 					}
 
 					void setAdvancedTutorialFlag(bool value){
-						set("advancedTutorialFlag", amf::object_creator_t(value).mValue);
+						get("advancedTutorialFlag") = value;
 					}
 
 					void setRevisionId(double value){
-						set("revisionId", amf::object_creator_t(value).mValue);
+						get("revisionId") = value;
 					}
 
 					void setRevisionDate(amf::Date* value){
-						set("revisionDate", (Variant*)value);
+						get("revisionDate") = value;
 					}
 
 					void setHelpFlag(bool value){
-						set("helpFlag", amf::object_creator_t(value).mValue);
+						get("helpFlag") = value;
 					}
 
 					void setIsMe(bool value){
-						set("isMe", amf::object_creator_t(value).mValue);
+						get("isMe") = value;
 					}
 
 					void setSocialNetworkUserIds(amf::Array* value){
-						set("socialNetworkUserIds", (Variant*)value);
+						get("socialNetworkUserIds") = value;
 					}
 
 					void setTutorialFlag(bool value){
-						set("tutorialFlag", amf::object_creator_t(value).mValue);
+						get("tutorialFlag") = value;
 					}
 
 					void setLastGameDate(amf::Date* value){
-						set("lastGameDate", (Variant*)value);
+						get("lastGameDate") = value;
 					}
 
 					void setDisplayEloQuestionaire(bool value){
-						set("displayEloQuestionaire", amf::object_creator_t(value).mValue);
+						get("displayEloQuestionaire") = value;
 					}
 				};
 			};

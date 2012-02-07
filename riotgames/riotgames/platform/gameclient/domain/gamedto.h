@@ -12,267 +12,267 @@ namespace riotgames {
 					GameDTO(){
 						setName("com.riotgames.platform.game.GameDTO");
 
-						set("gameMode", new amf::Null());
+						set("gameMode", (amf::Null*)nullptr);
 						set("bannedChampions", new amf::Array());
-						set("spectatorsAllowed", new amf::Null());
-						set("ownerSummary", new amf::Null());
-						set("queueTypeName", new amf::Null());
-						set("optimisticLock", new amf::Null());
-						set("id", new amf::Null());
+						set("spectatorsAllowed", (amf::Null*)nullptr);
+						set("ownerSummary", (amf::Null*)nullptr);
+						set("queueTypeName", (amf::Null*)nullptr);
+						set("optimisticLock", (amf::Null*)nullptr);
+						set("id", (amf::Null*)nullptr);
 						set("teamTwo", new amf::Array());
-						set("gameType", new amf::Null());
+						set("gameType", (amf::Null*)nullptr);
 						set("banOrder", new amf::Array());
-						set("expiryTime", new amf::Null());
+						set("expiryTime", (amf::Null*)nullptr);
 						set("teamOne", new amf::Array());
-						set("gameZonePort", new amf::Null());
-						set("gameZoneHost", new amf::Null());
-						set("gameStateString", new amf::Null());
-						set("name", new amf::Null());
-						set("terminatedCondition", new amf::Null());
-						set("gameTypeConfigId", new amf::Null());
-						set("creationTime", new amf::Null());
+						set("gameZonePort", (amf::Null*)nullptr);
+						set("gameZoneHost", (amf::Null*)nullptr);
+						set("gameStateString", (amf::Null*)nullptr);
+						set("name", (amf::Null*)nullptr);
+						set("terminatedCondition", (amf::Null*)nullptr);
+						set("gameTypeConfigId", (amf::Null*)nullptr);
+						set("creationTime", (amf::Null*)nullptr);
 						set("playerChampionSelections", new amf::Array());
-						set("mapId", new amf::Null());
-						set("gameState", new amf::Null());
-						set("pickTurn", new amf::Null());
-						set("queuePosition", new amf::Null());
+						set("mapId", (amf::Null*)nullptr);
+						set("gameState", (amf::Null*)nullptr);
+						set("pickTurn", (amf::Null*)nullptr);
+						set("queuePosition", (amf::Null*)nullptr);
 						set("observers", new amf::Array());
 						set("accountSpellsMap", new amf::Array());
-						set("spectatorDelay", new amf::Null());
-						set("maxNumPlayers", new amf::Null());
-						set("passwordSet", new amf::Null());
+						set("spectatorDelay", (amf::Null*)nullptr);
+						set("maxNumPlayers", (amf::Null*)nullptr);
+						set("passwordSet", (amf::Null*)nullptr);
 					}
 
-					std::string getGameMode(){
-						return get("gameMode")->toString();
+					std::string getGameMode() const {
+						return get("gameMode");
 					}
 
-					amf::Array* getBannedChampions(){
-						return get("bannedChampions")->toArray();
+					const amf::Reference<amf::Array> getBannedChampions() const {
+						return get("bannedChampions");
 					}
 
-					bool getSpectatorsAllowed(){
-						return get("spectatorsAllowed")->toBool();
+					bool getSpectatorsAllowed() const {
+						return get("spectatorsAllowed");
 					}
 
-					PlayerParticipant* getOwnerSummary(){
-						return (PlayerParticipant*)get("ownerSummary")->toObject();
+					const amf::Reference<PlayerParticipant> getOwnerSummary() const {
+						return get("ownerSummary").toObject();
 					}
 
-					std::string getQueueTypeName(){
-						return get("queueTypeName")->toString();
+					std::string getQueueTypeName() const {
+						return get("queueTypeName");
 					}
 
-					double getOptimisticLock(){
-						return get("optimisticLock")->toDouble();
+					double getOptimisticLock() const {
+						return get("optimisticLock");
 					}
 
-					double getId(){
-						return get("id")->toDouble();
+					double getId() const {
+						return get("id");
 					}
 
-					amf::Array* getTeamTwo(){
-						return get("teamTwo")->toArray();
+					const amf::Reference<amf::Array> getTeamTwo() const {
+						return get("teamTwo");
 					}
 
-					std::string getGameType(){
-						return get("gameType")->toString();
+					std::string getGameType() const {
+						return get("gameType");
 					}
 
-					amf::Array* getBanOrder(){
-						return get("banOrder")->toArray();
+					const amf::Reference<amf::Array> getBanOrder() const {
+						return get("banOrder");
 					}
 
-					double getExpiryTime(){
-						return get("expiryTime")->toDouble();
+					double getExpiryTime() const {
+						return get("expiryTime");
 					}
 
-					amf::Array* getTeamOne(){
-						return get("teamOne")->toArray();
+					const amf::Reference<amf::Array> getTeamOne() const {
+						return get("teamOne");
 					}
 
-					std::string getGameZonePort(){
-						return get("gameZonePort")->toString();
+					std::string getGameZonePort() const {
+						return get("gameZonePort");
 					}
 
-					std::string getGameZoneHost(){
-						return get("gameZoneHost")->toString();
+					std::string getGameZoneHost() const {
+						return get("gameZoneHost");
 					}
 
-					std::string getGameStateString(){
-						return get("gameStateString")->toString();
+					std::string getGameStateString() const {
+						return get("gameStateString");
 					}
 
-					std::string getName(){
-						return get("name")->toString();
+					std::string getName() const {
+						return get("name");
 					}
 
-					std::string getTerminatedCondition(){
-						return get("terminatedCondition")->toString();
+					std::string getTerminatedCondition() const {
+						return get("terminatedCondition");
 					}
 
-					int getGameTypeConfigId(){
-						return get("gameTypeConfigId")->toInt();
+					int getGameTypeConfigId() const {
+						return get("gameTypeConfigId");
 					}
 
-					amf::Date* getCreationTime(){
-						return get("creationTime")->toDate();
+					amf::Date* getCreationTime() const {
+						return get("creationTime").toDate();
 					}
 
-					amf::Array* getPlayerChampionSelections(){
-						return get("playerChampionSelections")->toArray();
+					const amf::Reference<amf::Array> getPlayerChampionSelections() const {
+						return get("playerChampionSelections");
 					}
 
-					int getMapId(){
-						return get("mapId")->toInt();
+					int getMapId() const {
+						return get("mapId");
 					}
 
-					std::string getGameState(){
-						return get("gameState")->toString();
+					std::string getGameState() const {
+						return get("gameState");
 					}
 
-					int getPickTurn(){
-						return get("pickTurn")->toInt();
+					int getPickTurn() const {
+						return get("pickTurn");
 					}
 
-					int getQueuePosition(){
-						return get("queuePosition")->toInt();
+					int getQueuePosition() const {
+						return get("queuePosition");
 					}
 
-					amf::Array* getObservers(){
-						return get("observers")->toArray();
+					const amf::Reference<amf::Array> getObservers() const {
+						return get("observers");
 					}
 
-					amf::Array* getAccountSpellsMap(){
-						return get("accountSpellsMap")->toArray();
+					const amf::Reference<amf::Array> getAccountSpellsMap() const {
+						return get("accountSpellsMap");
 					}
 
-					int getSpectatorDelay(){
-						return get("spectatorDelay")->toInt();
+					int getSpectatorDelay() const {
+						return get("spectatorDelay");
 					}
 
-					int getMaxNumPlayers(){
-						return get("maxNumPlayers")->toInt();
+					int getMaxNumPlayers() const {
+						return get("maxNumPlayers");
 					}
 
-					bool getPasswordSet(){
-						return get("passwordSet")->toBool();
+					bool getPasswordSet() const {
+						return get("passwordSet");
 					}
 
 					void setGameMode(const std::string& value){
-						set("gameMode", amf::object_creator_t(value).mValue);
+						get("gameMode") = value;
 					}
 
 					void setBannedChampions(amf::Array* value){
-						set("bannedChampions", (Variant*)value);
+						get("bannedChampions") = value;
 					}
 
 					void setSpectatorsAllowed(bool value){
-						set("spectatorsAllowed", amf::object_creator_t(value).mValue);
+						get("spectatorsAllowed") = value;
 					}
 
 					void setOwnerSummary(PlayerParticipant* value){
-						set("ownerSummary", (Variant*)value);
+						get("ownerSummary") = value;
 					}
 
 					void setQueueTypeName(const std::string& value){
-						set("queueTypeName", amf::object_creator_t(value).mValue);
+						get("queueTypeName") = value;
 					}
 
 					void setOptimisticLock(double value){
-						set("optimisticLock", amf::object_creator_t(value).mValue);
+						get("optimisticLock") = value;
 					}
 
 					void setId(double value){
-						set("id", amf::object_creator_t(value).mValue);
+						get("id") = value;
 					}
 
 					void setTeamTwo(amf::Array* value){
-						set("teamTwo", (Variant*)value);
+						get("teamTwo") = value;
 					}
 
 					void setGameType(const std::string& value){
-						set("gameType", amf::object_creator_t(value).mValue);
+						get("gameType") = value;
 					}
 
 					void setBanOrder(amf::Array* value){
-						set("banOrder", (Variant*)value);
+						get("banOrder") = value;
 					}
 
 					void setExpiryTime(double value){
-						set("expiryTime", amf::object_creator_t(value).mValue);
+						get("expiryTime") = value;
 					}
 
 					void setTeamOne(amf::Array* value){
-						set("teamOne", (Variant*)value);
+						get("teamOne") = value;
 					}
 
 					void setGameZonePort(const std::string& value){
-						set("gameZonePort", amf::object_creator_t(value).mValue);
+						get("gameZonePort") = value;
 					}
 
 					void setGameZoneHost(const std::string& value){
-						set("gameZoneHost", amf::object_creator_t(value).mValue);
+						get("gameZoneHost") = value;
 					}
 
 					void setGameStateString(const std::string& value){
-						set("gameStateString", amf::object_creator_t(value).mValue);
+						get("gameStateString") = value;
 					}
 
 					void setName(const std::string& value){
-						set("name", amf::object_creator_t(value).mValue);
+						get("name") = value;
 					}
 
 					void setTerminatedCondition(const std::string& value){
-						set("terminatedCondition", amf::object_creator_t(value).mValue);
+						get("terminatedCondition") = value;
 					}
 
 					void setGameTypeConfigId(int value){
-						set("gameTypeConfigId", amf::object_creator_t(value).mValue);
+						get("gameTypeConfigId") = value;
 					}
 
 					void setCreationTime(amf::Date* value){
-						set("creationTime", (Variant*)value);
+						get("creationTime") = value;
 					}
 
 					void setPlayerChampionSelections(amf::Array* value){
-						set("playerChampionSelections", (Variant*)value);
+						get("playerChampionSelections") = value;
 					}
 
 					void setMapId(int value){
-						set("mapId", amf::object_creator_t(value).mValue);
+						get("mapId") = value;
 					}
 
 					void setGameState(const std::string& value){
-						set("gameState", amf::object_creator_t(value).mValue);
+						get("gameState") = value;
 					}
 
 					void setPickTurn(int value){
-						set("pickTurn", amf::object_creator_t(value).mValue);
+						get("pickTurn") = value;
 					}
 
 					void setQueuePosition(int value){
-						set("queuePosition", amf::object_creator_t(value).mValue);
+						get("queuePosition") = value;
 					}
 
 					void setObservers(amf::Array* value){
-						set("observers", (Variant*)value);
+						get("observers") = value;
 					}
 
 					void setAccountSpellsMap(amf::Array* value){
-						set("accountSpellsMap", (Variant*)value);
+						get("accountSpellsMap") = value;
 					}
 
 					void setSpectatorDelay(int value){
-						set("spectatorDelay", amf::object_creator_t(value).mValue);
+						get("spectatorDelay") = value;
 					}
 
 					void setMaxNumPlayers(int value){
-						set("maxNumPlayers", amf::object_creator_t(value).mValue);
+						get("maxNumPlayers") = value;
 					}
 
 					void setPasswordSet(bool value){
-						set("passwordSet", amf::object_creator_t(value).mValue);
+						get("passwordSet") = value;
 					}
 				};
 			};

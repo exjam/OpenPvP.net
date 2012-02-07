@@ -5,6 +5,8 @@
 #include "ui_mainwindow.h"
 
 #include "alertdialog.h"
+
+#include "amf/variant.h"
 #include "riotgames/platform/gameclient/domain/serversessionobject.h"
 
 class StatusDialog;
@@ -37,19 +39,24 @@ public slots:
 private slots:
 	void doHideStatusDialog();
 
-	void onLoginComplete(ServerSessionObject* session);
+	void onLoginComplete(const amf::Reference<ServerSessionObject>& session);
 
 	void performHeartbeat();
-	void onHeartbeatReply(amf::Variant* result);
+	void onHeartbeatReply(const amf::Variant& result);
 
-	void onLoginDataPacket(amf::Variant* result);
-	void onActiveBoosts(amf::Variant* result);
-	void onAvailableChampions(amf::Variant* result);
-	void onAvailableQueues(amf::Variant* result);
-	void onCreatePlayer(amf::Variant* result);
-	void onRuneInventory(amf::Variant* result);
-	void onGetSummonerByName(amf::Variant* result);
-	void onGetSummonerByAccountId(amf::Variant* result);
+	void onLoginDataPacket(const amf::Variant& result);
+	void onActiveBoosts(const amf::Variant& result);
+	void onAvailableChampions(const amf::Variant& result);
+	void onAvailableQueues(const amf::Variant& result);
+	void onCreatePlayer(const amf::Variant& result);
+	void onRuneInventory(const amf::Variant& result);
+	void onGetSummonerByName(const amf::Variant& result);
+	void onGetSummonerByAccountId(const amf::Variant& result);
+	
+	void onChannelSetLogin(const amf::Variant& message);
+	void onGameMessage(const amf::Variant& message);
+	void onClientMessage(const amf::Variant& message);
+	void onBroadcastMessage(const amf::Variant& message);
 
 signals:
 	void _internalHideStatusDialog();
@@ -63,7 +70,7 @@ private:
 	
 	QTimer* mHeartbeatTimer;
 	int mHeartbeatCount;
-	ServerSessionObject* mServerSession;
+	amf::Reference<ServerSessionObject> mServerSession;
 	double mSummonerID;
 };
 

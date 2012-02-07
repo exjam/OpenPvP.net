@@ -6,6 +6,6 @@
 template<typename T>
 static std::string stringify(const T& value){
 	std::stringstream stream;
-	stream << value;
+	stream << std::fixed << value;
 	return stream.str();
 }

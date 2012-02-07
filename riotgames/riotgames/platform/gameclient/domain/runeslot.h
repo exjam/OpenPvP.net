@@ -12,33 +12,33 @@ namespace riotgames {
 					RuneSlot(){
 						setName("com.riotgames.platform.summoner.RuneSlot");
 
-						set("minLevel", new amf::Null());
-						set("id", new amf::Null());
-						set("runeType", new amf::Null());
+						set("minLevel", (amf::Null*)nullptr);
+						set("id", (amf::Null*)nullptr);
+						set("runeType", (amf::Null*)nullptr);
 					}
 
-					int getMinLevel(){
-						return get("minLevel")->toInt();
+					int getMinLevel() const {
+						return get("minLevel");
 					}
 
-					int getId(){
-						return get("id")->toInt();
+					int getId() const {
+						return get("id");
 					}
 
-					RuneType* getRuneType(){
-						return (RuneType*)get("runeType")->toObject();
+					const amf::Reference<RuneType> getRuneType() const {
+						return get("runeType").toObject();
 					}
 
 					void setMinLevel(int value){
-						set("minLevel", amf::object_creator_t(value).mValue);
+						get("minLevel") = value;
 					}
 
 					void setId(int value){
-						set("id", amf::object_creator_t(value).mValue);
+						get("id") = value;
 					}
 
 					void setRuneType(RuneType* value){
-						set("runeType", (Variant*)value);
+						get("runeType") = value;
 					}
 				};
 			};

@@ -14,33 +14,33 @@ namespace riotgames {
 						GameReconnectionInfo(){
 							setName("com.riotgames.platform.game.GameReconnectionInfo");
 
-							set("game", new amf::Null());
-							set("reconnectDelay", new amf::Null());
-							set("playerCredentials", new amf::Null());
+							set("game", (amf::Null*)nullptr);
+							set("reconnectDelay", (amf::Null*)nullptr);
+							set("playerCredentials", (amf::Null*)nullptr);
 						}
 
-						GameDTO* getGame(){
-							return (GameDTO*)get("game")->toObject();
+						const amf::Reference<GameDTO> getGame() const {
+							return get("game").toObject();
 						}
 
-						int getReconnectDelay(){
-							return get("reconnectDelay")->toInt();
+						int getReconnectDelay() const {
+							return get("reconnectDelay");
 						}
 
-						PlayerCredentialsDTO* getPlayerCredentials(){
-							return (PlayerCredentialsDTO*)get("playerCredentials")->toObject();
+						const amf::Reference<PlayerCredentialsDTO> getPlayerCredentials() const {
+							return get("playerCredentials").toObject();
 						}
 
 						void setGame(GameDTO* value){
-							set("game", (Variant*)value);
+							get("game") = value;
 						}
 
 						void setReconnectDelay(int value){
-							set("reconnectDelay", amf::object_creator_t(value).mValue);
+							get("reconnectDelay") = value;
 						}
 
 						void setPlayerCredentials(PlayerCredentialsDTO* value){
-							set("playerCredentials", (Variant*)value);
+							get("playerCredentials") = value;
 						}
 					};
 				};

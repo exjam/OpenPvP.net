@@ -13,24 +13,24 @@ namespace riotgames {
 					SlotEntry(){
 						setName("com.riotgames.platform.summoner.spellbook.SlotEntry");
 
-						set("rune", new amf::Null());
-						set("runeSlot", new amf::Null());
+						set("rune", (amf::Null*)nullptr);
+						set("runeSlot", (amf::Null*)nullptr);
 					}
 
-					Rune* getRune(){
-						return (Rune*)get("rune")->toObject();
+					const amf::Reference<Rune> getRune() const {
+						return get("rune").toObject();
 					}
 
-					RuneSlot* getRuneSlot(){
-						return (RuneSlot*)get("runeSlot")->toObject();
+					const amf::Reference<RuneSlot> getRuneSlot() const {
+						return get("runeSlot").toObject();
 					}
 
 					void setRune(Rune* value){
-						set("rune", (Variant*)value);
+						get("rune") = value;
 					}
 
 					void setRuneSlot(RuneSlot* value){
-						set("runeSlot", (Variant*)value);
+						get("runeSlot") = value;
 					}
 				};
 			};

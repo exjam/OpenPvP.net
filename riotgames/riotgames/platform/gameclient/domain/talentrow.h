@@ -12,51 +12,51 @@ namespace riotgames {
 					TalentRow(){
 						setName("com.riotgames.platform.summoner.TalentRow");
 
-						set("tltRowId", new amf::Null());
+						set("tltRowId", (amf::Null*)nullptr);
 						set("talents", new amf::Array());
-						set("tltGroupId", new amf::Null());
-						set("pointsToActivate", new amf::Null());
-						set("index", new amf::Null());
+						set("tltGroupId", (amf::Null*)nullptr);
+						set("pointsToActivate", (amf::Null*)nullptr);
+						set("index", (amf::Null*)nullptr);
 					}
 
-					int getTltRowId(){
-						return get("tltRowId")->toInt();
+					int getTltRowId() const {
+						return get("tltRowId");
 					}
 
-					amf::Array_t<Talent*>* getTalents(){
-						return (amf::Array_t<Talent*>*)get("talents")->toArray();
+					amf::TypedArray<Talent*>* getTalents() const {
+						return (amf::TypedArray<Talent*>*)(amf::Array*)get("talents");
 					}
 
-					int getTltGroupId(){
-						return get("tltGroupId")->toInt();
+					int getTltGroupId() const {
+						return get("tltGroupId");
 					}
 
-					int getPointsToActivate(){
-						return get("pointsToActivate")->toInt();
+					int getPointsToActivate() const {
+						return get("pointsToActivate");
 					}
 
-					int getIndex(){
-						return get("index")->toInt();
+					int getIndex() const {
+						return get("index");
 					}
 
 					void setTltRowId(int value){
-						set("tltRowId", amf::object_creator_t(value).mValue);
+						get("tltRowId") = value;
 					}
 
 					void setTalents(amf::Array* value){
-						set("talents", (Variant*)value);
+						get("talents") = value;
 					}
 
 					void setTltGroupId(int value){
-						set("tltGroupId", amf::object_creator_t(value).mValue);
+						get("tltGroupId") = value;
 					}
 
 					void setPointsToActivate(int value){
-						set("pointsToActivate", amf::object_creator_t(value).mValue);
+						get("pointsToActivate") = value;
 					}
 
 					void setIndex(int value){
-						set("index", amf::object_creator_t(value).mValue);
+						get("index") = value;
 					}
 				};
 			};

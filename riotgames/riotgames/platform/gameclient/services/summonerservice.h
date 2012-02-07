@@ -17,11 +17,11 @@ namespace riotgames {
 					}
 
 					void changeTalentRankings(double param1, amf::Object* param2, const rtmp::CommandCallback& callback){
-						invoke("changeTalentRankings", callback, &amf::Number(param1), param2);
+						invoke("changeTalentRankings", callback, param1, param2);
 					}
 
 					void checkSummonerName(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("checkSummonerName", callback, &amf::String(param1));
+						invoke("checkSummonerName", callback, param1);
 					}
 
 					void getSocialNetworkFriends(const rtmp::CommandCallback& callback){
@@ -29,19 +29,19 @@ namespace riotgames {
 					}
 
 					void getAllSummonerData(double param1, const rtmp::CommandCallback& callback){
-						invoke("getAllSummonerData", callback, &amf::Number(param1));
+						invoke("getAllSummonerData", callback, param1);
 					}
 
 					void getSummoner(double param1, const rtmp::CommandCallback& callback){
-						invoke("getSummoner", callback, &amf::Number(param1));
+						invoke("getSummoner", callback, param1);
 					}
 
 					void getSummonerByName(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("getSummonerByName", callback, &amf::String(param1));
+						invoke("getSummonerByName", callback, param1);
 					}
 
 					void saveSocialNetworkFriendList(amf::Array* param1, amf::Array* param2, const std::string& param3, const rtmp::CommandCallback& callback){
-						invoke("saveSocialNetworkFriendList", callback, param1, param2, &amf::String(param3));
+						invoke("saveSocialNetworkFriendList", callback, param1, param2, param3);
 					}
 
 					void getPublicSummonersByAccountIds(amf::Array* param1, const rtmp::CommandCallback& callback){
@@ -49,7 +49,7 @@ namespace riotgames {
 					}
 
 					void getAllPublicSummonerDataByAccount(double param1, const rtmp::CommandCallback& callback){
-						invoke("getAllPublicSummonerDataByAccount", callback, &amf::Number(param1));
+						invoke("getAllPublicSummonerDataByAccount", callback, param1);
 					}
 
 					void saveSummoner(Summoner* param1, const rtmp::CommandCallback& callback){
@@ -57,11 +57,11 @@ namespace riotgames {
 					}
 
 					void getSummonerByAccountId(double param1, const rtmp::CommandCallback& callback){
-						invoke("getSummonerByAccountId", callback, &amf::Number(param1));
+						invoke("getSummonerByAccountId", callback, param1);
 					}
 
 					void getSummonerInternalNameByName(const std::string& param1, amf::Object* param5, const rtmp::CommandCallback& callback){
-						invoke("getSummonerInternalNameByName", callback, &amf::String(param1), param5);
+						invoke("getSummonerInternalNameByName", callback, param1, param5);
 					}
 
 					void createSummoner(Summoner* param1, const rtmp::CommandCallback& callback){
@@ -69,11 +69,11 @@ namespace riotgames {
 					}
 
 					void getAllSummonerDataByAccount(double param1, const rtmp::CommandCallback& callback){
-						invoke("getAllSummonerDataByAccount", callback, &amf::Number(param1));
+						invoke("getAllSummonerDataByAccount", callback, param1);
 					}
 
 					void updateProfileIconId(int param1, const rtmp::CommandCallback& callback){
-						invoke("updateProfileIconId", callback, &amf::Integer(param1));
+						invoke("updateProfileIconId", callback, param1);
 					}
 
 					void getSummonerCatalog(const rtmp::CommandCallback& callback){
@@ -81,7 +81,7 @@ namespace riotgames {
 					}
 
 					void updateSummonerSocialNetworkUser(const std::string& param1, const std::string& param2, const std::string& param3, const rtmp::CommandCallback& callback){
-						invoke("updateSummonerSocialNetworkUser", callback, &amf::String(param1), &amf::String(param2), &amf::String(param3));
+						invoke("updateSummonerSocialNetworkUser", callback, param1, param2, param3);
 					}
 
 					void createStubSummoner(const rtmp::CommandCallback& callback){
@@ -89,11 +89,11 @@ namespace riotgames {
 					}
 
 					void playerChangeSummonerName(double param1, const std::string& param2, const rtmp::CommandCallback& callback){
-						invoke("playerChangeSummonerName", callback, &amf::Number(param1), &amf::String(param2));
+						invoke("playerChangeSummonerName", callback, param1, param2);
 					}
 
 					void createDefaultSummoner(const std::string& param1, const rtmp::CommandCallback& callback){
-						invoke("createDefaultSummoner", callback, &amf::String(param1));
+						invoke("createDefaultSummoner", callback, param1);
 					}
 
 					void getSummonerNames(amf::Array* param1, const rtmp::CommandCallback& callback){
@@ -101,11 +101,11 @@ namespace riotgames {
 					}
 
 					void getSocialNetworkUsers(amf::Array* param1, const std::string& param2, const rtmp::CommandCallback& callback){
-						invoke("getSocialNetworkUsers", callback, param1, &amf::String(param2));
+						invoke("getSocialNetworkUsers", callback, param1, param2);
 					}
 
 					void resetTalents(double param1, const rtmp::CommandCallback& callback){
-						invoke("resetTalents", callback, &amf::Number(param1));
+						invoke("resetTalents", callback, param1);
 					}
 				};
 

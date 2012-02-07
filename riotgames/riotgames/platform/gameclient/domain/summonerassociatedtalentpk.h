@@ -11,24 +11,24 @@ namespace riotgames {
 					SummonerAssociatedTalentPK(){
 						setName("com.riotgames.platform.summoner.SummonerAssociatedTalentPK");
 
-						set("tltId", new amf::Null());
-						set("sumId", new amf::Null());
+						set("tltId", (amf::Null*)nullptr);
+						set("sumId", (amf::Null*)nullptr);
 					}
 
-					int getTltId(){
-						return get("tltId")->toInt();
+					int getTltId() const {
+						return get("tltId");
 					}
 
-					double getSumId(){
-						return get("sumId")->toDouble();
+					double getSumId() const {
+						return get("sumId");
 					}
 
 					void setTltId(int value){
-						set("tltId", amf::object_creator_t(value).mValue);
+						get("tltId") = value;
 					}
 
 					void setSumId(double value){
-						set("sumId", amf::object_creator_t(value).mValue);
+						get("sumId") = value;
 					}
 				};
 			};

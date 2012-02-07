@@ -20,15 +20,19 @@
     <ClInclude Include="riotgames\platform\gameclient\domain\accountsummary.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\allsummonerdata.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\basesummoner.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\botparticipant.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\broadcast\broadcastnotification.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\champion.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\championskin.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\gameconfig\gametypeconfig.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\gamedto.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\gamezone.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\game\gamemap.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\game\gamequeueconfig.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\game\gamereconnectioninfo.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\inventory\activeboosts.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\logindatapacket.h" />
+    <ClInclude Include="riotgames\platform\gameclient\domain\newgamesummary.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\playercomplaint.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\playercredentialsdto.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\playerparticipant.h" />
@@ -61,6 +65,7 @@
     <ClInclude Include="riotgames\platform\gameclient\domain\talentgroup.h" />
     <ClInclude Include="riotgames\platform\gameclient\domain\talentrow.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\clientfacadeservice.h" />
+    <ClInclude Include="riotgames\platform\gameclient\services\gameservice.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\matchmakerservice.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\summonerruneservice.h" />
     <ClInclude Include="riotgames\platform\gameclient\services\summonerservice.h" />

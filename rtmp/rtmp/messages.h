@@ -2,10 +2,7 @@
 
 #include "types.h"
 #include "packet.h"
-
-namespace amf {
-	class Object;
-};
+#include "amf/variant.h"
 
 namespace rtmp {
 	typedef enum ProtocolControlMessages {
@@ -62,18 +59,18 @@ namespace rtmp {
 			static const int Type = AMF0_COMMAND;
 			
 			Amf0Command(Packet& source);
-			Amf0Command(const std::string& name, amf::Object* object);
+			Amf0Command(const std::string& name, amf::Variant& object);
 			~Amf0Command();
 
 			Packet* packet();
 			const std::string& name();
-			amf::Object* properties();
-			amf::Object* information();
+			const amf::Variant& properties();
+			const amf::Variant& information();
 
 		protected:
 			std::string mName;
-			amf::Object* mProperties;
-			amf::Object* mInformation;
+			amf::Variant mProperties;
+			amf::Variant mInformation;
 		};
 
 		class Amf3Command : public AmfCommand, protected Packet {
@@ -81,15 +78,15 @@ namespace rtmp {
 			static const int Type = AMF3_COMMAND;
 			
 			Amf3Command(Packet& source);
-			Amf3Command(amf::Object* object);
+			Amf3Command(amf::Variant& object);
 
 			~Amf3Command();
 
 			Packet* packet();
-			amf::Object* object();
+			const amf::Variant& object();
 
 		private:
-			amf::Object* mObject;
+			amf::Variant mObject;
 		};
 	};
 };

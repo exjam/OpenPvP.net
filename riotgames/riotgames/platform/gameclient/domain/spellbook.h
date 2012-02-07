@@ -13,33 +13,33 @@ namespace riotgames {
 						setName("com.riotgames.platform.summoner.spellbook.SpellBook");
 
 						set("spellBookPages", new amf::Array());
-						set("dateString", new amf::Null());
-						set("summonerId", new amf::Null());
-						set("bindingEventDispatcher", new amf::Null());
+						set("dateString", (amf::Null*)nullptr);
+						set("summonerId", (amf::Null*)nullptr);
+						set("bindingEventDispatcher", (amf::Null*)nullptr);
 					}
 
-					amf::Array_t<SpellBookPage*>* getSpellBookPages(){
-						return (amf::Array_t<SpellBookPage*>*)get("spellBookPages")->toArray();
+					amf::TypedArray<SpellBookPage*>* getSpellBookPages() const {
+						return (amf::TypedArray<SpellBookPage*>*)(amf::Array*)get("spellBookPages");
 					}
 
-					std::string getDateString(){
-						return get("dateString")->toString();
+					std::string getDateString() const {
+						return get("dateString");
 					}
 
-					double getSummonerId(){
-						return get("summonerId")->toDouble();
+					double getSummonerId() const {
+						return get("summonerId");
 					}
 
 					void setSpellBookPages(amf::Array* value){
-						set("spellBookPages", (Variant*)value);
+						get("spellBookPages") = value;
 					}
 
 					void setDateString(const std::string& value){
-						set("dateString", amf::object_creator_t(value).mValue);
+						get("dateString") = value;
 					}
 
 					void setSummonerId(double value){
-						set("summonerId", amf::object_creator_t(value).mValue);
+						get("summonerId") = value;
 					}
 				};
 			};

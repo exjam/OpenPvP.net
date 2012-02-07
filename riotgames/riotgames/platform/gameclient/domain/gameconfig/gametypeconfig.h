@@ -12,87 +12,87 @@ namespace riotgames {
 						GameTypeConfig(){
 							setName("com.riotgames.platform.game.GameTypeConfigDTO");
 
-							set("name", new amf::Null());
-							set("mainPickTimerDuration", new amf::Null());
-							set("maxAllowableBans", new amf::Null());
-							set("pickMode", amf::object_creator_t("DraftModeSinglePickStrategy").mValue);
-							set("exclusivePick", new amf::Null());
-							set("postPickTimerDuration", new amf::Null());
-							set("allowTrades", new amf::Null());
-							set("id", new amf::Null());
-							set("banTimerDuration", new amf::Null());
+							set("name", (amf::Null*)nullptr);
+							set("mainPickTimerDuration", (amf::Null*)nullptr);
+							set("maxAllowableBans", (amf::Null*)nullptr);
+							set("pickMode", "DraftModeSinglePickStrategy");
+							set("exclusivePick", (amf::Null*)nullptr);
+							set("postPickTimerDuration", (amf::Null*)nullptr);
+							set("allowTrades", (amf::Null*)nullptr);
+							set("id", (amf::Null*)nullptr);
+							set("banTimerDuration", (amf::Null*)nullptr);
 						}
 
-						std::string getName(){
-							return get("name")->toString();
+						std::string getName() const {
+							return get("name");
 						}
 
-						double getMainPickTimerDuration(){
-							return get("mainPickTimerDuration")->toDouble();
+						double getMainPickTimerDuration() const {
+							return get("mainPickTimerDuration");
 						}
 
-						int getMaxAllowableBans(){
-							return get("maxAllowableBans")->toInt();
+						int getMaxAllowableBans() const {
+							return get("maxAllowableBans");
 						}
 
-						std::string getPickMode(){
-							return get("pickMode")->toString();
+						std::string getPickMode() const {
+							return get("pickMode");
 						}
 
-						bool getExclusivePick(){
-							return get("exclusivePick")->toBool();
+						bool getExclusivePick() const {
+							return get("exclusivePick");
 						}
 
-						double getPostPickTimerDuration(){
-							return get("postPickTimerDuration")->toDouble();
+						double getPostPickTimerDuration() const {
+							return get("postPickTimerDuration");
 						}
 
-						bool getAllowTrades(){
-							return get("allowTrades")->toBool();
+						bool getAllowTrades() const {
+							return get("allowTrades");
 						}
 
-						double getId(){
-							return get("id")->toDouble();
+						double getId() const {
+							return get("id");
 						}
 
-						double getBanTimerDuration(){
-							return get("banTimerDuration")->toDouble();
+						double getBanTimerDuration() const {
+							return get("banTimerDuration");
 						}
 
 						void setName(const std::string& value){
-							set("name", amf::object_creator_t(value).mValue);
+							get("name") = value;
 						}
 
 						void setMainPickTimerDuration(double value){
-							set("mainPickTimerDuration", amf::object_creator_t(value).mValue);
+							get("mainPickTimerDuration") = value;
 						}
 
 						void setMaxAllowableBans(int value){
-							set("maxAllowableBans", amf::object_creator_t(value).mValue);
+							get("maxAllowableBans") = value;
 						}
 
 						void setPickMode(const std::string& value){
-							set("pickMode", amf::object_creator_t(value).mValue);
+							get("pickMode") = value;
 						}
 
 						void setExclusivePick(bool value){
-							set("exclusivePick", amf::object_creator_t(value).mValue);
+							get("exclusivePick") = value;
 						}
 
 						void setPostPickTimerDuration(double value){
-							set("postPickTimerDuration", amf::object_creator_t(value).mValue);
+							get("postPickTimerDuration") = value;
 						}
 
 						void setAllowTrades(bool value){
-							set("allowTrades", amf::object_creator_t(value).mValue);
+							get("allowTrades") = value;
 						}
 
 						void setId(double value){
-							set("id", amf::object_creator_t(value).mValue);
+							get("id") = value;
 						}
 
 						void setBanTimerDuration(double value){
-							set("banTimerDuration", amf::object_creator_t(value).mValue);
+							get("banTimerDuration") = value;
 						}
 					};
 				};

@@ -30,6 +30,29 @@ public:
 		ui.rpCount->setText(QString("%1").arg(value));
 	}
 
+public slots:
+	void _store(){
+		emit store();
+	}
+
+	void _profile(){
+		emit profile();
+	}
+
+	void _lore(){
+		emit lore();
+	}
+
+	void _help(){
+		emit help();
+	}
+
+signals:
+	void store();
+	void profile();
+	void lore();
+	void help();
+
 private:
 	Ui::SummonerInfo ui;
 };

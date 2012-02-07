@@ -12,34 +12,34 @@ namespace riotgames {
 					SummonerDefaultSpells(){
 						setName("com.riotgames.platform.summoner.SummonerDefaultSpells");
 
-						set("bindingEventDispatcher", new amf::Null());
-						set("spellDefault1", new amf::Null());
-						set("summonerId", new amf::Null());
-						set("spellDefault2", new amf::Null());
+						set("bindingEventDispatcher", (amf::Null*)nullptr);
+						set("spellDefault1", (amf::Null*)nullptr);
+						set("summonerId", (amf::Null*)nullptr);
+						set("spellDefault2", (amf::Null*)nullptr);
 					}
 
-					Spell* getSpellDefault1(){
-						return (Spell*)get("spellDefault1")->toObject();
+					const amf::Reference<Spell> getSpellDefault1() const {
+						return get("spellDefault1").toObject();
 					}
 
-					double getSummonerId(){
-						return get("summonerId")->toDouble();
+					double getSummonerId() const {
+						return get("summonerId");
 					}
 
-					Spell* getSpellDefault2(){
-						return (Spell*)get("spellDefault2")->toObject();
+					const amf::Reference<Spell> getSpellDefault2() const {
+						return get("spellDefault2").toObject();
 					}
 
 					void setSpellDefault1(Spell* value){
-						set("spellDefault1", (Variant*)value);
+						get("spellDefault1") = value;
 					}
 
 					void setSummonerId(double value){
-						set("summonerId", amf::object_creator_t(value).mValue);
+						get("summonerId") = value;
 					}
 
 					void setSpellDefault2(Spell* value){
-						set("spellDefault2", (Variant*)value);
+						get("spellDefault2") = value;
 					}
 				};
 			};

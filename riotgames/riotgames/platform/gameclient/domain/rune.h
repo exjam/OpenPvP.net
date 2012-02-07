@@ -12,24 +12,24 @@ namespace riotgames {
 					Rune(){
 						setName("com.riotgames.platform.summoner.Rune");
 
-						set("imagePath", new amf::Null());
-						set("runeType", new amf::Null());
+						set("imagePath", (amf::Null*)nullptr);
+						set("runeType", (amf::Null*)nullptr);
 					}
 
-					std::string getImagePath(){
-						return get("imagePath")->toString();
+					std::string getImagePath() const {
+						return get("imagePath");
 					}
 
-					RuneType* getRuneType(){
-						return (RuneType*)get("runeType")->toObject();
+					const amf::Reference<RuneType> getRuneType() const {
+						return get("runeType").toObject();
 					}
 
 					void setImagePath(const std::string& value){
-						set("imagePath", amf::object_creator_t(value).mValue);
+						get("imagePath") = value;
 					}
 
 					void setRuneType(RuneType* value){
-						set("runeType", (Variant*)value);
+						get("runeType") = value;
 					}
 				};
 			};

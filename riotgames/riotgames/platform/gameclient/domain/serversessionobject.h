@@ -12,33 +12,33 @@ namespace riotgames {
 					ServerSessionObject(){
 						setName("com.riotgames.platform.login.Session");
 
-						set("token", new amf::Null());
-						set("accountSummary", new amf::Null());
-						set("password", new amf::Null());
+						set("token", (amf::Null*)nullptr);
+						set("accountSummary", (amf::Null*)nullptr);
+						set("password", (amf::Null*)nullptr);
 					}
 
-					std::string getToken(){
-						return get("token")->toString();
+					std::string getToken() const {
+						return get("token");
 					}
 
-					AccountSummary* getAccountSummary(){
-						return (AccountSummary*)get("accountSummary")->toObject();
+					const amf::Reference<AccountSummary> getAccountSummary() const {
+						return get("accountSummary").toObject();
 					}
 
-					std::string getPassword(){
-						return get("password")->toString();
+					std::string getPassword() const {
+						return get("password");
 					}
 
 					void setToken(const std::string& value){
-						set("token", amf::object_creator_t(value).mValue);
+						get("token") = value;
 					}
 
 					void setAccountSummary(AccountSummary* value){
-						set("accountSummary", (Variant*)value);
+						get("accountSummary") = value;
 					}
 
 					void setPassword(const std::string& value){
-						set("password", amf::object_creator_t(value).mValue);
+						get("password") = value;
 					}
 				};
 			};

@@ -3,24 +3,31 @@
 
 #include <QWidget>
 #include "ui_lobbyscreen.h"
+#include "amf/variant.h"
 
 class LobbyScreen : public QWidget
 {
 	Q_OBJECT
 
 public:
-	LobbyScreen(QWidget *parent = 0)
-		: QWidget(parent)
-	{
-		ui.setupUi(this);
-	}
+	LobbyScreen(QWidget *parent = 0);
+	~LobbyScreen();
 
-	~LobbyScreen(){
-	}
+	SummonerInfoWidget* getSummonerInfoWidget();
 
-	SummonerInfoWidget* getSummonerInfoWidget(){
-		return ui.summonerInfo;
-	}
+	void onGetStoreUrl(const amf::Variant& result);
+
+public slots:
+	void play();
+	void home();
+	void lore();
+	void help();
+	void store();
+	void profile();
+	void openUrl(const QString& url);
+
+signals:
+	void openStore(const QString& url);
 
 private:
 	Ui::LobbyScreen ui;

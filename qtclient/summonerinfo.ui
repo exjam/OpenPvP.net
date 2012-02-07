@@ -337,5 +337,80 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>store</sender>
+   <signal>clicked()</signal>
+   <receiver>SummonerInfo</receiver>
+   <slot>_store()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>116</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>profile</sender>
+   <signal>clicked()</signal>
+   <receiver>SummonerInfo</receiver>
+   <slot>_profile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>208</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lore</sender>
+   <signal>clicked()</signal>
+   <receiver>SummonerInfo</receiver>
+   <slot>_lore()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>300</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>help</sender>
+   <signal>clicked()</signal>
+   <receiver>SummonerInfo</receiver>
+   <slot>_help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>391</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>store()</signal>
+  <signal>profile()</signal>
+  <signal>lore()</signal>
+  <signal>help()</signal>
+  <slot>_store()</slot>
+  <slot>_profile()</slot>
+  <slot>_lore()</slot>
+  <slot>_help()</slot>
+ </slots>
 </ui>

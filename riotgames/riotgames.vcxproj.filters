@@ -213,6 +213,21 @@
     <ClInclude Include="riotgames\platform\gameclient\services\summonerservice.h">
       <Filter>Header Files\gameclient\services</Filter>
     </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\services\gameservice.h">
+      <Filter>Header Files\gameclient\services</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\botparticipant.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\game\gamemap.h">
+      <Filter>Header Files\gameclient\domain\game</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\newgamesummary.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
+    <ClInclude Include="riotgames\platform\gameclient\domain\gamezone.h">
+      <Filter>Header Files\gameclient\domain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="riotgames.cpp">

@@ -15,12 +15,12 @@ namespace riotgames {
 						set("stats", new amf::Array());
 					}
 
-					amf::Array_t<SummaryAggStat*>* getStats(){
-						return (amf::Array_t<SummaryAggStat*>*)get("stats")->toArray();
+					amf::TypedArray<SummaryAggStat*>* getStats() const {
+						return (amf::TypedArray<SummaryAggStat*>*)(amf::Array*)get("stats");
 					}
 
 					void setStats(amf::Array* value){
-						set("stats", (Variant*)value);
+						get("stats") = value;
 					}
 				};
 			};

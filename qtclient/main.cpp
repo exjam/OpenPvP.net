@@ -1,15 +1,17 @@
 #include "mainwindow.h"
 #include "connection.h"
 #include "riotgames.h"
-#include <QtGui/QApplication>
+
+#include <QApplication>
+#include <QFontDatabase>
 
 MainWindow* gMainWindow;
 Connection* gConnection;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
 	riotgames::init();
 	QApplication a(argc, argv);
+	int id = QFontDatabase::addApplicationFont("assets/fonts/frizquadratatt.ttf");
 
 	gConnection = new Connection();
 	gMainWindow = new MainWindow();

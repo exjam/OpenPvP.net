@@ -3,6 +3,7 @@
 #include "riotgames/platform/common/services/inventoryservice.h"
 #include "riotgames/platform/gameclient/services/matchmakerservice.h"
 #include "riotgames/platform/gameclient/services/clientfacadeservice.h"
+#include "riotgames/platform/gameclient/services/gameservice.h"
 #include "riotgames/platform/gameclient/services/teamservice.h"
 #include "riotgames/platform/gameclient/services/summonerservice.h"
 #include "riotgames/platform/gameclient/services/summonerruneservice.h"
@@ -26,6 +27,7 @@ namespace riotgames {
 				SummonerRuneService summonerRuneService;
 				TeamService summonerTeamService;
 				SummonerService summonerService;
+				GameService gameService;
 			};
 		};
 	};

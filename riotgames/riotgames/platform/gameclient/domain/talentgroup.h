@@ -13,41 +13,41 @@ namespace riotgames {
 						setName("com.riotgames.platform.summoner.TalentGroup");
 
 						set("talentRows", new amf::Array());
-						set("tltGroupId", new amf::Null());
-						set("name", new amf::Null());
-						set("index", new amf::Null());
+						set("tltGroupId", (amf::Null*)nullptr);
+						set("name", (amf::Null*)nullptr);
+						set("index", (amf::Null*)nullptr);
 					}
 
-					amf::Array_t<TalentRow*>* getTalentRows(){
-						return (amf::Array_t<TalentRow*>*)get("talentRows")->toArray();
+					amf::TypedArray<TalentRow*>* getTalentRows() const {
+						return (amf::TypedArray<TalentRow*>*)(amf::Array*)get("talentRows");
 					}
 
-					int getTltGroupId(){
-						return get("tltGroupId")->toInt();
+					int getTltGroupId() const {
+						return get("tltGroupId");
 					}
 
-					std::string getName(){
-						return get("name")->toString();
+					std::string getName() const {
+						return get("name");
 					}
 
-					int getIndex(){
-						return get("index")->toInt();
+					int getIndex() const {
+						return get("index");
 					}
 
 					void setTalentRows(amf::Array* value){
-						set("talentRows", (Variant*)value);
+						get("talentRows") = value;
 					}
 
 					void setTltGroupId(int value){
-						set("tltGroupId", amf::object_creator_t(value).mValue);
+						get("tltGroupId") = value;
 					}
 
 					void setName(const std::string& value){
-						set("name", amf::object_creator_t(value).mValue);
+						get("name") = value;
 					}
 
 					void setIndex(int value){
-						set("index", amf::object_creator_t(value).mValue);
+						get("index") = value;
 					}
 				};
 			};

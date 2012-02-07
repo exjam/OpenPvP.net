@@ -11,51 +11,51 @@ namespace riotgames {
 					BaseSummoner(){
 						setName("com.riotgames.platform.summoner.BaseSummoner");
 
-						set("profileIconId", new amf::Null());
-						set("summonerId", new amf::Null());
-						set("acctId", new amf::Null());
-						set("name", new amf::Null());
-						set("internalName", new amf::Null());
+						set("profileIconId", (amf::Null*)nullptr);
+						set("summonerId", (amf::Null*)nullptr);
+						set("acctId", (amf::Null*)nullptr);
+						set("name", (amf::Null*)nullptr);
+						set("internalName", (amf::Null*)nullptr);
 					}
 
-					int getProfileIconId(){
-						return get("profileIconId")->toInt();
+					int getProfileIconId() const {
+						return get("profileIconId");
 					}
 
-					double getSummonerId(){
-						return get("summonerId")->toDouble();
+					double getSummonerId() const {
+						return get("summonerId");
 					}
 
-					double getAcctId(){
-						return get("acctId")->toDouble();
+					double getAcctId() const {
+						return get("acctId");
 					}
 
-					std::string getName(){
-						return get("name")->toString();
+					std::string getName() const {
+						return get("name");
 					}
 
-					std::string getInternalName(){
-						return get("internalName")->toString();
+					std::string getInternalName() const {
+						return get("internalName");
 					}
 
 					void setProfileIconId(int value){
-						set("profileIconId", amf::object_creator_t(value).mValue);
+						get("profileIconId") = value;
 					}
 
 					void setSummonerId(double value){
-						set("summonerId", amf::object_creator_t(value).mValue);
+						get("summonerId") = value;
 					}
 
 					void setAcctId(double value){
-						set("acctId", amf::object_creator_t(value).mValue);
+						get("acctId") = value;
 					}
 
 					void setName(const std::string& value){
-						set("name", amf::object_creator_t(value).mValue);
+						get("name") = value;
 					}
 
 					void setInternalName(const std::string& value){
-						set("internalName", amf::object_creator_t(value).mValue);
+						get("internalName") = value;
 					}
 				};
 			};

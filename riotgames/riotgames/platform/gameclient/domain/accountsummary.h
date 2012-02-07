@@ -12,96 +12,96 @@ namespace riotgames {
 					AccountSummary(){
 						setName("com.riotgames.platform.account.AccountSummary");
 
-						set("summonerName", new amf::Null());
+						set("summonerName", (amf::Null*)nullptr);
 						set("items", new amf::Array());
-						set("partnerMode", amf::object_creator_t(false).mValue);
-						set("admin", amf::object_creator_t(false).mValue);
-						set("hasBetaAccess", amf::object_creator_t(false).mValue);
-						set("accountId", new amf::Null());
-						set("username", new amf::Null());
-						set("needsPasswordReset", amf::object_creator_t(false).mValue);
-						set("summonerInternalName", new amf::Null());
-						set("groupCount", amf::object_creator_t(0).mValue);
+						set("partnerMode", false);
+						set("admin", false);
+						set("hasBetaAccess", false);
+						set("accountId", (amf::Null*)nullptr);
+						set("username", (amf::Null*)nullptr);
+						set("needsPasswordReset", false);
+						set("summonerInternalName", (amf::Null*)nullptr);
+						set("groupCount", 0);
 					}
 
-					std::string getSummonerName(){
-						return get("summonerName")->toString();
+					std::string getSummonerName() const {
+						return get("summonerName");
 					}
 
-					amf::Array* getItems(){
-						return get("items")->toArray();
+					const amf::Reference<amf::Array> getItems() const {
+						return get("items");
 					}
 
-					bool getPartnerMode(){
-						return get("partnerMode")->toBool();
+					bool getPartnerMode() const {
+						return get("partnerMode");
 					}
 
-					bool getAdmin(){
-						return get("admin")->toBool();
+					bool getAdmin() const {
+						return get("admin");
 					}
 
-					bool getHasBetaAccess(){
-						return get("hasBetaAccess")->toBool();
+					bool getHasBetaAccess() const {
+						return get("hasBetaAccess");
 					}
 
-					double getAccountId(){
-						return get("accountId")->toDouble();
+					double getAccountId() const {
+						return get("accountId");
 					}
 
-					std::string getUsername(){
-						return get("username")->toString();
+					std::string getUsername() const {
+						return get("username");
 					}
 
-					bool getNeedsPasswordReset(){
-						return get("needsPasswordReset")->toBool();
+					bool getNeedsPasswordReset() const {
+						return get("needsPasswordReset");
 					}
 
-					std::string getSummonerInternalName(){
-						return get("summonerInternalName")->toString();
+					std::string getSummonerInternalName() const {
+						return get("summonerInternalName");
 					}
 
-					double getGroupCount(){
-						return get("groupCount")->toDouble();
+					double getGroupCount() const {
+						return get("groupCount");
 					}
 
 					void setSummonerName(const std::string& value){
-						set("summonerName", amf::object_creator_t(value).mValue);
+						get("summonerName") = value;
 					}
 
 					void setItems(amf::Array* value){
-						set("items", (Variant*)value);
+						get("items") = value;
 					}
 
 					void setPartnerMode(bool value){
-						set("partnerMode", amf::object_creator_t(value).mValue);
+						get("partnerMode") = value;
 					}
 
 					void setAdmin(bool value){
-						set("admin", amf::object_creator_t(value).mValue);
+						get("admin") = value;
 					}
 
 					void setHasBetaAccess(bool value){
-						set("hasBetaAccess", amf::object_creator_t(value).mValue);
+						get("hasBetaAccess") = value;
 					}
 
 					void setAccountId(double value){
-						set("accountId", amf::object_creator_t(value).mValue);
+						get("accountId") = value;
 					}
 
 					void setUsername(const std::string& value){
-						set("username", amf::object_creator_t(value).mValue);
+						get("username") = value;
 					}
 
 					void setNeedsPasswordReset(bool value){
-						set("needsPasswordReset", amf::object_creator_t(value).mValue);
+						get("needsPasswordReset") = value;
 					}
 
 					void setSummonerInternalName(const std::string& value){
-						set("summonerInternalName", amf::object_creator_t(value).mValue);
+						get("summonerInternalName") = value;
 					}
 
 					void setGroupCount(double value){
-						set("groupCount", amf::object_creator_t(value).mValue);
+						get("groupCount") = value;
 					}
 				};
 			};

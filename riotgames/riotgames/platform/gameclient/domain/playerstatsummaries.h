@@ -14,23 +14,23 @@ namespace riotgames {
 						setName("com.riotgames.platform.statistics.PlayerStatSummaries");
 
 						set("playerStatSummarySet", new amf::Array());
-						set("userId", new amf::Null());
+						set("userId", (amf::Null*)nullptr);
 					}
 
-					amf::Array_t<PlayerStatSummary*>* getPlayerStatSummarySet(){
-						return (amf::Array_t<PlayerStatSummary*>*)get("playerStatSummarySet")->toArray();
+					amf::TypedArray<PlayerStatSummary*>* getPlayerStatSummarySet() const {
+						return (amf::TypedArray<PlayerStatSummary*>*)(amf::Array*)get("playerStatSummarySet");
 					}
 
-					double getUserId(){
-						return get("userId")->toDouble();
+					double getUserId() const {
+						return get("userId");
 					}
 
 					void setPlayerStatSummarySet(amf::Array* value){
-						set("playerStatSummarySet", (Variant*)value);
+						get("playerStatSummarySet") = value;
 					}
 
 					void setUserId(double value){
-						set("userId", amf::object_creator_t(value).mValue);
+						get("userId") = value;
 					}
 				};
 			};

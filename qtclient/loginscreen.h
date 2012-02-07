@@ -14,10 +14,6 @@
 #include "ui_loginscreen.h"
 #include "riotgames/platform/gameclient/domain/serversessionobject.h"
 
-namespace amf {
-	class Variant;
-};
-
 using riotgames::platform::gameclient::domain::ServerSessionObject;
 
 class LoginScreen : public QWidget
@@ -39,13 +35,13 @@ public slots:
 	void onClientConnected();
 
 private:
-	void onLoginResult(amf::Variant* result);
+	void onLoginResult(const amf::Variant& result);
 	void updateLoginButton();
 	void loginError(const QString& error);
 
 signals:
-	void loginComplete(ServerSessionObject* session);
-	void receiveLoginResult(amf::Variant* result);
+	void loginComplete(const amf::Reference<ServerSessionObject>& session);
+	void receiveLoginResult(const amf::Variant& result);
 
 private:
 	QString mAuthToken;

@@ -1,62 +1,234 @@
 #pragma once
 
-#include "amf.h"
-
 #include <map>
 #include <vector>
 
+#include "types.h"
+
 namespace amf {
-	class Variant {
+	class Null;
+	class Date;
+	class Array;
+	class Object;
+	class Number;
+	class String;
+	class Integer;
+	class Boolean;
+	class ByteArray;
+
+	typedef enum {
+		AMF_NULL,
+		AMF_NUMBER,
+		AMF_INTEGER,
+		AMF_BOOLEAN,
+		AMF_STRING,
+		AMF_DATE,
+		AMF_ARRAY,
+		AMF_BYTE_ARRAY,
+		AMF_OBJECT,
+		AMF_UNKNOWN_TYPE,
+	} AmfTypes;
+
+	class ReferenceCounter {
 	public:
-		Variant(int type) : mType(type) {}
-		virtual ~Variant() {}
+		ReferenceCounter()
+			: mReferences(0)
+		{
+		}
 
-		int type() const { return mType; }
+		int addReference(){
+			return ++mReferences;
+		}
 
-		int32 toInt() const;
-		bool toBool() const;
-		Date* toDate() const;
-		uint32 toUInt() const;
-		Array* toArray() const;
-		double toDouble() const;
-		Object* toObject() const;
-		std::string toString() const;
-		ByteArray* toByteArray() const;
+		int removeReference(){
+			return --mReferences;
+		}
 
-		static Variant* fromValue(const std::string& value);
-		static Variant* fromValue(const char* value);
-		static Variant* fromValue(const uint32& value);
-		static Variant* fromValue(const int32& value);
-		static Variant* fromValue(const bool& value);
-		static Variant* fromValue(const double& value);
+	private:
+		volatile int mReferences;
+	};
 
-		virtual Variant* copy() const = 0;
+	template<class T>
+	class Reference {
+	public:
+		Reference()
+			: mObject(nullptr)
+		{
+		}
+
+		Reference(T* object)
+			: mObject(object)
+		{
+			if(mObject)
+				mObject->addReference();
+		}
+
+		Reference(const Reference& other)
+			: mObject(other.mObject)
+		{
+			if(mObject)
+				mObject->addReference();
+		}
+
+		template<class X>
+		Reference(const Reference<X>& other){
+			mObject = (T*)other.__InternalObject();
+
+			if(mObject)
+				mObject->addReference();
+		}
+
+		virtual ~Reference(){
+			if(mObject){
+				if(mObject->removeReference() <= 0){
+					delete mObject;
+				}
+			}
+		}
+
+		operator T*() const {
+			return mObject;
+		}
+
+		T* operator ->() const {
+			return mObject;
+		}
+
+		Reference& operator =(T* object){
+			if(mObject){
+				if(mObject->removeReference() <= 0){
+					delete mObject;
+				}
+			}
+			
+			mObject = object;
+
+			if(mObject)
+				mObject->addReference();
+
+			return *this;
+		}
+
+		Reference& operator =(const Reference& other){
+			(*this) = other.mObject;
+			return *this;
+		}
+
+		T* __InternalObject() const {
+			return mObject;
+		}
+
+	protected:
+		T* mObject;
+	};
+
+	class BaseAmf : public ReferenceCounter {
+	public:
+		BaseAmf(int type) : mType(type) {}
+		virtual ~BaseAmf(){}
+
+		int type() const {
+			return mType;
+		}
 
 	private:
 		int mType;
 	};
+
+	class Variant : public Reference<BaseAmf> {
+	public:
+		Variant();
+		Variant(BaseAmf* obj);
+		Variant(const Variant& other);
+
+		Variant(const char* value);
+		Variant(const bool& value);
+		Variant(const int32& value);
+		Variant(const uint32& value);
+		Variant(const double& value);
+		Variant(const std::string& value);
+
+		virtual ~Variant();
+
+		int type() const;
+		bool operator !() const;
+		/*
+		BaseAmf* operator ->(){
+			return mObject;
+		}
+		*/
+
+		void fromBool(const bool& value);
+		void fromInt(const int32& value);
+		void fromUInt(const uint32& value);
+		void fromDouble(const double& value);
+		void fromString(const std::string& value);
+		
+		Variant& operator =(BaseAmf* v);
+		Variant& operator =(const Variant& v);
+
+		Variant& operator =(const bool& v);
+		Variant& operator =(const int32& v);
+		Variant& operator =(const uint32& v);
+		Variant& operator =(const double& v);
+		Variant& operator =(const std::string& v);
+		
+		int32 toInt() const;
+		bool toBool() const;
+		uint32 toUInt() const;
+		double toDouble() const;
+		std::string toString() const;
+
+		Reference<Date> toDate() const;
+		Reference<Array> toArray() const;
+		Reference<Object> toObject() const;
+		Reference<ByteArray> toByteArray() const;
+
+		operator bool() const;
+		operator int32() const;
+		operator uint32() const;
+		operator double() const;
+		operator std::string() const;
+		
+		operator Null*() const;
+		operator Date*() const;
+		operator Array*() const;
+		operator Object*() const;
+		operator Number*() const;
+		operator String*() const;
+		operator Integer*() const;
+		operator Boolean*() const;
+		operator ByteArray*() const;
+	};
 	
-	class Null : public Variant {
+	struct var_t {
+		var_t(const std::string& name, const Variant& value) : mName(name), mValue(value) {}
+
+		std::string mName;
+		Variant mValue;
+	};
+
+	var_t var(const std::string& name, const Variant& obj);
+
+	Variant& operator<<(Variant& lhs, const var_t& var);
+
+	class Null : public BaseAmf {
 	public:
 		static const int Type = AMF_NULL;
 
-		Null() : Variant(Type) {}
-		
-		Variant* copy() const {
-			return new Null();
-		}
+		Null() : BaseAmf(Type) {}
 
 	private:
 	};
 
-	class Number : public Variant {
+	class Number : public BaseAmf {
 	public:
 		static const int Type = AMF_NUMBER;
 
-		Number() : Variant(Type), mValue(0.0) {}
-		Number(double value) : Variant(Type), mValue(value) {}
+		Number() : BaseAmf(Type), mValue(0.0) {}
+		Number(double value) : BaseAmf(Type), mValue(value) {}
 
-		double& value(){
+		double value() const {
 			return mValue;
 		}
 
@@ -72,23 +244,19 @@ namespace amf {
 		operator double() const {
 			return mValue;
 		}
-		
-		Variant* copy() const {
-			return new Number(mValue);
-		}
 
 	private:
 		double mValue;
 	};
 
-	class Integer : public Variant {
+	class Integer : public BaseAmf {
 	public:
 		static const int Type = AMF_INTEGER;
 
-		Integer() : Variant(Type), mValue(0) {}
-		Integer(int value) : Variant(Type), mValue(value) {}
+		Integer() : BaseAmf(Type), mValue(0) {}
+		Integer(int value) : BaseAmf(Type), mValue(value) {}
 
-		int& value(){
+		int value() const {
 			return mValue;
 		}
 
@@ -104,23 +272,19 @@ namespace amf {
 		operator int() const {
 			return mValue;
 		}
-		
-		Variant* copy() const {
-			return new Integer(mValue);
-		}
 
 	private:
 		int mValue;
 	};
 
-	class Boolean : public Variant {
+	class Boolean : public BaseAmf {
 	public:
 		static const int Type = AMF_BOOLEAN;
 
-		Boolean() : Variant(Type), mValue(false) {}
-		Boolean(bool value) : Variant(Type), mValue(value) {}
+		Boolean() : BaseAmf(Type), mValue(false) {}
+		Boolean(bool value) : BaseAmf(Type), mValue(value) {}
 
-		bool& value(){
+		bool value() const {
 			return mValue;
 		}
 
@@ -136,23 +300,19 @@ namespace amf {
 		operator bool() const {
 			return mValue;
 		}
-		
-		Variant* copy() const {
-			return new Boolean(mValue);
-		}
 
 	private:
 		bool mValue;
 	};
 
-	class String : public Variant {
+	class String : public BaseAmf {
 	public:
 		static const int Type = AMF_STRING;
 
-		String() : Variant(Type) {}
-		String(const std::string& value) : mValue(value), Variant(Type) {}
+		String() : BaseAmf(Type) {}
+		String(const std::string& value) : BaseAmf(Type), mValue(value) {}
 
-		std::string& value(){
+		const std::string& value() const {
 			return mValue;
 		}
 
@@ -176,32 +336,28 @@ namespace amf {
 		operator std::string() const {
 			return mValue;
 		}
-		
-		Variant* copy() const {
-			return new String(mValue);
-		}
 
 	private:
 		std::string mValue;
 	};
 	
-	class Date : public Variant {
+	class Date : public BaseAmf {
 	public:
 		static const int Type = AMF_DATE;
 
-		Date() : Variant(Type), mValue(0.0), mTimezone(0) {}
-		Date(double value, uint16 timezone = 0) : Variant(Type), mValue(value), mTimezone(timezone) {}
+		Date() : BaseAmf(Type), mValue(0.0), mTimezone(0) {}
+		Date(double value, uint16 timezone = 0) : BaseAmf(Type), mValue(value), mTimezone(timezone) {}
 
-		double& value(){
+		double value() const {
 			return mValue;
+		}
+
+		uint16 timezone() const {
+			return mTimezone;
 		}
 
 		void setValue(double value){
 			mValue = value;
-		}
-
-		uint16& timezone(){
-			return mTimezone;
 		}
 
 		void setTimezone(uint16 value){
@@ -216,21 +372,17 @@ namespace amf {
 		operator double() const {
 			return mValue;
 		}
-		
-		Variant* copy() const {
-			return new Date(mValue, mTimezone);
-		}
 
 	private:
 		double mValue;
 		uint16 mTimezone;
 	};
 
-	class ByteArray : public Variant {
+	class ByteArray : public BaseAmf {
 	public:
 		static const int Type = AMF_BYTE_ARRAY;
 
-		ByteArray() : Variant(Type), mSize(0), mData(0) {}
+		ByteArray() : BaseAmf(Type), mSize(0), mData(0) {}
 
 		~ByteArray(){
 			if(mData)
@@ -245,6 +397,10 @@ namespace amf {
 			return mData;
 		}
 
+		const uint8* value() const {
+			return mData;
+		}
+
 		void setSize(uint32 size){
 			mSize = size;
 
@@ -253,81 +409,34 @@ namespace amf {
 
 			mData = new uint8[size];
 		}
-		
-		Variant* copy() const {
-			ByteArray* arr = new ByteArray();
-			arr->mSize = mSize;
-			arr->mData = new uint8[mSize];
-			memcpy(arr->mData, mData, mSize);
-			return arr;
-		}
 
 	private:
 		uint32 mSize;
 		uint8* mData;
 	};
-
-	struct var_t {
-		var_t(const std::string& name, Variant* value) : mName(name), mValue(value) {}
-
-		std::string mName;
-		Variant* mValue;
-	};
-
-	struct object_creator_t {
-		object_creator_t(Variant* value) : mValue(value) {}
-		object_creator_t(const std::string& value) : mValue(Variant::fromValue(value)) {}
-		object_creator_t(const char* value) : mValue(Variant::fromValue(value)) {}
-		object_creator_t(const uint32& value) : mValue(Variant::fromValue(value)) {}
-		object_creator_t(const int32& value) : mValue(Variant::fromValue(value)) {}
-		object_creator_t(const bool& value) : mValue(Variant::fromValue(value)) {}
-		object_creator_t(const double& value) : mValue(Variant::fromValue(value)) {}
-
-		Variant* mValue;
-	};
-
-	var_t var(const std::string& name, object_creator_t obj);
 	
-	template<typename T>
-	class Array_t : public Variant {
+	class Array : public BaseAmf {
 	public:
-		typename std::map<std::string, T>::const_iterator iterator;
+		typedef std::map<std::string, Variant>::const_iterator iterator;
+
 		static const int Type = AMF_ARRAY;
 
-		Array_t() : Variant(Type) {}
-		
-		~Array_t(){
-			for(auto itr = mDense.begin(); itr != mDense.end(); ++itr){
-				if(*itr)
-					delete *itr;
-			}
+		Array() : BaseAmf(Type) {}
+		~Array(){}
 
-			for(auto itr = mAssociative.begin(); itr != mAssociative.end(); ++itr){
-				if(itr->second)
-					delete itr->second;
-			}
-		}
-
-		T at(size_t index) const {
-			if(index >= mDense.size())
-				return nullptr;
-
+		const Variant& at(size_t index) const {
 			return mDense[index];
 		}
 
-		T at(const std::string& key) const {
-			auto itr = mAssociative.find(key);
-			if(itr == mAssociative.end())
-				return nullptr;
-
-			return itr->second;
+		const Variant& at(const std::string& key) const {
+			return mAssociative.find(key)->second;
 		}
 
-		void insert(const std::string& key, T value){
+		void insert(const std::string& key, const Variant& value){
 			mAssociative[key] = value;
 		}
 
-		void push_back(T value){
+		void push_back(const Variant& value){
 			mDense.push_back(value);
 		}
 
@@ -347,80 +456,85 @@ namespace amf {
 			return mDense.size() > 0;
 		}
 
-		T& operator[](size_t index){
-			while(mDense.size() <= index)
-				mDense.push_back(nullptr);
-
+		Variant& operator[](size_t index){
 			return mDense[index];
 		}
 
-		T& operator[](const std::string& key){
+		Variant& operator[](const std::string& key){
 			return mAssociative[key];
 		}
 
-		typename std::map<std::string, T>::const_iterator begin(){
+		iterator begin() const {
 			return mAssociative.begin();
 		}
 
-		typename std::map<std::string, T>::const_iterator end(){
+		iterator end() const {
 			return mAssociative.end();
 		}
 		
-		Array_t<T>& operator<<(Variant* var){
-			push_back((T)var);
+		Array& operator<<(const Variant& var){
+			push_back(var);
 			return *this;
 		}
 		
-		Array_t<T>& operator<<(const var_t& var){
+		Array& operator<<(const var_t& var){
 			insert(var.mName, var.mValue);
 			return *this;
 		}
 		
-		Variant* copy() const {
-			Array* arr = new Array();
-			for(auto itr = mDense.begin(); itr != mDense.end(); ++itr)
-				arr->push_back((*itr)->copy());
+	private:
+		std::vector<Variant> mDense;
+		std::map<std::string, Variant> mAssociative;
+	};
 
-			for(auto itr = mAssociative.begin(); itr != mAssociative.end(); ++itr)
-				arr->insert(itr->first, itr->second->copy());
-			
-			return arr;
+	template<class T>
+	class TypedArray : private Array {
+	public:
+		T* at(size_t index) const {
+			return (T*)(Array::at(index).toObject());
+		}
+
+		T* at(const std::string& key) const {
+			return (T*)(Array::at(key).toObject());
+		}
+
+		T* operator[](size_t index){
+			return (T*)(Array::operator [](index).toObject());
+		}
+
+		Variant& operator[](const std::string& key){
+			return (T*)(Array::operator [](key).toObject());
+		}
+
+		size_t size() const {
+			return Array::size();
+		}
+
+		size_t keys() const {
+			return Array::keys();
 		}
 
 	private:
-		std::vector<T> mDense;
-		std::map<std::string, T> mAssociative;
 	};
-
-	class Array : public Array_t<Variant*> {};
 	
-	class Object : public Variant {
+	class Object : public BaseAmf {
 	public:
+		typedef std::map<std::string, Variant>::const_iterator iterator;
 		static const int Type = AMF_OBJECT;
 
-		Object() : Variant(Type) {}
-		Object(const std::string& name) : Variant(Type), mName(name) {}
-		
-		virtual ~Object(){
-			for(auto itr = mProperties.begin(); itr != mProperties.end(); ++itr){
-				if(itr->second)
-					delete itr->second;
-			}
+		Object() : BaseAmf(Type) {}
+		Object(const std::string& name) : BaseAmf(Type), mName(name) {}
+		virtual ~Object(){}
+
+		Variant& get(const std::string& key){
+			return mProperties.find(key)->second;
 		}
 
-		Variant* get(const std::string& key) const {
-			auto itr = mProperties.find(key);
-			if(itr == mProperties.end())
-				return nullptr;
-
-			return itr->second;
+		const Variant& get(const std::string& key) const {
+			return mProperties.find(key)->second;
 		}
 
-		void set(const std::string& key, Variant* value){
-			auto itr = mProperties.find(key);
-			if(itr != mProperties.end())
-				delete itr->second;
-
+		void set(const std::string& key, const Variant& value){
 			mProperties[key] = value;
 		}
 
@@ -432,19 +546,19 @@ namespace amf {
 			mName = name;
 		}
 
-		void insert(const std::string& key, Variant* value){
+		void insert(const std::string& key, const Variant& value){
 			set(key, value);
 		}
 
-		Variant*& operator[](const std::string& key){
+		const Variant& operator[](const std::string& key){
 			return mProperties[key];
 		}
 
-		std::map<std::string, Variant*>::const_iterator begin(){
+		iterator begin() const {
 			return mProperties.begin();
 		}
 
-		std::map<std::string, Variant*>::const_iterator end(){
+		iterator end() const {
 			return mProperties.end();
 		}
 		
@@ -454,18 +568,9 @@ namespace amf {
 		}
 		
 		void defineObject();
-		
-		Variant* copy() const {
-			Object* obj = new Object(mName);
-
-			for(auto itr = mProperties.begin(); itr != mProperties.end(); ++itr)
-				obj->insert(itr->first, itr->second->copy());
-
-			return obj;
-		}
 
 	private:
 		std::string mName;
-		std::map<std::string, Variant*> mProperties;
+		std::map<std::string, Variant> mProperties;
 	};
 };

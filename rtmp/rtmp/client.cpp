@@ -68,7 +68,7 @@ namespace rtmp {
 			mSocket->disconnect();
 
 		if(!mEventCallback._Empty())
-			mEventCallback(EVT_DISCONNECT, nullptr);
+			mEventCallback(EVT_DISCONNECT, amf::Variant());
 	}
 
 	void Client::send(ByteStream* stream){
@@ -79,7 +79,7 @@ namespace rtmp {
 		mSendLock->lock();
 
 		fprintf(lf, " %d bytes", stream->size());
-
+		
 		for(uint32 i = 0; i < stream->size(); ++i){
 			if(i % 16 == 0)
 				fprintf(lf, "\n");
@@ -179,12 +179,10 @@ namespace rtmp {
 						return;
 					}
 
-					if(amf::Variant* vcid = command.object()->get("clientId")){
-						auto itr = mConsumers.find(vcid->toString());
-						if(itr != mConsumers.end()){
-							itr->second->onMessage(command.object());
-							return;
-						}
+					auto itr = mConsumers.find(command.object().toObject()->get("clientId"));
+					if(itr != mConsumers.end()){
+						itr->second->onMessage(command.object());
+						return;
 					}
 
 					std::cout << "Unhandled Amf3Command [" << command.id() << "]" << std::endl;
@@ -235,10 +233,10 @@ namespace rtmp {
 		};
 	}
 
-	void Client::onConnect(amf::Variant* result){
-		amf::Object* object = result->toObject();
+	void Client::onConnect(const amf::Variant& result){
+		amf::Object* object = result.toObject();
 
-		if(object->get("code")->toString().compare("NetConnection.Connect.Success") == 0){
+		if(object->get("code").toString().compare("NetConnection.Connect.Success") == 0){
 			if(!mEventCallback._Empty())
 				mEventCallback(EVT_CONNECT, object);
 		}else{
@@ -266,21 +264,22 @@ namespace rtmp {
 			case Client::HS_COMPLETE:
 				{
 					using namespace amf;
-
-					Object object;
+					
+					Object* an_object = new Object();
+					Variant object = an_object;
 					object
 						<< var("app", "")
 						<< var("audioCodecs", 3191)
 						<< var("capabilities", 239)
 						<< var("flashVer", "WIN 10,1,85,3")
 						<< var("fpad", false)
-						<< var("objectEncoding", 3)
+						<< var("objectEncoding", 3)	
 						<< var("swfUrl", "app:/mod_ser.dat")
 						<< var("tcUrl", "rtmps://prod.na1.lol.riotgames.com:2099")
 						<< var("videoCodecs", 252)
 						<< var("videoFunction", 1);
 					
-					send(&messages::Amf0Command("connect", &object), std::bind(&Client::onConnect, this, std::placeholders::_1));
+					send(&messages::Amf0Command("connect", object), std::bind(&Client::onConnect, this, std::placeholders::_1));
 				}
 			default:
 				return 1;

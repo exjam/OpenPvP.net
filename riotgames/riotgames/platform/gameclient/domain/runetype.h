@@ -11,15 +11,15 @@ namespace riotgames {
 					RuneType(){
 						setName("com.riotgames.platform.catalog.runes.RuneType");
 
-						set("runeTypeId", new amf::Null());
+						set("runeTypeId", (amf::Null*)nullptr);
 					}
 
-					int getRuneTypeId(){
-						return get("runeTypeId")->toInt();
+					int getRuneTypeId() const {
+						return get("runeTypeId");
 					}
 
 					void setRuneTypeId(int value){
-						set("runeTypeId", amf::object_creator_t(value).mValue);
+						get("runeTypeId") = value;
 					}
 				};
 			};

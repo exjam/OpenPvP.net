@@ -13,132 +13,132 @@ namespace riotgames {
 					Champion(){
 						setName("com.riotgames.platform.catalog.champion.ChampionDTO");
 
-						set("ownedByYourTeam", amf::object_creator_t(true).mValue);
-						set("active", new amf::Null());
-						set("freeToPlayReward", new amf::Null());
-						set("displayName", new amf::Null());
-						set("championData", new amf::Null());
-						set("botEnabled", new amf::Null());
-						set("freeToPlay", new amf::Null());
-						set("banned", amf::object_creator_t(false).mValue);
-						set("defaultSkin", new amf::Null());
+						set("ownedByYourTeam", true);
+						set("active", (amf::Null*)nullptr);
+						set("freeToPlayReward", (amf::Null*)nullptr);
+						set("displayName", (amf::Null*)nullptr);
+						set("championData", (amf::Null*)nullptr);
+						set("botEnabled", (amf::Null*)nullptr);
+						set("freeToPlay", (amf::Null*)nullptr);
+						set("banned", false);
+						set("defaultSkin", (amf::Null*)nullptr);
 						set("championSkins", new amf::Array());
-						set("championId", new amf::Null());
-						set("ownedByEnemyTeam", amf::object_creator_t(true).mValue);
-						set("description", new amf::Null());
-						set("owned", new amf::Null());
+						set("championId", (amf::Null*)nullptr);
+						set("ownedByEnemyTeam", true);
+						set("description", (amf::Null*)nullptr);
+						set("owned", (amf::Null*)nullptr);
 					}
 
-					bool getOwnedByYourTeam(){
-						return get("ownedByYourTeam")->toBool();
+					bool getOwnedByYourTeam() const {
+						return get("ownedByYourTeam");
 					}
 
-					bool getActive(){
-						return get("active")->toBool();
+					bool getActive() const {
+						return get("active");
 					}
 
-					bool getFreeToPlayReward(){
-						return get("freeToPlayReward")->toBool();
+					bool getFreeToPlayReward() const {
+						return get("freeToPlayReward");
 					}
 
-					std::string getDisplayName(){
-						return get("displayName")->toString();
+					std::string getDisplayName() const {
+						return get("displayName");
 					}
 
-					Object* getChampionData(){
-						return (Object*)get("championData")->toObject();
+					const amf::Reference<Object> getChampionData() const {
+						return get("championData").toObject();
 					}
 
-					bool getBotEnabled(){
-						return get("botEnabled")->toBool();
+					bool getBotEnabled() const {
+						return get("botEnabled");
 					}
 
-					bool getFreeToPlay(){
-						return get("freeToPlay")->toBool();
+					bool getFreeToPlay() const {
+						return get("freeToPlay");
 					}
 
-					bool getBanned(){
-						return get("banned")->toBool();
+					bool getBanned() const {
+						return get("banned");
 					}
 
-					ChampionSkin* getDefaultSkin(){
-						return (ChampionSkin*)get("defaultSkin")->toObject();
+					const amf::Reference<ChampionSkin> getDefaultSkin() const {
+						return get("defaultSkin").toObject();
 					}
 
-					amf::Array_t<ChampionSkin*>* getChampionSkins(){
-						return (amf::Array_t<ChampionSkin*>*)get("championSkins")->toArray();
+					amf::TypedArray<ChampionSkin*>* getChampionSkins() const {
+						return (amf::TypedArray<ChampionSkin*>*)(amf::Array*)get("championSkins");
 					}
 
-					int getChampionId(){
-						return get("championId")->toInt();
+					int getChampionId() const {
+						return get("championId");
 					}
 
-					bool getOwnedByEnemyTeam(){
-						return get("ownedByEnemyTeam")->toBool();
+					bool getOwnedByEnemyTeam() const {
+						return get("ownedByEnemyTeam");
 					}
 
-					std::string getDescription(){
-						return get("description")->toString();
+					std::string getDescription() const {
+						return get("description");
 					}
 
-					bool getOwned(){
-						return get("owned")->toBool();
+					bool getOwned() const {
+						return get("owned");
 					}
 
 					void setOwnedByYourTeam(bool value){
-						set("ownedByYourTeam", amf::object_creator_t(value).mValue);
+						get("ownedByYourTeam") = value;
 					}
 
 					void setActive(bool value){
-						set("active", amf::object_creator_t(value).mValue);
+						get("active") = value;
 					}
 
 					void setFreeToPlayReward(bool value){
-						set("freeToPlayReward", amf::object_creator_t(value).mValue);
+						get("freeToPlayReward") = value;
 					}
 
 					void setDisplayName(const std::string& value){
-						set("displayName", amf::object_creator_t(value).mValue);
+						get("displayName") = value;
 					}
 
 					void setChampionData(Object* value){
-						set("championData", (Variant*)value);
+						get("championData") = value;
 					}
 
 					void setBotEnabled(bool value){
-						set("botEnabled", amf::object_creator_t(value).mValue);
+						get("botEnabled") = value;
 					}
 
 					void setFreeToPlay(bool value){
-						set("freeToPlay", amf::object_creator_t(value).mValue);
+						get("freeToPlay") = value;
 					}
 
 					void setBanned(bool value){
-						set("banned", amf::object_creator_t(value).mValue);
+						get("banned") = value;
 					}
 
 					void setDefaultSkin(ChampionSkin* value){
-						set("defaultSkin", (Variant*)value);
+						get("defaultSkin") = value;
 					}
 
 					void setChampionSkins(amf::Array* value){
-						set("championSkins", (Variant*)value);
+						get("championSkins") = value;
 					}
 
 					void setChampionId(int value){
-						set("championId", amf::object_creator_t(value).mValue);
+						get("championId") = value;
 					}
 
 					void setOwnedByEnemyTeam(bool value){
-						set("ownedByEnemyTeam", amf::object_creator_t(value).mValue);
+						get("ownedByEnemyTeam") = value;
 					}
 
 					void setDescription(const std::string& value){
-						set("description", amf::object_creator_t(value).mValue);
+						get("description") = value;
 					}
 
 					void setOwned(bool value){
-						set("owned", amf::object_creator_t(value).mValue);
+						get("owned") = value;
 					}
 				};
 			};

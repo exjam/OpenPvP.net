@@ -13,33 +13,33 @@ namespace riotgames {
 					SummonerAssociatedTalent(){
 						setName("com.riotgames.platform.summoner.SummonerAssociatedTalent");
 
-						set("talent", new amf::Null());
-						set("comp_id", new amf::Null());
-						set("rank", new amf::Null());
+						set("talent", (amf::Null*)nullptr);
+						set("comp_id", (amf::Null*)nullptr);
+						set("rank", (amf::Null*)nullptr);
 					}
 
-					Talent* getTalent(){
-						return (Talent*)get("talent")->toObject();
+					const amf::Reference<Talent> getTalent() const {
+						return get("talent").toObject();
 					}
 
-					SummonerAssociatedTalentPK* getComp_id(){
-						return (SummonerAssociatedTalentPK*)get("comp_id")->toObject();
+					const amf::Reference<SummonerAssociatedTalentPK> getComp_id(){
+						return get("comp_id").toObject();
 					}
 
-					int getRank(){
-						return get("rank")->toInt();
+					int getRank() const {
+						return get("rank");
 					}
 
 					void setTalent(Talent* value){
-						set("talent", (Variant*)value);
+						get("talent") = value;
 					}
 
 					void setComp_id(SummonerAssociatedTalentPK* value){
-						set("comp_id", (Variant*)value);
+						set("comp_id", value);
 					}
 
 					void setRank(int value){
-						set("rank", amf::object_creator_t(value).mValue);
+						get("rank") = value;
 					}
 				};
 			};

@@ -25,186 +25,186 @@ namespace riotgames {
 					LoginDataPacket(){
 						setName("com.riotgames.platform.clientfacade.domain.LoginDataPacket");
 
-						set("rpBalance", new amf::Null());
-						set("minutesUntilMidnight", new amf::Null());
-						set("leaverBusterPenaltyTime", new amf::Null());
-						set("minorShutdownEnforced", new amf::Null());
-						set("clientHeartBeatEnabled", new amf::Null());
-						set("playerStatSummaries", new amf::Null());
-						set("maxPracticeGameSize", new amf::Null());
-						set("reconnectInfo", new amf::Null());
-						set("minor", new amf::Null());
-						set("platformId", new amf::Null());
+						set("rpBalance", (amf::Null*)nullptr);
+						set("minutesUntilMidnight", (amf::Null*)nullptr);
+						set("leaverBusterPenaltyTime", (amf::Null*)nullptr);
+						set("minorShutdownEnforced", (amf::Null*)nullptr);
+						set("clientHeartBeatEnabled", (amf::Null*)nullptr);
+						set("playerStatSummaries", (amf::Null*)nullptr);
+						set("maxPracticeGameSize", (amf::Null*)nullptr);
+						set("reconnectInfo", (amf::Null*)nullptr);
+						set("minor", (amf::Null*)nullptr);
+						set("platformId", (amf::Null*)nullptr);
 						set("gameTypeConfigs", new amf::Array());
-						set("ipBalance", new amf::Null());
-						set("clientSystemStates", new amf::Null());
-						set("summonerCatalog", new amf::Null());
+						set("ipBalance", (amf::Null*)nullptr);
+						set("clientSystemStates", (amf::Null*)nullptr);
+						set("summonerCatalog", (amf::Null*)nullptr);
 						set("languages", new amf::Array());
-						set("allSummonerData", new amf::Null());
-						set("leaverPenaltyLevel", new amf::Null());
-						set("broadcastNotification", new amf::Null());
-						set("matchMakingEnabled", new amf::Null());
-						set("inGhostGame", new amf::Null());
+						set("allSummonerData", (amf::Null*)nullptr);
+						set("leaverPenaltyLevel", (amf::Null*)nullptr);
+						set("broadcastNotification", (amf::Null*)nullptr);
+						set("matchMakingEnabled", (amf::Null*)nullptr);
+						set("inGhostGame", (amf::Null*)nullptr);
 					}
 
-					double getRpBalance(){
-						return get("rpBalance")->toDouble();
+					double getRpBalance() const {
+						return get("rpBalance");
 					}
 
-					double getMinutesUntilMidnight(){
-						return get("minutesUntilMidnight")->toDouble();
+					double getMinutesUntilMidnight() const {
+						return get("minutesUntilMidnight");
 					}
 
-					int getLeaverBusterPenaltyTime(){
-						return get("leaverBusterPenaltyTime")->toInt();
+					int getLeaverBusterPenaltyTime() const {
+						return get("leaverBusterPenaltyTime");
 					}
 
-					bool getMinorShutdownEnforced(){
-						return get("minorShutdownEnforced")->toBool();
+					bool getMinorShutdownEnforced() const {
+						return get("minorShutdownEnforced");
 					}
 
-					bool getClientHeartBeatEnabled(){
-						return get("clientHeartBeatEnabled")->toBool();
+					bool getClientHeartBeatEnabled() const {
+						return get("clientHeartBeatEnabled");
 					}
 
-					PlayerStatSummaries* getPlayerStatSummaries(){
-						return (PlayerStatSummaries*)get("playerStatSummaries")->toObject();
+					const amf::Reference<PlayerStatSummaries> getPlayerStatSummaries() const {
+						return get("playerStatSummaries").toObject();
 					}
 
-					int getMaxPracticeGameSize(){
-						return get("maxPracticeGameSize")->toInt();
+					int getMaxPracticeGameSize() const {
+						return get("maxPracticeGameSize");
 					}
 
-					GameReconnectionInfo* getReconnectInfo(){
-						return (GameReconnectionInfo*)get("reconnectInfo")->toObject();
+					const amf::Reference<GameReconnectionInfo> getReconnectInfo() const {
+						return get("reconnectInfo").toObject();
 					}
 
-					bool getMinor(){
-						return get("minor")->toBool();
+					bool getMinor() const {
+						return get("minor");
 					}
 
-					std::string getPlatformId(){
-						return get("platformId")->toString();
+					std::string getPlatformId() const {
+						return get("platformId");
 					}
 
-					amf::Array_t<GameTypeConfig*>* getGameTypeConfigs(){
-						return (amf::Array_t<GameTypeConfig*>*)get("gameTypeConfigs")->toArray();
+					amf::TypedArray<GameTypeConfig*>* getGameTypeConfigs() const {
+						return (amf::TypedArray<GameTypeConfig*>*)(amf::Array*)get("gameTypeConfigs");
 					}
 
-					double getIpBalance(){
-						return get("ipBalance")->toDouble();
+					double getIpBalance() const {
+						return get("ipBalance");
 					}
 
-					ClientSystemStatesNotification* getClientSystemStates(){
-						return (ClientSystemStatesNotification*)get("clientSystemStates")->toObject();
+					const amf::Reference<ClientSystemStatesNotification> getClientSystemStates() const {
+						return get("clientSystemStates").toObject();
 					}
 
-					SummonerCatalog* getSummonerCatalog(){
-						return (SummonerCatalog*)get("summonerCatalog")->toObject();
+					const amf::Reference<SummonerCatalog> getSummonerCatalog() const {
+						return get("summonerCatalog").toObject();
 					}
 
-					amf::Array* getLanguages(){
-						return get("languages")->toArray();
+					const amf::Reference<amf::Array> getLanguages() const {
+						return get("languages");
 					}
 
-					AllSummonerData* getAllSummonerData(){
-						return (AllSummonerData*)get("allSummonerData")->toObject();
+					const amf::Reference<AllSummonerData> getAllSummonerData() const {
+						return get("allSummonerData").toObject();
 					}
 
-					int getLeaverPenaltyLevel(){
-						return get("leaverPenaltyLevel")->toInt();
+					int getLeaverPenaltyLevel() const {
+						return get("leaverPenaltyLevel");
 					}
 
-					BroadcastNotification* getBroadcastNotification(){
-						return (BroadcastNotification*)get("broadcastNotification")->toObject();
+					const amf::Reference<BroadcastNotification> getBroadcastNotification() const {
+						return get("broadcastNotification").toObject();
 					}
 
-					bool getMatchMakingEnabled(){
-						return get("matchMakingEnabled")->toBool();
+					bool getMatchMakingEnabled() const {
+						return get("matchMakingEnabled");
 					}
 
-					bool getInGhostGame(){
-						return get("inGhostGame")->toBool();
+					bool getInGhostGame() const {
+						return get("inGhostGame");
 					}
 
 					void setRpBalance(double value){
-						set("rpBalance", amf::object_creator_t(value).mValue);
+						get("rpBalance") = value;
 					}
 
 					void setMinutesUntilMidnight(double value){
-						set("minutesUntilMidnight", amf::object_creator_t(value).mValue);
+						get("minutesUntilMidnight") = value;
 					}
 
 					void setLeaverBusterPenaltyTime(int value){
-						set("leaverBusterPenaltyTime", amf::object_creator_t(value).mValue);
+						get("leaverBusterPenaltyTime") = value;
 					}
 
 					void setMinorShutdownEnforced(bool value){
-						set("minorShutdownEnforced", amf::object_creator_t(value).mValue);
+						get("minorShutdownEnforced") = value;
 					}
 
 					void setClientHeartBeatEnabled(bool value){
-						set("clientHeartBeatEnabled", amf::object_creator_t(value).mValue);
+						get("clientHeartBeatEnabled") = value;
 					}
 
 					void setPlayerStatSummaries(PlayerStatSummaries* value){
-						set("playerStatSummaries", (Variant*)value);
+						get("playerStatSummaries") = value;
 					}
 
 					void setMaxPracticeGameSize(int value){
-						set("maxPracticeGameSize", amf::object_creator_t(value).mValue);
+						get("maxPracticeGameSize") = value;
 					}
 
 					void setReconnectInfo(GameReconnectionInfo* value){
-						set("reconnectInfo", (Variant*)value);
+						get("reconnectInfo") = value;
 					}
 
 					void setMinor(bool value){
-						set("minor", amf::object_creator_t(value).mValue);
+						get("minor") = value;
 					}
 
 					void setPlatformId(const std::string& value){
-						set("platformId", amf::object_creator_t(value).mValue);
+						get("platformId") = value;
 					}
 
 					void setGameTypeConfigs(amf::Array* value){
-						set("gameTypeConfigs", (Variant*)value);
+						get("gameTypeConfigs") = value;
 					}
 
 					void setIpBalance(double value){
-						set("ipBalance", amf::object_creator_t(value).mValue);
+						get("ipBalance") = value;
 					}
 
 					void setClientSystemStates(ClientSystemStatesNotification* value){
-						set("clientSystemStates", (Variant*)value);
+						get("clientSystemStates") = value;
 					}
 
 					void setSummonerCatalog(SummonerCatalog* value){
-						set("summonerCatalog", (Variant*)value);
+						get("summonerCatalog") = value;
 					}
 
 					void setLanguages(amf::Array* value){
-						set("languages", (Variant*)value);
+						get("languages") = value;
 					}
 
 					void setAllSummonerData(AllSummonerData* value){
-						set("allSummonerData", (Variant*)value);
+						get("allSummonerData") = value;
 					}
 
 					void setLeaverPenaltyLevel(int value){
-						set("leaverPenaltyLevel", amf::object_creator_t(value).mValue);
+						get("leaverPenaltyLevel") = value;
 					}
 
 					void setBroadcastNotification(BroadcastNotification* value){
-						set("broadcastNotification", (Variant*)value);
+						get("broadcastNotification") = value;
 					}
 
 					void setMatchMakingEnabled(bool value){
-						set("matchMakingEnabled", amf::object_creator_t(value).mValue);
+						get("matchMakingEnabled") = value;
 					}
 
 					void setInGhostGame(bool value){
-						set("inGhostGame", amf::object_creator_t(value).mValue);
+						get("inGhostGame") = value;
 					}
 				};
 			};
